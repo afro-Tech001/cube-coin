@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap');
+
+.status-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #050b07;
+  font-family: 'DM Sans', sans-serif;
+  padding: 20px;
+}
+
+.status-card {
+  background: rgba(10, 28, 14, 0.9);
+  border: 1px solid rgba(127, 255, 110, 0.15);
+  border-radius: 28px;
+  padding: 2.5rem 2rem;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+  animation: cardIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.status-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+.status-card h2 {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0 0 10px;
+}
+
+.status-card p {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.92rem;
+  line-height: 1.65;
+  margin: 0 0 20px;
+}
+
+.status-card p strong {
+  color: #4ade80;
+}
+
+/* ── Spinner ── */
+.status-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid rgba(74, 222, 128, 0.15);
+  border-top-color: #4ade80;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Pending pulse bar ── */
+.status-pulse-bar {
+  height: 4px;
+  background: rgba(74, 222, 128, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.status-pulse-fill {
+  height: 100%;
+  width: 40%;
+  background: #4ade80;
+  border-radius: 2px;
+  animation: pulseSlide 2s ease-in-out infinite;
+}
+
+@keyframes pulseSlide {
+  0%   { transform: translateX(-100%); }
+  50%  { transform: translateX(200%); }
+  100% { transform: translateX(200%); }
+}
+
+.status-hint {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.04em;
+}
+
+/* ── Approved redirect bar ── */
+.status-redirect-bar {
+  height: 3px;
+  background: #22c55e;
+  border-radius: 2px;
+  animation: fillBar 1.8s ease forwards;
+  margin-top: 16px;
+}
+
+@keyframes fillBar {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+
+/* ── Rejected retry ── */
+.status-retry-btn {
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  color: #041107;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 28px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: 0.2s;
+  margin-top: 8px;
+}
+
+.status-retry-btn:hover { filter: brightness(1.1); }

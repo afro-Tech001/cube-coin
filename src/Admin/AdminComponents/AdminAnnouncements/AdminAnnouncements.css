@@ -1,0 +1,176 @@
+.admin-announcements {
+  padding: 30px;
+  min-height: 100vh;
+  background: #050b07;
+  color: white;
+}
+
+.announcement-header {
+  margin-bottom: 25px;
+}
+
+.announcement-header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.announcement-header p {
+  color: rgba(255,255,255,.5);
+}
+
+/* Form */
+
+.announcement-form {
+  background: rgba(10,28,14,.92);
+  border: 1px solid rgba(127,255,110,.1);
+  border-radius: 24px;
+  padding: 25px;
+  margin-bottom: 30px;
+}
+
+.form-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.form-header h2 {
+  font-size: 1.2rem;
+}
+
+.announcement-form input,
+.announcement-form textarea {
+  width: 100%;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(127,255,110,.1);
+  border-radius: 12px;
+  color: white;
+  padding: 14px;
+  margin-bottom: 15px;
+}
+
+.announcement-form textarea {
+  resize: vertical;
+}
+
+.upload-box {
+  border: 2px dashed rgba(127,255,110,.2);
+  border-radius: 14px;
+  padding: 25px;
+  text-align: center;
+  cursor: pointer;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+
+  color: rgba(255,255,255,.7);
+}
+
+.upload-box:hover {
+  border-color: #4ade80;
+}
+
+.selected-image {
+  margin-top: 12px;
+  color: #4ade80;
+  font-size: .9rem;
+}
+
+.publish-btn {
+  width: 100%;
+  margin-top: 20px;
+
+  background: linear-gradient(
+    135deg,
+    #4ade80,
+    #22c55e
+  );
+
+  color: #041107;
+
+  border: none;
+
+  padding: 15px;
+
+  border-radius: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* History */
+
+.announcement-history h2 {
+  margin-bottom: 18px;
+}
+
+.announcement-card {
+  background: rgba(10,28,14,.9);
+
+  border: 1px solid rgba(127,255,110,.08);
+
+  border-radius: 18px;
+
+  padding: 20px;
+
+  margin-bottom: 15px;
+}
+
+.announcement-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.announcement-top h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.announcement-top span {
+  color: rgba(255,255,255,.45);
+  font-size: .85rem;
+}
+
+.announcement-card p {
+  color: rgba(255,255,255,.75);
+  line-height: 1.6;
+}
+
+.image-badge {
+  margin-top: 12px;
+  color: #4ade80;
+  font-size: .9rem;
+}
+
+.delete-btn {
+  width: 36px;
+  height: 36px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: rgba(239,68,68,.15);
+  color: #ef4444;
+
+  cursor: pointer;
+}
+
+@media(max-width:768px){
+
+  .announcement-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+}

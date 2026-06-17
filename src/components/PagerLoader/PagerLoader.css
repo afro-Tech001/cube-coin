@@ -1,0 +1,443 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+/* ── CSS VARIABLES ────────────────────────────────────── */
+:root {
+  --ld-green:      #4ade80;
+  --ld-bright:     #7fff6e;
+  --ld-glow:       #22c55e;
+  --ld-dark:       #15803d;
+  --ld-surface:    rgba(10, 24, 13, 0.92);
+  --ld-border:     rgba(122, 255, 110, 0.13);
+  --ld-border-md:  rgba(122, 255, 110, 0.26);
+  --ld-text:       #e8ffe6;
+  --ld-muted:      rgba(200, 255, 195, 0.5);
+  --ld-muted2:     rgba(200, 255, 195, 0.28);
+  --ld-blue:       #60a5fa;
+  --ld-red:        #f87171;
+  --ld-amber:      #f59e0b;
+}
+
+/* ═══════════════════════════════════════════════════════
+   1. PAGE LOADER  (full-screen overlay)
+   Usage: <PageLoader message="Loading…" />
+════════════════════════════════════════════════════════ */
+.ld-page-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 11, 7, 0.93);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(6px);
+  animation: ldFadeIn 0.25s ease both;
+}
+@keyframes ldFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.ld-page-inner {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 28px 32px;
+  background: var(--ld-surface);
+  border: 1px solid var(--ld-border-md);
+  border-radius: 20px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+  position: relative;
+  overflow: hidden;
+}
+.ld-page-inner::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(74,222,128,0.4), transparent);
+}
+
+/* 3-D cube */
+.ld-cube-stage {
+  width: 56px;
+  height: 56px;
+  perspective: 220px;
+  flex-shrink: 0;
+  position: relative;
+}
+.ld-cube-glow-ring {
+  position: absolute;
+  inset: -16px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    rgba(74,222,128,0.2) 40%,
+    rgba(127,255,110,0.38) 50%,
+    rgba(74,222,128,0.2) 60%,
+    transparent 100%
+  );
+  animation: ldRingRot 2.8s linear infinite;
+  filter: blur(1.5px);
+  pointer-events: none;
+}
+@keyframes ldRingRot { to { transform: rotate(360deg); } }
+
+.ld-cube-3d {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  animation: ldCubeRotate 3.5s linear infinite;
+}
+@keyframes ldCubeRotate {
+  0%   { transform: rotateX(-18deg) rotateY(0deg); }
+  100% { transform: rotateX(-18deg) rotateY(360deg); }
+}
+.ld-face {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  top: 50%; left: 50%;
+  margin: -16px 0 0 -16px;
+  border: 1px solid rgba(74,222,128,0.4);
+  backface-visibility: visible;
+}
+.ld-face-front  { transform: translateZ(16px);              background: rgba(74,222,128,0.15); }
+.ld-face-back   { transform: rotateY(180deg) translateZ(16px); background: rgba(34,197,94,0.07); }
+.ld-face-left   { transform: rotateY(-90deg) translateZ(16px); background: rgba(74,222,128,0.09); }
+.ld-face-right  { transform: rotateY(90deg) translateZ(16px);  background: rgba(74,222,128,0.09); }
+.ld-face-top    { transform: rotateX(90deg) translateZ(16px);  background: rgba(127,255,110,0.2); }
+.ld-face-bottom { transform: rotateX(-90deg) translateZ(16px); background: rgba(22,101,52,0.22); }
+
+/* text + bar */
+.ld-page-info { display: flex; flex-direction: column; gap: 2px; }
+.ld-page-brand {
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ld-text);
+  letter-spacing: 0.08em;
+}
+.ld-page-brand span { color: var(--ld-bright); }
+.ld-page-msg {
+  font-size: 12px;
+  color: var(--ld-muted);
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+.ld-progress-bar {
+  width: 140px;
+  height: 2px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.ld-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--ld-glow), var(--ld-bright), var(--ld-glow));
+  background-size: 200% 100%;
+  border-radius: 2px;
+  animation: ldBarFill 2.4s ease-in-out infinite, ldShimmer 1.4s linear infinite;
+}
+@keyframes ldBarFill {
+  0%   { width: 0%;   opacity: 0.6; }
+  50%  { width: 75%;  opacity: 1; }
+  100% { width: 100%; opacity: 0.8; }
+}
+@keyframes ldShimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   2. SPINNER  (ring, dual, dots, pulse, bars)
+   Usage: <Spinner variant="ring" size="md" />
+════════════════════════════════════════════════════════ */
+
+/* -- ring -- */
+.ld-spinner-ring {
+  border-radius: 50%;
+  border-style: solid;
+  border-color: rgba(74,222,128,0.15);
+  border-top-color: var(--ld-green);
+  animation: ldSpin 0.85s linear infinite;
+}
+/* -- dual ring -- */
+.ld-spinner-dual {
+  border-radius: 50%;
+  position: relative;
+  animation: none !important;
+}
+.ld-spinner-dual::before,
+.ld-spinner-dual::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+.ld-spinner-dual::before {
+  border-style: solid;
+  border-color: rgba(74,222,128,0.15);
+  border-top-color: var(--ld-green);
+  animation: ldSpin 0.9s linear infinite;
+}
+.ld-spinner-dual::after {
+  border-style: solid;
+  border-color: transparent;
+  border-bottom-color: rgba(74,222,128,0.4);
+  animation: ldSpin 1.4s linear infinite reverse;
+}
+@keyframes ldSpin { to { transform: rotate(360deg); } }
+
+/* -- dots -- */
+.ld-spinner-dots {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.ld-spinner-dots span {
+  border-radius: 50%;
+  background: var(--ld-green);
+  animation: ldDotBounce 1.2s ease-in-out infinite;
+}
+.ld-spinner-dots span:nth-child(2) { animation-delay: 0.18s; }
+.ld-spinner-dots span:nth-child(3) { animation-delay: 0.36s; }
+@keyframes ldDotBounce {
+  0%, 80%, 100% { transform: scale(0.5); opacity: 0.4; }
+  40%           { transform: scale(1);   opacity: 1; }
+}
+
+/* -- pulse -- */
+.ld-spinner-pulse {
+  border-radius: 50%;
+  border: 2px solid var(--ld-green);
+  animation: ldPulse 1.4s ease-out infinite;
+}
+@keyframes ldPulse {
+  0%   { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+/* -- bars -- */
+.ld-spinner-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+}
+.ld-spinner-bars span {
+  border-radius: 2px;
+  background: var(--ld-green);
+  animation: ldBarWave 1s ease-in-out infinite;
+}
+.ld-spinner-bars span:nth-child(1) { animation-delay: 0s; }
+.ld-spinner-bars span:nth-child(2) { animation-delay: 0.12s; }
+.ld-spinner-bars span:nth-child(3) { animation-delay: 0.24s; }
+.ld-spinner-bars span:nth-child(4) { animation-delay: 0.36s; }
+.ld-spinner-bars span:nth-child(5) { animation-delay: 0.48s; }
+@keyframes ldBarWave {
+  0%, 100% { transform: scaleY(0.4); opacity: 0.5; }
+  50%       { transform: scaleY(1);   opacity: 1; }
+}
+
+/* Size presets */
+.ld-spinner-sm  { width: 16px; height: 16px; border-width: 1.5px; }
+.ld-spinner-md  { width: 28px; height: 28px; border-width: 2.5px; }
+.ld-spinner-lg  { width: 42px; height: 42px; border-width: 3px; }
+
+/* Dots size presets */
+.ld-spinner-dots.ld-sm  span { width: 5px;  height: 5px; }
+.ld-spinner-dots.ld-md  span { width: 8px;  height: 8px; }
+.ld-spinner-dots.ld-lg  span { width: 11px; height: 11px; }
+
+/* Bars size presets */
+.ld-spinner-bars.ld-sm  { height: 18px; } .ld-spinner-bars.ld-sm  span { width: 3px; }
+.ld-spinner-bars.ld-md  { height: 26px; } .ld-spinner-bars.ld-md  span { width: 4px; }
+.ld-spinner-bars.ld-lg  { height: 36px; } .ld-spinner-bars.ld-lg  span { width: 5px; }
+
+/* Colour overrides */
+.ld-spinner-blue  { border-top-color: var(--ld-blue)  !important; }
+.ld-spinner-amber { border-top-color: var(--ld-amber) !important; }
+.ld-spinner-red   { border-top-color: var(--ld-red)   !important; }
+
+/* ═══════════════════════════════════════════════════════
+   3. SKELETON LOADER
+   Usage: <SkeletonLoader rows={3} showAvatar />
+════════════════════════════════════════════════════════ */
+.ld-skeleton-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+.ld-skel-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ld-skel-block {
+  border-radius: 8px;
+  background: rgba(74,222,128,0.06);
+  border: 1px solid rgba(74,222,128,0.08);
+  animation: ldSkelPulse 1.8s ease-in-out infinite;
+}
+@keyframes ldSkelPulse {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 1; }
+}
+.ld-skel-avatar { width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0; }
+.ld-skel-line   { height: 10px; border-radius: 5px; }
+.ld-skel-line.short { width: 50%; }
+.ld-skel-line.long  { width: 80%; }
+.ld-skel-line.full  { width: 100%; }
+
+/* Card skeleton */
+.ld-skel-card {
+  width: 100%;
+  background: rgba(74,222,128,0.04);
+  border: 1px solid rgba(74,222,128,0.1);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+/* Stagger delays */
+.ld-d1 { animation-delay: 0.15s; }
+.ld-d2 { animation-delay: 0.30s; }
+.ld-d3 { animation-delay: 0.45s; }
+.ld-d4 { animation-delay: 0.60s; }
+
+/* ═══════════════════════════════════════════════════════
+   4. INLINE / BUTTON LOADER
+   Usage: <InlineLoader message="Fetching…" />
+         wrap a button with loading state class
+════════════════════════════════════════════════════════ */
+.ld-inline-strip {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 14px;
+  background: rgba(74,222,128,0.05);
+  border: 1px solid rgba(74,222,128,0.14);
+  border-radius: 10px;
+  width: 100%;
+}
+.ld-inline-strip.blue  { background: rgba(96,165,250,0.05);  border-color: rgba(96,165,250,0.15); }
+.ld-inline-strip.amber { background: rgba(245,158,11,0.05);  border-color: rgba(245,158,11,0.15); }
+
+.ld-inline-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ld-muted);
+  letter-spacing: 0.04em;
+}
+.ld-inline-strip.blue  .ld-inline-text { color: rgba(96,165,250,0.85); }
+.ld-inline-strip.amber .ld-inline-text { color: rgba(245,158,11,0.85); }
+
+/* Button loading state utility class */
+.ld-btn-loading {
+  pointer-events: none;
+  opacity: 0.85;
+  position: relative;
+}
+.ld-btn-spinner {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(209,250,229,0.25);
+  border-top-color: #d1fae5;
+  border-radius: 50%;
+  animation: ldSpin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════════════
+   5. PROGRESS BAR
+   Usage: <ProgressBar percent={72} label="Mining sync" />
+         or variant="indeterminate"
+════════════════════════════════════════════════════════ */
+.ld-prog-wrap { width: 100%; }
+.ld-prog-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.ld-prog-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ld-muted);
+}
+.ld-prog-pct {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ld-green);
+  letter-spacing: 0.08em;
+}
+.ld-prog-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.ld-prog-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--ld-glow), var(--ld-bright));
+  background-size: 200% 100%;
+  transition: width 0.35s ease;
+  animation: ldShimmer 1.6s linear infinite;
+}
+.ld-prog-fill.indeterminate {
+  width: 40% !important;
+  transition: none;
+  animation: ldProgSlide 1.8s ease-in-out infinite;
+}
+@keyframes ldProgSlide {
+  0%   { transform: translateX(-120%); width: 40%; }
+  50%  { width: 60%; }
+  100% { transform: translateX(300%);  width: 40%; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   6. DATA FETCH STATE CARD
+   Usage: <FetchState status="loading|success|error|empty"
+           message="…" sub="…" />
+════════════════════════════════════════════════════════ */
+.ld-fetch-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(74,222,128,0.04);
+  border: 1px solid rgba(74,222,128,0.1);
+  border-radius: 11px;
+  width: 100%;
+}
+.ld-fetch-card.success { background: rgba(74,222,128,0.05);  border-color: rgba(74,222,128,0.14); }
+.ld-fetch-card.error   { background: rgba(248,113,113,0.04); border-color: rgba(248,113,113,0.14); }
+.ld-fetch-card.empty   { background: rgba(200,255,195,0.03); border-color: rgba(200,255,195,0.1); }
+
+.ld-fetch-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.ld-fetch-card.loading  .ld-fetch-icon { background: rgba(96,165,250,0.1);  color: var(--ld-blue);  border: 1px solid rgba(96,165,250,0.2); }
+.ld-fetch-card.success  .ld-fetch-icon { background: rgba(74,222,128,0.1);  color: var(--ld-green); border: 1px solid rgba(74,222,128,0.22); }
+.ld-fetch-card.error    .ld-fetch-icon { background: rgba(248,113,113,0.1); color: var(--ld-red);   border: 1px solid rgba(248,113,113,0.22); }
+.ld-fetch-card.empty    .ld-fetch-icon { background: rgba(200,255,195,0.06);color: var(--ld-muted); border: 1px solid rgba(200,255,195,0.14); }
+
+.ld-fetch-title { font-size: 13px; font-weight: 700; color: var(--ld-text);  letter-spacing: 0.02em; }
+.ld-fetch-sub   { font-size: 11px;                  color: var(--ld-muted2); margin-top: 1px; letter-spacing: 0.02em; }
