@@ -3,7 +3,7 @@ import { useNavigate }                  from "react-router-dom";
 import { supabase }                     from "../../libs/supabase";
 import { toast, ToastContainer }        from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import "./ProfileSetup.css";
+import "./Profilesetup.css";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
