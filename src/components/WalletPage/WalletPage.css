@@ -6,7 +6,7 @@
 /* ── Page shell ── */
 .wallet-page {
   min-height: 100vh;
-  background: #050b07;
+  /* background: #050b07; */
   font-family: 'DM Sans', sans-serif;
   padding: 28px 20px 60px;
   color: #fff;

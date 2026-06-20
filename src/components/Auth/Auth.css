@@ -8,13 +8,18 @@
   --green-glow: #22c55e;
   --green-dark: #15803d;
   --green-deep: #0d4a24;
-  --bg-deep: #0a1f0e;
+  --bg-deep: radial-gradient(circle at top, rgba(74, 222, 128, 0.08), transparent 30%),
+    #050b07;;
   --bg-card: rgba(10, 28, 14, 0.92);
   --bg-input: rgba(255,255,255,0.04);
   --border-subtle: rgba(122, 255, 110, 0.15);
   --border-focus: rgba(122, 255, 110, 0.55);
   --text-primary: #e8ffe6;
   --text-muted: rgba(200,255,195,0.55);
+}
+html, body {
+  overflow-x: hidden;
+  width: 100%;
 }
 
 body {
@@ -25,6 +30,10 @@ body {
 
 .auth-root {
   min-height: 100vh;
+   overflow-x: hidden;
+  overflow-y: auto;
+  padding: 20px 16px;
+  box-sizing: border-box;
   width: 100%;
   display: flex;
   align-items: center;
@@ -505,4 +514,111 @@ body {
 @keyframes pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.6; transform: scale(0.85); }
+}
+/* ── Password toggle button ── */
+.field-input.has-toggle {
+  padding-right: 44px;
+}
+
+.pwd-toggle-btn {
+  position: absolute;
+  bottom: 9px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0;
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.pwd-toggle-btn:hover {
+  color: var(--green-mid);
+  background: rgba(74, 222, 128, 0.08);
+}
+
+.pwd-toggle-btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* ── Card width / overflow safety ── */
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+  box-sizing: border-box;
+}
+
+/* ── Responsive breakpoints ── */
+@media (max-width: 540px) {
+  .auth-card {
+    padding: 32px 24px 28px;
+    border-radius: 20px;
+  }
+
+  .field-row {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .social-row {
+    grid-template-columns: 1fr;
+  }
+
+  .logo-cube-text,
+  .logo-coin-text {
+    font-size: 19px;
+  }
+
+  .cube-logo,
+  .cube-svg {
+    width: 72px;
+    height: 72px;
+  }
+
+  .submit-btn {
+    font-size: 12px;
+    padding: 13px;
+  }
+}
+
+@media (max-width: 380px) {
+  .auth-card {
+    padding: 26px 18px 24px;
+  }
+
+  .field-input {
+    font-size: 14px;
+    padding: 12px 12px 12px 38px;
+  }
+
+  .field-input.has-toggle {
+    padding-right: 40px;
+  }
+
+  .field-icon {
+    left: 12px;
+    width: 16px;
+    height: 16px;
+  }
+
+  .security-badge-text {
+    font-size: 9.5px;
+  }
+}
+
+/* ── Prevent orb glows from causing horizontal scroll ── */
+.orb {
+  max-width: 100vw;
+}
+
+.orb-1 {
+  left: 50%;
+  right: auto;
 }

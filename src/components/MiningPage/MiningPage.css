@@ -1,10 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap');
 
+*, *::before, *::after { box-sizing: border-box; }
+
 .mining-page {
   min-height: 100vh;
-  padding: 30px;
-  background: #050b07;
+  padding: 30px 20px;
   font-family: 'DM Sans', sans-serif;
+  overflow-x: hidden;
 }
 
 /* ── Hero ── */
@@ -18,12 +20,24 @@
   padding: 40px 30px;
 }
 
-/* ── Mining circle ── */
+/* ── Scene wrap — holds pickaxe + circle together ── */
+/* Uses clamp() so it shrinks fluidly instead of overflowing on small screens */
+.scene-wrap {
+  position: relative;
+  width: clamp(180px, 60vw, 260px);
+  height: clamp(180px, 60vw, 260px);
+  margin: 0 auto 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Mining circle — scales with scene-wrap via % sizing ── */
 .circle-wrap {
   position: relative;
-  width: 220px;
-  height: 220px;
-  margin: 0 auto 28px;
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,7 +55,7 @@
 
 .ring-mid {
   position: absolute;
-  inset: 12px;
+  inset: 5%;
   border-radius: 50%;
   border: 2px solid rgba(127, 255, 110, 0.07);
   border-bottom: 2px solid rgba(74, 222, 128, 0.4);
@@ -52,8 +66,8 @@
 .circle-inner {
   position: relative;
   z-index: 2;
-  width: 150px;
-  height: 150px;
+  width: 68%;
+  height: 68%;
   border-radius: 50%;
   background: rgba(10, 28, 14, 0.95);
   border: 2px solid rgba(127, 255, 110, 0.2);
@@ -62,23 +76,14 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
+  padding: 8px;
+  text-align: center;
 }
 
 .circle-inner.pulse-ring { animation: pulse 2.4s infinite; }
 
-.cube-svg { transition: transform 0.05s; }
+.cube-svg { transition: transform 0.05s; max-width: 100%; height: auto; }
 .cube-svg.hit { animation: cubeHit 0.12s ease; }
-
-.pick-wrap {
-  position: absolute;
-  bottom: -8px;
-  right: -8px;
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 .chips-svg {
   position: absolute;
@@ -93,21 +98,22 @@
 
 .earn-num {
   color: #fff;
-  font-size: 2.2rem;
+  font-size: clamp(1.3rem, 5vw, 2.2rem);
   font-weight: 800;
   line-height: 1;
   letter-spacing: -1px;
+  word-break: break-word;
 }
 
 .earn-sub {
   color: rgba(255, 255, 255, 0.5);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 500;
 }
 
 .mining-hero h2 {
   color: #fff;
-  font-size: 1.8rem;
+  font-size: clamp(1.3rem, 4vw, 1.8rem);
   font-weight: 700;
   margin-bottom: 8px;
 }
@@ -117,6 +123,7 @@
   font-size: 0.95rem;
   margin-bottom: 28px;
   min-height: 22px;
+  word-break: break-word;
 }
 
 /* ── Buttons ── */
@@ -127,15 +134,18 @@
   flex-wrap: wrap;
 }
 
-.start-btn, .claim-btn, .stop-btn {
+.start-btn, .claim-btn, .stop-btn, .pause-btn {
   border: none;
   cursor: pointer;
-  padding: 14px 32px;
+  padding: 14px 28px;
   border-radius: 14px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   transition: 0.2s;
   font-family: 'DM Sans', sans-serif;
+  white-space: nowrap;
+  flex: 1 1 auto;
+  min-width: fit-content;
 }
 
 .start-btn {
@@ -160,6 +170,14 @@
 
 .stop-btn:hover { background: rgba(255, 255, 255, 0.12); }
 
+.pause-btn {
+  background: rgba(250, 204, 21, 0.12);
+  color: #facc15;
+  border: 1px solid rgba(250, 204, 21, 0.25);
+}
+
+.pause-btn:hover { background: rgba(250, 204, 21, 0.2); }
+
 /* ── Stats ── */
 .stats-grid {
   max-width: 680px;
@@ -173,9 +191,10 @@
   background: rgba(10, 28, 14, 0.85);
   border: 1px solid rgba(127, 255, 110, 0.1);
   border-radius: 20px;
-  padding: 22px 16px;
+  padding: 20px 12px;
   text-align: center;
   transition: 0.25s;
+  min-width: 0;
 }
 
 .stat-card:hover {
@@ -184,20 +203,21 @@
 }
 
 .stat-icon {
-  font-size: 1.5rem;
-  margin-bottom: 10px;
+  font-size: 1.4rem;
+  margin-bottom: 8px;
 }
 
 .stat-card h3 {
   color: #fff;
-  font-size: 1.7rem;
+  font-size: clamp(1rem, 4vw, 1.7rem);
   font-weight: 800;
   margin-bottom: 5px;
+  word-break: break-word;
 }
 
 .stat-card p {
   color: rgba(255, 255, 255, 0.5);
-  font-size: 0.85rem;
+  font-size: 0.78rem;
 }
 
 /* ── Referral ── */
@@ -215,6 +235,8 @@
   flex-wrap: wrap;
 }
 
+.referral-left { min-width: 0; flex: 1 1 200px; }
+
 .referral-left p {
   color: rgba(255, 255, 255, 0.5);
   font-size: 0.85rem;
@@ -225,13 +247,15 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .ref-code h2 {
   color: #4ade80;
-  font-size: 1.6rem;
+  font-size: clamp(1.1rem, 4vw, 1.6rem);
   font-weight: 800;
   letter-spacing: 1px;
+  word-break: break-all;
 }
 
 .copy-btn {
@@ -244,9 +268,11 @@
   font-size: 0.8rem;
   font-weight: 600;
   transition: 0.2s;
+  flex-shrink: 0;
 }
 
 .copy-btn:hover { background: rgba(74, 222, 128, 0.2); }
+.copy-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .invite-btn {
   background: linear-gradient(135deg, #4ade80, #22c55e);
@@ -258,6 +284,8 @@
   cursor: pointer;
   transition: 0.2s;
   font-family: 'DM Sans', sans-serif;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .invite-btn:hover { transform: translateY(-2px); }
@@ -279,9 +307,11 @@
   background: #0a1c0e;
   border: 1px solid rgba(127, 255, 110, 0.2);
   border-radius: 28px;
-  padding: 36px 32px;
+  padding: 32px 26px;
   max-width: 380px;
   width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
   text-align: center;
   animation: modalIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -301,24 +331,25 @@
 
 .modal h3 {
   color: #fff;
-  font-size: 1.5rem;
+  font-size: clamp(1.2rem, 4vw, 1.5rem);
   font-weight: 800;
   margin-bottom: 8px;
 }
 
 .modal .modal-sub {
   color: rgba(255, 255, 255, 0.5);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   margin-bottom: 24px;
   line-height: 1.5;
 }
 
 .modal-amt {
-  font-size: 2.8rem;
+  font-size: clamp(2rem, 8vw, 2.8rem);
   font-weight: 900;
   color: #4ade80;
   margin-bottom: 6px;
   letter-spacing: -1px;
+  word-break: break-word;
 }
 
 .modal-amt-sub {
@@ -343,9 +374,10 @@
 
 .invite-code-val {
   color: #4ade80;
-  font-size: 1.8rem;
+  font-size: clamp(1.2rem, 5vw, 1.8rem);
   font-weight: 800;
   letter-spacing: 2px;
+  word-break: break-all;
 }
 
 .modal-confirm {
@@ -363,7 +395,8 @@
   font-family: 'DM Sans', sans-serif;
 }
 
-.modal-confirm:hover { filter: brightness(1.08); }
+.modal-confirm:hover:not(:disabled) { filter: brightness(1.08); }
+.modal-confirm:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .modal-cancel {
   background: none;
@@ -389,11 +422,14 @@
   font-weight: 700;
   padding: 12px 24px;
   border-radius: 100px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   animation: toastIn 0.3s ease;
   z-index: 9999;
   white-space: nowrap;
   font-family: 'DM Sans', sans-serif;
+  max-width: calc(100vw - 32px);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ── Keyframes ── */
@@ -425,25 +461,24 @@
   from { opacity: 0; transform: translateX(-50%) translateY(12px); }
   to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
-/* ── Scene wrap — holds pickaxe + circle together ── */
-.scene-wrap {
-  position: relative;
-  width: 260px;
-  height: 260px;
-  margin: 0 auto 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 /* ── Pickaxe positioning ── */
+/* Scaled with % offsets relative to scene-wrap instead of fixed px,
+   so it stays anchored to the circle edge at every screen size */
 .pickaxe-wrap {
   position: absolute;
-  top: -20px;
-  right: -30px;
+  top: -6%;
+  right: -10%;
   z-index: 10;
-  transform-origin: 78px 78px; /* pivot = handle base */
+  width: 38%;
+  transform-origin: 78px 78px;
   filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6));
+}
+
+.pickaxe-wrap svg {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 6px rgba(74, 222, 128, 0.4)) drop-shadow(0 4px 8px rgba(0,0,0,0.6));
 }
 
 /* ── Impact flash ── */
@@ -473,7 +508,7 @@
   100% { opacity: 0; }
 }
 
-/* ── Cube logo bob animation (keep from Loader.css) ── */
+/* ── Cube logo bob animation ── */
 .cube-logo-top   { animation: logoBob 2.4s ease-in-out infinite; }
 .cube-logo-left  { animation: logoBob 2.4s ease-in-out infinite 0.15s; }
 .cube-logo-right { animation: logoBob 2.4s ease-in-out infinite 0.30s; }
@@ -496,32 +531,10 @@
   100% { transform: translate(0, 0) rotate(0); }
 }
 
-/* ── Cube glow on hit ── */
 .cube-svg.hit svg {
   filter: drop-shadow(0 0 12px rgba(74, 222, 128, 0.9));
 }
-/* ── Pickaxe glow (green variant) ── */
-.pickaxe-wrap svg {
-  filter: drop-shadow(0 0 6px rgba(74, 222, 128, 0.4)) drop-shadow(0 4px 8px rgba(0,0,0,0.6));
-}
-.pause-btn {
-  background: rgba(250, 204, 21, 0.12);
-  color: #facc15;
-  border: 1px solid rgba(250, 204, 21, 0.25);
-  border-radius: 14px;
-  padding: 14px 32px;
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.2s;
-  font-family: 'DM Sans', sans-serif;
-}
 
-.pause-btn:hover { background: rgba(250, 204, 21, 0.2); }
-/* ── Claim btn when session done ── */
-.claim-btn-full {
-  width: 100%;
-}
 /* ── Plan badge ── */
 .plan-badge {
   display: inline-block;
@@ -534,14 +547,87 @@
   color: #4ade80;
   margin-bottom: 20px;
   letter-spacing: 0.02em;
-}
-/* ── Responsive ── */
-@media (max-width: 600px) {
-  .stats-grid { grid-template-columns: 1fr 1fr; }
-  .referral-card { flex-direction: column; text-align: center; }
-  .ref-code { justify-content: center; }
+  max-width: 100%;
+  word-break: break-word;
 }
 
-@media (max-width: 380px) {
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════════════════════════ */
+
+@media (max-width: 700px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+}
+
+@media (max-width: 600px) {
+  .mining-page { padding: 20px 14px; }
+
+  .mining-hero {
+    padding: 28px 18px;
+    border-radius: 24px;
+  }
+
+  .referral-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 22px 20px;
+  }
+
+  .ref-code { justify-content: center; }
+
+  .invite-btn { width: 100%; }
+
+  .btn-row { gap: 8px; }
+
+  .start-btn, .claim-btn, .stop-btn, .pause-btn {
+    padding: 13px 18px;
+    font-size: 0.88rem;
+    flex: 1 1 auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .mining-page { padding: 16px 10px; }
+
+  .mining-hero { padding: 22px 14px; }
+
+  .scene-wrap {
+    width: clamp(150px, 56vw, 200px);
+    height: clamp(150px, 56vw, 200px);
+    margin-bottom: 20px;
+  }
+
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  .stat-card { padding: 16px 10px; }
+
+  .btn-row {
+    flex-direction: column;
+  }
+
+  .start-btn, .claim-btn, .stop-btn, .pause-btn {
+    width: 100%;
+  }
+
+  .modal {
+    padding: 26px 18px;
+    border-radius: 22px;
+  }
+}
+
+@media (max-width: 340px) {
   .stats-grid { grid-template-columns: 1fr; }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .ring-outer.spinning,
+  .ring-mid.spinning,
+  .circle-inner.pulse-ring,
+  .cube-logo-top,
+  .cube-logo-left,
+  .cube-logo-right,
+  .security-dot {
+    animation: none;
+  }
 }

@@ -530,13 +530,179 @@
   color: #4ade80;
   letter-spacing: 1px;
 }
+/* ── Cube award badge (plan card + step 1) ── */
+.sub-cube-award {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, rgba(74, 222, 128, 0.1), rgba(34, 197, 94, 0.06));
+  border: 1px solid rgba(74, 222, 128, 0.25);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin: 2px 0;
+}
+
+.sub-cube-award-icon {
+  font-size: 1.3rem;
+  color: #4ade80;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(74, 222, 128, 0.12);
+  border-radius: 8px;
+}
+
+.sub-cube-award-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.sub-cube-award-val {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #4ade80;
+  line-height: 1.1;
+  letter-spacing: -0.3px;
+}
+
+.sub-cube-award-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* ── Large variant — used prominently on Step 1 ── */
+.sub-cube-award.large {
+  padding: 18px 20px;
+  gap: 14px;
+  border-radius: 16px;
+  border: 1.5px solid rgba(74, 222, 128, 0.35);
+  margin-bottom: 20px;
+  box-shadow: 0 0 24px rgba(74, 222, 128, 0.1);
+}
+
+.sub-cube-award.large .sub-cube-award-icon {
+  width: 46px;
+  height: 46px;
+  font-size: 1.8rem;
+  border-radius: 12px;
+}
+
+.sub-cube-award.large .sub-cube-award-val {
+  font-size: 1.5rem;
+}
+
+.sub-cube-award.large .sub-cube-award-label {
+  font-size: 11px;
+}
+
+/* ── Compact cube reminder — Step 2 ── */
+.sub-cube-reminder {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(74, 222, 128, 0.06);
+  border: 1px solid rgba(74, 222, 128, 0.15);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.sub-cube-reminder strong {
+  color: #4ade80;
+  font-weight: 700;
+}
+
+.sub-cube-reminder-icon {
+  font-size: 1rem;
+  color: #4ade80;
+  flex-shrink: 0;
+}
+
+/* ── Success screen cube box ── */
+.sub-success-cube-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, rgba(74, 222, 128, 0.1), rgba(34, 197, 94, 0.05));
+  border: 1px solid rgba(74, 222, 128, 0.25);
+  border-radius: 16px;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.sub-success-cube-icon {
+  font-size: 1.6rem;
+  color: #4ade80;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(74, 222, 128, 0.12);
+  border-radius: 12px;
+}
+
+.sub-success-cube-val {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #4ade80;
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.sub-success-cube-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.4;
+}
 
 /* ── Responsive ── */
 @media (max-width: 600px) {
   .sub-plans-grid { grid-template-columns: 1fr 1fr; }
 }
-
 @media (max-width: 400px) {
   .sub-plans-grid { grid-template-columns: 1fr; }
   .sub-hdr h1 { font-size: 1.5rem; }
+  .sub-cube-award {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .sub-cube-award-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 1.1rem;
+  }
+
+  .sub-cube-award-val {
+    font-size: 0.95rem;
+  }
+
+  .sub-cube-award.large {
+    padding: 14px 16px;
+  }
+
+  .sub-cube-award.large .sub-cube-award-val {
+    font-size: 1.25rem;
+  }
+
+  .sub-success-cube-box {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
 }

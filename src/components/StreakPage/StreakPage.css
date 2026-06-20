@@ -3,7 +3,7 @@
 .streak-page {
   padding: 30px;
   min-height: 100vh;
-  background: #050b07;
+  /* background: #050b07; */
   font-family: 'DM Sans', sans-serif;
   display: flex;
   flex-direction: column;

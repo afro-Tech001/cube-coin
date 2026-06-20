@@ -1,18 +1,11 @@
 import "./Sidebar.css";
 import {
-  LayoutDashboard,
-  Pickaxe,
-  Gift,
-  Users,
-  Wallet,
-  Settings,
-  LogOut,
-  Menu,
-  X,
-  Flame,
+  LayoutDashboard, Pickaxe, Gift, Users,
+  Wallet, Settings, LogOut, Menu, X, Flame,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+
 // ── Mini Cube Logo ────────────────────────────────────────────────────────────
 function CubeLogoSVG() {
   return (
@@ -52,172 +45,147 @@ function CubeLogoSVG() {
     </svg>
   );
 }
-export default function Sidebar() {
-  const [open, setOpen] = useState(false);
 
-  const navItems = [
-  {
-    icon: <LayoutDashboard size={20} />,
-    label: "Dashboard",
-    path: "/dashboard",
-  },
-  {
-    icon: <Pickaxe size={20} />,
-    label: "Mine",
-    path: "/mining",
-  },
-  {
-    icon: <Gift size={20} />,
-    label: "Rewards",
-    path: "/rewards",
-  },
-  {
-    icon: <Users size={20} />,
-    label: "Referrals",
-    path: "/referrals",
-  },
-  {
-    icon: <Flame size={20} />,
-    label: "Streaks",
-    path: "/streaks",
-  },
-  {
-    icon: <Wallet size={20} />,
-    label: "Wallet",
-    path: "/wallet",
-  },
-  {
-    icon: <Settings size={20} />,
-    label: "Settings",
-    path: "/profilesettings",
-  },
+// ── Nav data ─────────────────────────────────────────────────────────────────
+const NAV_ITEMS = [
+  { icon: <LayoutDashboard size={19} />, label: "Dashboard", path: "/dashboard"        },
+  { icon: <Pickaxe         size={19} />, label: "Mine",      path: "/mining"           },
+  { icon: <Gift            size={19} />, label: "Rewards",   path: "/rewards"          },
+  { icon: <Users           size={19} />, label: "Referrals", path: "/referrals"        },
+  { icon: <Flame           size={19} />, label: "Streaks",   path: "/streaks"          },
+  { icon: <Wallet          size={19} />, label: "Wallet",    path: "/wallet"           },
+  { icon: <Settings        size={19} />, label: "Settings",  path: "/profilesettings"  },
 ];
-const navigate = useNavigate();
-const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-const handleLogout = () => {
-  localStorage.clear();
-  navigate("/");
-};
-useEffect(() => {
-  document.body.style.overflow = open ? "hidden" : "auto";
+// ── Main ─────────────────────────────────────────────────────────────────────
+export default function Sidebar() {
+  const [open, setOpen]               = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const navigate = useNavigate();
 
-  return () => {
-    document.body.style.overflow = "auto";
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/");
   };
-}, [open]);
+
+  // Lock body scroll while the mobile drawer is open
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "auto";
+    return () => { document.body.style.overflow = "auto"; };
+  }, [open]);
+
+  // Close drawer automatically if viewport grows past mobile breakpoint
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 900 && open) setOpen(false);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [open]);
+
   return (
     <>
+      {/* Mobile hamburger trigger */}
       <button
-  className={`mobile-menu-btn ${open ? "hide" : ""}`}
-  onClick={() => setOpen(true)}
->
+        className={`mobile-menu-btn ${open ? "hide" : ""}`}
+        onClick={() => setOpen(true)}
+        aria-label="Open menu"
+      >
         <Menu size={22} />
       </button>
 
+      {/* Backdrop (mobile only) */}
       <div
         className={`sidebar-overlay ${open ? "show" : ""}`}
         onClick={() => setOpen(false)}
       />
 
+      {/* Sidebar drawer */}
       <aside className={`sidebar ${open ? "open" : ""}`}>
+
         <div className="sidebar-top">
-
           {/* Logo */}
-      <div className="sb-logo">
-        <CubeLogoSVG />
-        <div className="sb-logo-text">
-          <span>
-            <span className="sb-logo-cube">CUBE</span>
-            <span className="sb-logo-coin"> COIN</span>
-          </span>
-        </div>
-      </div>
+          <div className="sb-logo">
+            <CubeLogoSVG />
+            <div className="sb-logo-text">
+              <span>
+                <span className="sb-logo-cube">CUBE</span>
+                <span className="sb-logo-coin"> COIN</span>
+              </span>
+            </div>
+          </div>
 
+          {/* Mobile-only close button */}
           <button
             className="close-sidebar"
             onClick={() => setOpen(false)}
+            aria-label="Close menu"
           >
             <X size={20} />
           </button>
-
         </div>
 
-        <div className="sidebar-links">
-          {navItems.map((item) => (
+        {/* Nav links */}
+        <nav className="sidebar-links">
+          {NAV_ITEMS.map((item) => (
             <NavLink
-  key={item.label}
-  to={item.path}
-  className={({ isActive }) =>
-    isActive
-      ? "sidebar-link active"
-      : "sidebar-link"
-  }
-  onClick={() => setOpen(false)}
->
-  {item.icon}
+              key={item.label}
+              to={item.path}
+              className={({ isActive }) =>
+                isActive ? "sidebar-link active" : "sidebar-link"
+              }
+              onClick={() => setOpen(false)}
+            >
+              {item.icon}
               <span>{item.label}</span>
-</NavLink>
+            </NavLink>
           ))}
-        </div>
+        </nav>
 
+        {/* Bottom — logout */}
         <div className="sidebar-bottom">
-
-          {/* <div className="premium-card">
-            <Crown size={18} />
-            <div>
-              <h4>Go Pro</h4>
-              <p>Unlock advanced tools</p>
-            </div>
-          </div> */}
-
           <button
-  className="logout-btn"
-  onClick={() => setShowLogoutModal(true)}
->
-  <LogOut size={18} />
-  Logout
-</button>
-
+            className="logout-btn"
+            onClick={() => setShowLogoutModal(true)}
+          >
+            <LogOut size={18} />
+            Logout
+          </button>
         </div>
+
       </aside>
+
+      {/* Logout confirmation modal */}
       {showLogoutModal && (
-  <div
-    className="logout-modal-overlay"
-    onClick={() => setShowLogoutModal(false)}
-  >
-    <div
-      className="logout-modal"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <div className="logout-icon">
-        <LogOut size={34} />
-      </div>
-
-      <h3>Logout?</h3>
-
-      <p>
-        Are you sure you want to logout from your Cube Coin account?
-      </p>
-
-      <div className="logout-actions">
-        <button
-          className="cancel-logout-btn"
+        <div
+          className="logout-modal-overlay"
           onClick={() => setShowLogoutModal(false)}
         >
-          Cancel
-        </button>
+          <div className="logout-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="logout-icon">
+              <LogOut size={32} />
+            </div>
 
-        <button
-          className="confirm-logout-btn"
-          onClick={handleLogout}
-        >
-          Yes, Logout
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+            <h3>Logout?</h3>
+            <p>Are you sure you want to logout from your Cube Coin account?</p>
+
+            <div className="logout-actions">
+              <button
+                className="cancel-logout-btn"
+                onClick={() => setShowLogoutModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="confirm-logout-btn"
+                onClick={handleLogout}
+              >
+                Yes, Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

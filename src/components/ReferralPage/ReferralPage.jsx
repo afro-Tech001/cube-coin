@@ -17,9 +17,11 @@ function Toast({ msg, show }) {
     <div style={{
       position:"fixed", bottom:28, left:"50%", transform:"translateX(-50%)",
       background:"#4ade80", color:"#041107", fontWeight:700,
-      padding:"11px 22px", borderRadius:100, fontSize:"0.85rem",
+      padding:"11px 20px", borderRadius:100, fontSize:"0.85rem",
       zIndex:9999, whiteSpace:"nowrap", fontFamily:"'DM Sans',sans-serif",
       animation:"toastIn .3s ease",
+      maxWidth:"calc(100vw - 32px)", overflow:"hidden", textOverflow:"ellipsis",
+      boxSizing:"border-box",
     }}>
       {msg}
       <style>{`@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}`}</style>

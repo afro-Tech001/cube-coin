@@ -110,14 +110,21 @@ function CrackLines({ visible }) {
 }
 
 // ── Plan tiers ────────────────────────────────────────────────────────────────
+// Sessions run 4x FASTER than before, with rates scaled up 4x to match —
+// total CUBE earned per full session is unchanged, it just arrives quicker.
+//   Starter:  0.02 → 0.08 CUBE/hr,  8h  → 2h    session
+//   Bronze:   0.05 → 0.20 CUBE/hr,  6h  → 1.5h  session
+//   Silver:   0.10 → 0.40 CUBE/hr,  4h  → 1h    session
+//   Gold:     0.18 → 0.72 CUBE/hr,  3h  → 0.75h session
+//   Diamond:  0.35 → 1.40 CUBE/hr,  2h  → 0.5h  session
 const PLAN_TIERS = {
-  0.02: { sessionSecs: 8 * 3600, swingEvery: 50, label: "Starter" },
-  0.05: { sessionSecs: 6 * 3600, swingEvery: 44, label: "Bronze"  },
-  0.10: { sessionSecs: 4 * 3600, swingEvery: 38, label: "Silver"  },
-  0.18: { sessionSecs: 3 * 3600, swingEvery: 32, label: "Gold"    },
-  0.35: { sessionSecs: 2 * 3600, swingEvery: 26, label: "Diamond" },
+  0.08: { sessionSecs: 2    * 3600, swingEvery: 13, label: "Starter" },
+  0.20: { sessionSecs: 1.5  * 3600, swingEvery: 11, label: "Bronze"  },
+  0.40: { sessionSecs: 1    * 3600, swingEvery: 10, label: "Silver"  },
+  0.72: { sessionSecs: 0.75 * 3600, swingEvery: 8,  label: "Gold"    },
+  1.40: { sessionSecs: 0.5  * 3600, swingEvery: 7,  label: "Diamond" },
 };
-const getTier = (rate) => PLAN_TIERS[rate] || PLAN_TIERS[0.02];
+const getTier = (rate) => PLAN_TIERS[rate] || PLAN_TIERS[0.08];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 // Earned = elapsed real time MINUS time spent paused, multiplied by rate
@@ -173,7 +180,7 @@ export default function MiningPage() {
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3200); };
 
-  const tier = sub ? getTier(sub.mining_rate) : getTier(0.02);
+  const tier = sub ? getTier(sub.mining_rate) : getTier(0.08);
 
   // ── Initial load ─────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -539,19 +546,20 @@ setProfile({
       setShowClaim(false);
       showToast(`🎉 ${earned.toFixed(4)} CUBE added to wallet!`);
 
+      // Log to wallet_transactions
+      await supabase.from("wallet_transactions").insert([{
+        user_id: user.id,
+        title: "Mining Reward",
+        amount: earned,
+        type: "credit",
+      }]);
+
     } catch (err) {
       console.error("Unexpected claim error:", err);
       showToast("Something went wrong — try again");
     } finally {
       setClaiming(false);
     }
-    // After: setProfile(p => ({ ...p, cube_balance: newBalance, ... }));
-await supabase.from("wallet_transactions").insert([{
-  user_id: user.id,
-  title: "Mining Reward",
-  amount: earned,
-  type: "credit",
-}]);
   };
 
   // ── Copy referral ────────────────────────────────────────────────────────────

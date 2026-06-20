@@ -3,6 +3,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { supabase } from "../../libs/supabase";
 import { Bell, Flame, Users, Pickaxe, Gift, ArrowUpRight, X } from "lucide-react";
 import PagerLoader from "../../components/PagerLoader/PagerLoader";
+import AnnouncementModal from "../../Admin/AdminComponents/AdminAnnouncements/AnnouncementModal";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const calcEarned = (startedAt, rate, totalPausedSecs = 0, currentlyPausedSince = null) => {
@@ -47,6 +48,13 @@ export default function DashboardHome() {
   const timerRef = useRef(null);
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3200); };
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUserId(data?.user?.id ?? null);
+    });
+  }, []);
 
   // ── Live claimable counter ────────────────────────────────────────────────
   useEffect(() => {
@@ -238,7 +246,7 @@ export default function DashboardHome() {
 
   return (
     <div className="dashboard-home">
-
+      {userId && <AnnouncementModal userId={userId} />}
       {/* TOP BAR */}
       <div className="dashboard-topbar">
         <div className="profile-section">

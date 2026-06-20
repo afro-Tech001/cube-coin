@@ -63,6 +63,25 @@ function AppleIcon() {
   );
 }
 
+// ── Eye icons for password visibility toggle ──────────────────────────────────
+function EyeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+  );
+}
+
+function EyeOffIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a18.4 18.4 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>
+    </svg>
+  );
+}
+
 function getPwdStrength(pwd) {
   if (!pwd) return 0;
   let s = 0;
@@ -73,7 +92,6 @@ function getPwdStrength(pwd) {
   return s;
 }
 
-// ── Retry helper: polls until profile row exists, then writes referred_by_code ──
 // ── Retry helper ──────────────────────────────────────────────────────────────
 async function writeReferredByCode(userId, code, maxAttempts = 10) {
   for (let i = 0; i < maxAttempts; i++) {
@@ -85,40 +103,24 @@ async function writeReferredByCode(userId, code, maxAttempts = 10) {
       .eq("id", userId)
       .maybeSingle();
 
-    if (!existing) {
-      console.log(`Profile row not ready yet, attempt ${i + 1}/${maxAttempts}`);
-      continue;
-    }
-
-    // Already set — nothing to do
-    if (existing.referred_by_code) {
-      console.log("referred_by_code already set:", existing.referred_by_code);
-      return true;
-    }
+    if (!existing) continue;
+    if (existing.referred_by_code) return true;
 
     const { error } = await supabase
       .from("profiles")
       .update({ referred_by_code: code })
       .eq("id", userId);
 
-    if (error) {
-      console.error("Update error:", error);
-      continue; // retry
-    }
+    if (error) continue;
 
-    // Verify
     const { data: verify } = await supabase
       .from("profiles")
       .select("referred_by_code")
       .eq("id", userId)
       .maybeSingle();
 
-    if (verify?.referred_by_code === code) {
-      console.log("✅ referred_by_code written:", code);
-      return true;
-    }
+    if (verify?.referred_by_code === code) return true;
   }
-  console.error("❌ Could not write referred_by_code after all attempts");
   return false;
 }
 
@@ -133,12 +135,15 @@ export default function Auth() {
     password: "", referralCode: "",
   });
 
+  // ── Password visibility state ──────────────────────────────────────────────
+  const [showLoginPwd,  setShowLoginPwd]  = useState(false);
+  const [showSignupPwd, setShowSignupPwd] = useState(false);
+
   const pwdStrength = getPwdStrength(signupData.password);
   const switchTab = (t) => { if (t !== tab) setTab(t); };
   const handleLoginChange  = (e) => setLoginData(p  => ({ ...p, [e.target.name]: e.target.value }));
   const handleSignupChange = (e) => setSignupData(p => ({ ...p, [e.target.name]: e.target.value }));
 
-  // ── Google OAuth ─────────────────────────────────────────────────────────────
   const handleGoogleLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -147,7 +152,6 @@ export default function Auth() {
     if (error) toast.error(error.message);
   };
 
-  // ── Login ─────────────────────────────────────────────────────────────────────
   const handleLogin = async () => {
     if (!loginData.email || !loginData.password) {
       toast.error("Please fill in all fields");
@@ -201,7 +205,6 @@ export default function Auth() {
     }
   };
 
-  // ── Sign up ───────────────────────────────────────────────────────────────────
   const handleSignup = async () => {
     const { firstName, lastName, email, password, referralCode } = signupData;
 
@@ -223,70 +226,62 @@ export default function Auth() {
 
       const fullName        = `${firstName.trim()} ${lastName.trim()}`;
       const trimmedReferral = referralCode.trim().toUpperCase() || null;
-   
-      // ── Validate referral code against profiles.referral_code ──
-let validReferral = null;
-if (trimmedReferral) {
-  const { data: referrerProfile, error: refErr } = await supabase
-    .from("profiles")
-    .select("id, referral_code")
-    .eq("referral_code", trimmedReferral)
-    .maybeSingle();
 
-  if (refErr) {
-    console.error("Referral lookup error:", refErr);
-    toast.error("Could not verify referral code — try again");
-    setLoading(false);
-    return;
-  }
+      let validReferral = null;
+      if (trimmedReferral) {
+        const { data: referrerProfile, error: refErr } = await supabase
+          .from("profiles")
+          .select("id, referral_code")
+          .eq("referral_code", trimmedReferral)
+          .maybeSingle();
 
-  if (!referrerProfile) {
-    toast.error("Invalid referral code — check and try again");
-    setLoading(false);
-    return;
-  }
+        if (refErr) {
+          toast.error("Could not verify referral code — try again");
+          setLoading(false);
+          return;
+        }
 
-  validReferral = trimmedReferral;
-  console.log("✅ Valid referral code, referrer id:", referrerProfile.id);
-}
+        if (!referrerProfile) {
+          toast.error("Invalid referral code — check and try again");
+          setLoading(false);
+          return;
+        }
 
-// ── Sign up ──
-const { data, error } = await supabase.auth.signUp({
-  email:    email.trim().toLowerCase(),
-  password,
-  options: { data: { full_name: fullName } },
-});
+        validReferral = trimmedReferral;
+      }
 
-if (error) { toast.error(error.message); return; }
+      const { data, error } = await supabase.auth.signUp({
+        email:    email.trim().toLowerCase(),
+        password,
+        options: { data: { full_name: fullName } },
+      });
 
-const newUserId = data.user?.id;
+      if (error) { toast.error(error.message); return; }
 
-// ── Record referral — fire and forget with retry ──
-if (validReferral && newUserId) {
-  writeReferredByCode(newUserId, validReferral).then(ok => {
-    if (!ok) console.error("Failed to record referral for:", newUserId);
-  });
-}
+      const newUserId = data.user?.id;
 
-if (!data.session) {
-  toast.success("Account created! Check your email to confirm, then log in.", { autoClose: 6000 });
-  setTab("login");
-  return;
-}
+      if (validReferral && newUserId) {
+        writeReferredByCode(newUserId, validReferral);
+      }
 
-await new Promise(res => setTimeout(res, 1500));
+      if (!data.session) {
+        toast.success("Account created! Check your email to confirm, then log in.", { autoClose: 6000 });
+        setTab("login");
+        return;
+      }
 
-const { data: profile } = await supabase
-  .from("profiles")
-  .select("*")
-  .eq("id", newUserId)
-  .maybeSingle();
+      await new Promise(res => setTimeout(res, 1500));
 
-localStorage.setItem("cubecoin_user",    JSON.stringify(data.user));
-localStorage.setItem("cubecoin_profile", JSON.stringify(profile));
-toast.success(`Welcome to CubeCoin, ${firstName}! 🎉`);
-setTimeout(() => navigate("/subscription"), 1500);
-      
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", newUserId)
+        .maybeSingle();
+
+      localStorage.setItem("cubecoin_user",    JSON.stringify(data.user));
+      localStorage.setItem("cubecoin_profile", JSON.stringify(profile));
+      toast.success(`Welcome to CubeCoin, ${firstName}! 🎉`);
+      setTimeout(() => navigate("/subscription"), 1500);
 
     } catch (err) {
       console.error(err);
@@ -348,7 +343,24 @@ setTimeout(() => navigate("/subscription"), 1500);
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                     <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                   </svg>
-                  <input className="field-input" type="password" name="password" placeholder="••••••••" autoComplete="current-password" value={loginData.password} onChange={handleLoginChange} />
+                  <input
+                    className="field-input has-toggle"
+                    type={showLoginPwd ? "text" : "password"}
+                    name="password"
+                    placeholder="••••••••"
+                    autoComplete="current-password"
+                    value={loginData.password}
+                    onChange={handleLoginChange}
+                  />
+                  <button
+                    type="button"
+                    className="pwd-toggle-btn"
+                    onClick={() => setShowLoginPwd(v => !v)}
+                    aria-label={showLoginPwd ? "Hide password" : "Show password"}
+                    tabIndex={-1}
+                  >
+                    {showLoginPwd ? <EyeOffIcon /> : <EyeIcon />}
+                  </button>
                   <div className="forgot-row" style={{ marginTop: 8 }}>
                     <span className="forgot-link">Forgot password?</span>
                   </div>
@@ -406,7 +418,23 @@ setTimeout(() => navigate("/subscription"), 1500);
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                     <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                   </svg>
-                  <input className="field-input" type="password" name="password" placeholder="Min. 8 characters" value={signupData.password} onChange={handleSignupChange} />
+                  <input
+                    className="field-input has-toggle"
+                    type={showSignupPwd ? "text" : "password"}
+                    name="password"
+                    placeholder="Min. 8 characters"
+                    value={signupData.password}
+                    onChange={handleSignupChange}
+                  />
+                  <button
+                    type="button"
+                    className="pwd-toggle-btn"
+                    onClick={() => setShowSignupPwd(v => !v)}
+                    aria-label={showSignupPwd ? "Hide password" : "Show password"}
+                    tabIndex={-1}
+                  >
+                    {showSignupPwd ? <EyeOffIcon /> : <EyeIcon />}
+                  </button>
                   {signupData.password && (
                     <div className="pwd-strength">
                       {[1,2,3,4].map(i => (
