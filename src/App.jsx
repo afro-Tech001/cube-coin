@@ -20,6 +20,7 @@ import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import AdminSubscriptionsPage from "./Admin/AdminPages/AdminSubscriptionsPage/AdminSubscriptionsPage";
 import SubscriptionStatus from "./components/Subscriptionpage/SubscriptionStatus";
 import ProfileSetup from "./components/Subscriptionpage/Profilesetup";
+import AdminReferralPage from "./Admin/AdminPages/AdminReferralPage/AdminReferralPage";
 function App() {
 
   const [loading, setLoading] = useState(true);
@@ -57,6 +58,7 @@ function App() {
       <Route path="/admin/users" element={<ProtectedRoute><AdminUserPage /></ProtectedRoute>} />
       <Route path="/admin/mining" element={<ProtectedRoute><AdminMiningPage /></ProtectedRoute>} />
       <Route path="/admin/subscription" element={<ProtectedRoute><AdminSubscriptionsPage /></ProtectedRoute>} />
+      <Route path="/admin/referal" element={<ProtectedRoute><AdminReferralPage /></ProtectedRoute>} />
       <Route path="/admin/withdrawals" element={<ProtectedRoute><AdminWithdrawalPage /></ProtectedRoute>} />
       <Route path="/admin/settings" element={<ProtectedRoute><AdminSettingsPage /></ProtectedRoute>} />
       <Route path="/admin/announcements" element={<ProtectedRoute><AdminAnnouncePage /></ProtectedRoute>} />

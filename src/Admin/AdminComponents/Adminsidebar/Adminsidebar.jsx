@@ -7,14 +7,16 @@ import {
   Gift,
   BarChart3,
   Settings,
-  Shield,
+  User,
   LogOut,
   Menu,
   X,
   Megaphone,
 } from "lucide-react";
-import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { supabase } from "../../../libs/supabase";
+
 // ── Mini Cube Logo ────────────────────────────────────────────────────────────
 function CubeLogoSVG() {
   return (
@@ -58,7 +60,20 @@ function CubeLogoSVG() {
 export default function AdminSidebar() {
   const [open, setOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  // Close mobile sidebar automatically whenever the route changes
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
+
+  // Lock body scroll while mobile sidebar is open
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
 
   const links = [
     {
@@ -87,6 +102,11 @@ export default function AdminSidebar() {
       path: "/admin/withdrawals",
     },
     {
+      icon: <User size={20} />,
+      name: "Referrals",
+      path: "/admin/referal",
+    },
+    {
       icon: <Settings size={20} />,
       name: "Settings",
       path: "/admin/settings",
@@ -98,11 +118,34 @@ export default function AdminSidebar() {
     }
   ];
 
+  // ── Real logout ────────────────────────────────────────────────────────────
+  const handleLogout = async () => {
+    if (loggingOut) return;
+    setLoggingOut(true);
+
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) console.error("Logout error:", error);
+    } catch (err) {
+      console.error("Unexpected logout error:", err);
+    }
+
+    // Clear any locally cached admin/user data
+    localStorage.removeItem("cubecoin_admin");
+    localStorage.removeItem("cubecoin_user");
+    localStorage.removeItem("cubecoin_profile");
+
+    setShowLogoutModal(false);
+    setLoggingOut(false);
+    navigate("/login", { replace: true });
+  };
+
   return (
     <>
       <button
         className="admin-mobile-btn"
         onClick={() => setOpen(true)}
+        aria-label="Open menu"
       >
         <Menu size={22} />
       </button>
@@ -128,6 +171,7 @@ export default function AdminSidebar() {
           <button
             className="admin-close-btn"
             onClick={() => setOpen(false)}
+            aria-label="Close menu"
           >
             <X size={20} />
           </button>
@@ -137,12 +181,12 @@ export default function AdminSidebar() {
         <div className="admin-links">
           {links.map((link) => (
             <a
-  key={link.name}
-  href={link.path}
-  className={`admin-nav-link ${
-    location.pathname === link.path ? "active" : ""
-  }`}
->
+              key={link.name}
+              href={link.path}
+              className={`admin-nav-link ${
+                location.pathname === link.path ? "active" : ""
+              }`}
+            >
               {link.icon}
               <span>{link.name}</span>
             </a>
@@ -150,69 +194,56 @@ export default function AdminSidebar() {
         </div>
 
         <div className="admin-footer">
-
-          {/* <div className="admin-status">
-            <span className="admin-dot"></span>
-            System Online
-          </div> */}
-
-           <button
-  className="admin-logout-btn"
-  onClick={() => setShowLogoutModal(true)}
->
-  <LogOut size={18} />
-  Logout
-</button>
-
+          <button
+            className="admin-logout-btn"
+            onClick={() => setShowLogoutModal(true)}
+          >
+            <LogOut size={18} />
+            Logout
+          </button>
         </div>
       </aside>
+
       {showLogoutModal && (
-  <div className="logout-modal-overlay">
+        <div className="logout-modal-overlay" onClick={(e) => e.target === e.currentTarget && !loggingOut && setShowLogoutModal(false)}>
 
-    <div className="logout-modal">
+          <div className="logout-modal">
 
-      <div className="logout-icon">
-        <LogOut size={28} />
-      </div>
+            <div className="logout-icon">
+              <LogOut size={28} />
+            </div>
 
-      <h3>Logout Admin?</h3>
+            <h3>Logout Admin?</h3>
 
-      <p>
-        Are you sure you want to logout from
-        the Cube Admin Dashboard?
-      </p>
+            <p>
+              Are you sure you want to logout from
+              the Cube Admin Dashboard?
+            </p>
 
-      <div className="logout-actions">
+            <div className="logout-actions">
 
-        <button
-          className="cancel-btn"
-          onClick={() => setShowLogoutModal(false)}
-        >
-          Cancel
-        </button>
+              <button
+                className="cancel-btn"
+                onClick={() => setShowLogoutModal(false)}
+                disabled={loggingOut}
+              >
+                Cancel
+              </button>
 
-        <button
-          className="confirm-btn"
-          onClick={() => {
-            // Logout Logic Here
-            console.log("Admin Logged Out");
+              <button
+                className="confirm-btn"
+                onClick={handleLogout}
+                disabled={loggingOut}
+              >
+                {loggingOut ? "Logging out…" : "Logout"}
+              </button>
 
-            setShowLogoutModal(false);
+            </div>
 
-            // Example:
-            // localStorage.removeItem("adminToken");
-            // window.location.href = "/admin-login";
-          }}
-        >
-          Logout
-        </button>
+          </div>
 
-      </div>
-
-    </div>
-
-  </div>
-)}
+        </div>
+      )}
     </>
   );
 }

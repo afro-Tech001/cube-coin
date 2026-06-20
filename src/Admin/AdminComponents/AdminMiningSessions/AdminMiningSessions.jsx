@@ -11,7 +11,7 @@ function fmtDate(iso) {
   });
 }
 
-function fmtDuration(startedAt, endsAt, isPaused) {
+function fmtDuration(startedAt, endsAt) {
   if (!startedAt || !endsAt) return "—";
   const totalMs  = new Date(endsAt) - new Date(startedAt);
   const totalHrs = Math.round(totalMs / 3600000);
@@ -60,7 +60,7 @@ function DetailSheet({ session, onClose }) {
   const rows = [
     ["Session ID",   session.id],
     ["User ID",      session.user_id],
-    ["Miner",        session.profiles?.full_name || "—"],
+    ["Miner",        session.minerName || "—"],
     ["Plan",         session.plan_name || "—"],
     ["Mining Rate",  `${session.mining_rate} CUBE/hr`],
     ["Started At",   fmtDate(session.started_at)],
@@ -100,7 +100,7 @@ function DetailSheet({ session, onClose }) {
               Mining session
             </div>
             <div style={{ fontSize:"1.3rem", fontWeight:800, color:T.white, display:"flex", alignItems:"center", gap:10 }}>
-              {session.profiles?.full_name || "Unknown"}
+              {session.minerName || "Unknown"}
               <span style={{
                 background:`${statusColor}18`, border:`1px solid ${statusColor}40`,
                 color:statusColor, fontSize:10, fontWeight:700,
@@ -143,10 +143,10 @@ export default function AdminMiningSessions() {
   const [sessions,  setSessions]  = useState([]);
   const [loading,   setLoading]   = useState(true);
   const [search,    setSearch]    = useState("");
-  const [filter,    setFilter]    = useState("all"); // all | active | paused | completed | stopped
+  const [filter,    setFilter]    = useState("all");
   const [selected,  setSelected]  = useState(null);
+  const [errMsg,    setErrMsg]    = useState(null);
 
-  // ── Stats derived from data ──
   const total       = sessions.length;
   const active      = sessions.filter(s => s.is_mining && !s.is_paused && !s.claimed).length;
   const paused      = sessions.filter(s => s.is_paused && !s.claimed).length;
@@ -155,32 +155,63 @@ export default function AdminMiningSessions() {
 
   const fetchSessions = async () => {
     setLoading(true);
+    setErrMsg(null);
 
-    // Fetch mining sessions joined with profiles for the miner's name
-    const { data, error } = await supabase
+    // ── Step 1: fetch sessions WITHOUT the join (this always works) ──────────
+    const { data: sessionData, error: sessionErr } = await supabase
       .from("mining_sessions")
-      .select(`
-        *,
-        profiles:user_id (
-          full_name,
-          email
-        )
-      `)
+      .select("*")
       .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error("Fetch error:", error);
+    console.log("Mining sessions raw fetch:", sessionData, sessionErr);
+
+    if (sessionErr) {
+      console.error("Fetch error:", sessionErr);
+      setErrMsg(sessionErr.message);
       setLoading(false);
       return;
     }
 
-    setSessions(data || []);
+    if (!sessionData || sessionData.length === 0) {
+      console.warn("No mining_sessions rows returned. Check RLS policies and table contents.");
+      setSessions([]);
+      setLoading(false);
+      return;
+    }
+
+    // ── Step 2: fetch matching profiles separately ────────────────────────────
+    const userIds = [...new Set(sessionData.map(s => s.user_id).filter(Boolean))];
+
+    let profilesMap = {};
+    if (userIds.length > 0) {
+      const { data: profilesData, error: profilesErr } = await supabase
+        .from("profiles")
+        .select("id, full_name, email")
+        .in("id", userIds);
+
+      console.log("Profiles fetch:", profilesData, profilesErr);
+
+      if (profilesErr) {
+        console.error("Profiles fetch error:", profilesErr);
+      } else {
+        profilesMap = Object.fromEntries((profilesData || []).map(p => [p.id, p]));
+      }
+    }
+
+    // ── Step 3: merge ──────────────────────────────────────────────────────────
+    const merged = sessionData.map(s => ({
+      ...s,
+      minerName: profilesMap[s.user_id]?.full_name
+        || profilesMap[s.user_id]?.email
+        || "Unknown",
+    }));
+
+    setSessions(merged);
     setLoading(false);
   };
 
   useEffect(() => { fetchSessions(); }, []);
 
-  // ── Filter + search ──────────────────────────────────────────────────────────
   const visible = sessions.filter(s => {
     const status = getStatus(s).toLowerCase();
     const matchFilter =
@@ -192,9 +223,9 @@ export default function AdminMiningSessions() {
 
     const q = search.toLowerCase();
     const matchSearch = !q ||
-      (s.profiles?.full_name || "").toLowerCase().includes(q) ||
+      (s.minerName || "").toLowerCase().includes(q) ||
       (s.plan_name || "").toLowerCase().includes(q) ||
-      s.user_id.toLowerCase().includes(q);
+      (s.user_id || "").toLowerCase().includes(q);
 
     return matchFilter && matchSearch;
   });
@@ -217,13 +248,21 @@ export default function AdminMiningSessions() {
   return (
     <div className="admin-mining">
 
-      {/* Header */}
       <div className="mining-header">
         <h1>Mining Sessions</h1>
         <p>Monitor all active and historical mining activity</p>
       </div>
 
-      {/* Stats */}
+      {errMsg && (
+        <div style={{
+          background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.25)",
+          color: "#f87171", padding: "12px 16px", borderRadius: 12,
+          fontSize: 13, marginBottom: 20, fontFamily: "'DM Sans', sans-serif",
+        }}>
+          ⚠ Failed to load sessions: {errMsg}
+        </div>
+      )}
+
       <div className="mining-stats">
         <div className="mining-stat-card">
           <h2>{active}</h2>
@@ -243,7 +282,6 @@ export default function AdminMiningSessions() {
         </div>
       </div>
 
-      {/* Toolbar */}
       <div style={{ display:"flex", gap:10, flexWrap:"wrap", alignItems:"center", marginBottom:16 }}>
         <div className="search-box" style={{ flex:1, margin:0 }}>
           <input
@@ -266,7 +304,6 @@ export default function AdminMiningSessions() {
         </button>
       </div>
 
-      {/* Filter tabs */}
       <div style={{ display:"flex", gap:6, marginBottom:20, flexWrap:"wrap" }}>
         {FILTER_TABS.map(t => (
           <button
@@ -292,7 +329,6 @@ export default function AdminMiningSessions() {
         ))}
       </div>
 
-      {/* Table */}
       <div className="mining-table-card">
         {loading ? (
           <div style={{ textAlign:"center", padding:"60px 0", color:"rgba(255,255,255,.4)" }}>
@@ -300,9 +336,7 @@ export default function AdminMiningSessions() {
             Loading sessions…
           </div>
         ) : visible.length === 0 ? (
-          <div style={{
-            textAlign:"center", padding:"60px 0", color:"rgba(255,255,255,.4)",
-          }}>
+          <div style={{ textAlign:"center", padding:"60px 0", color:"rgba(255,255,255,.4)" }}>
             <div style={{ fontSize:"2rem", marginBottom:10 }}>📭</div>
             No sessions found
           </div>
@@ -329,7 +363,7 @@ export default function AdminMiningSessions() {
                   <tr key={s.id}>
                     <td>
                       <div style={{ fontWeight:700, color:"#fff", fontSize:14 }}>
-                        {s.profiles?.full_name || "Unknown"}
+                        {s.minerName || "Unknown"}
                       </div>
                       <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", marginTop:2 }}>
                         {(s.user_id || "").slice(0, 8)}…
@@ -389,7 +423,6 @@ export default function AdminMiningSessions() {
         )}
       </div>
 
-      {/* Detail sheet */}
       <DetailSheet
         session={selected}
         onClose={() => setSelected(null)}

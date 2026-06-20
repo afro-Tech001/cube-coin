@@ -40,14 +40,15 @@ export default function AdminDashboard() {
         })
         .eq("is_mining", true);
 
-      // TOTAL REFERRALS
+      // TOTAL REFERRALS — count profiles that were referred by someone
+      // (referred_by_code is the column that's actually populated at signup)
       const { count: referrals } = await supabase
         .from("profiles")
         .select("*", {
           count: "exact",
           head: true,
         })
-        .not("referred_by", "is", null);
+        .not("referred_by_code", "is", null);
 
       // TOTAL CUBE MINED
       const { data: minedData } = await supabase
@@ -74,44 +75,27 @@ export default function AdminDashboard() {
           0
         ) || 0;
 
-      // NEWEST USERS
+      // NEWEST USERS — referral_code lives directly on profiles now,
+      // no need for a per-user subscriptions lookup
       const { data: users } = await supabase
-  .from("profiles")
-  .select(`
-    id,
-    full_name,
-    created_at
-  `)
-  .order("created_at", {
-    ascending: false,
-  })
-  .limit(10);
+        .from("profiles")
+        .select(`
+          id,
+          full_name,
+          referral_code,
+          created_at
+        `)
+        .order("created_at", { ascending: false })
+        .limit(10);
 
-if (users) {
-  const usersWithCodes = await Promise.all(
-    users.map(async (user) => {
-      const { data: subscription } =
-        await supabase
-          .from("subscriptions")
-          .select("tx_ref")
-          .eq("user_id", user.id)
-          .order("created_at", {
-            ascending: false,
-          })
-          .limit(1)
-          .single();
-
-      return {
-        ...user,
-        referralCode:
-          subscription?.tx_ref || "No Code",
-      };
-    })
-  );
-
-  setNewUsers(usersWithCodes);
-}
-
+      if (users) {
+        setNewUsers(
+          users.map((user) => ({
+            ...user,
+            referralCode: user.referral_code || "No Code",
+          }))
+        );
+      }
 
       setStats({
         totalUsers,
