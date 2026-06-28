@@ -5,19 +5,19 @@ import {
   Coins,
   Wallet,
   Gift,
-  BarChart3,
   Settings,
   User,
   LogOut,
   Menu,
   X,
   Megaphone,
+  PackageSearch,
+  Trophy,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "../../../libs/supabase";
 
-// ── Mini Cube Logo ────────────────────────────────────────────────────────────
 function CubeLogoSVG() {
   return (
     <svg className="sb-logo-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -64,77 +64,38 @@ export default function AdminSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Close mobile sidebar automatically whenever the route changes
-  useEffect(() => {
-    setOpen(false);
-  }, [location.pathname]);
+  useEffect(() => { setOpen(false); }, [location.pathname]);
 
-  // Lock body scroll while mobile sidebar is open
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
   const links = [
-    {
-      icon: <LayoutDashboard size={20} />,
-      name: "Overview",
-      path: "/admin/dashboard",
-    },
-    {
-      icon: <Users size={20} />,
-      name: "Users",
-      path: "/admin/users",
-    },
-    {
-      icon: <Coins size={20} />,
-      name: "Mining",
-      path: "/admin/mining",
-    },
-    {
-      icon: <Gift size={20} />,
-      name: "Subcription",
-      path: "/admin/subscription",
-    },
-    {
-      icon: <Wallet size={20} />,
-      name: "Withdrawals",
-      path: "/admin/withdrawals",
-    },
-    {
-      icon: <User size={20} />,
-      name: "Referrals",
-      path: "/admin/referal",
-    },
-    {
-      icon: <Settings size={20} />,
-      name: "Settings",
-      path: "/admin/settings",
-    },
-    {
-      icon: <Megaphone size={20} />,
-      name: "Announcements",
-      path: "/admin/announcements",
-    }
+    { icon: <LayoutDashboard size={20} />, name: "Overview",      path: "/admin/dashboard"     },
+    { icon: <Users           size={20} />, name: "Users",         path: "/admin/users"         },
+    { icon: <Coins           size={20} />, name: "Mining",        path: "/admin/mining"        },
+    { icon: <Gift            size={20} />, name: "Subscription",  path: "/admin/subscription"  },
+    { icon: <Wallet          size={20} />, name: "Withdrawals",   path: "/admin/withdrawals"   },
+    { icon: <User            size={20} />, name: "Referrals",     path: "/admin/referal"       },
+    { icon: <Trophy          size={20} />, name: "Rewards",       path: "/admin/reward"       },
+    { icon: <PackageSearch   size={20} />, name: "Plans",         path: "/admin/plans"         },
+    { icon: <Megaphone       size={20} />, name: "Announcements", path: "/admin/announcements" },
+    { icon: <Settings        size={20} />, name: "Settings",      path: "/admin/settings"      },
   ];
 
-  // ── Real logout ────────────────────────────────────────────────────────────
   const handleLogout = async () => {
     if (loggingOut) return;
     setLoggingOut(true);
-
     try {
       const { error } = await supabase.auth.signOut();
       if (error) console.error("Logout error:", error);
     } catch (err) {
       console.error("Unexpected logout error:", err);
     }
-
-    // Clear any locally cached admin/user data
     localStorage.removeItem("cubecoin_admin");
     localStorage.removeItem("cubecoin_user");
     localStorage.removeItem("cubecoin_profile");
-
     setShowLogoutModal(false);
     setLoggingOut(false);
     navigate("/login", { replace: true });
@@ -142,40 +103,24 @@ export default function AdminSidebar() {
 
   return (
     <>
-      <button
-        className="admin-mobile-btn"
-        onClick={() => setOpen(true)}
-        aria-label="Open menu"
-      >
+      <button className="admin-mobile-btn" onClick={() => setOpen(true)} aria-label="Open menu">
         <Menu size={22} />
       </button>
 
-      <div
-        className={`admin-overlay ${open ? "show" : ""}`}
-        onClick={() => setOpen(false)}
-      />
+      <div className={`admin-overlay ${open ? "show" : ""}`} onClick={() => setOpen(false)} />
 
-      <aside
-        className={`admin-sidebar ${open ? "open" : ""}`}
-      >
+      <aside className={`admin-sidebar ${open ? "open" : ""}`}>
         <div className="admin-header">
-
           <div className="admin-logo">
-              <CubeLogoSVG />
+            <CubeLogoSVG />
             <div>
               <h3>Cube Admin</h3>
               <span>Control Center</span>
             </div>
           </div>
-
-          <button
-            className="admin-close-btn"
-            onClick={() => setOpen(false)}
-            aria-label="Close menu"
-          >
+          <button className="admin-close-btn" onClick={() => setOpen(false)} aria-label="Close menu">
             <X size={20} />
           </button>
-
         </div>
 
         <div className="admin-links">
@@ -183,9 +128,7 @@ export default function AdminSidebar() {
             <a
               key={link.name}
               href={link.path}
-              className={`admin-nav-link ${
-                location.pathname === link.path ? "active" : ""
-              }`}
+              className={`admin-nav-link ${location.pathname === link.path ? "active" : ""}`}
             >
               {link.icon}
               <span>{link.name}</span>
@@ -194,10 +137,7 @@ export default function AdminSidebar() {
         </div>
 
         <div className="admin-footer">
-          <button
-            className="admin-logout-btn"
-            onClick={() => setShowLogoutModal(true)}
-          >
+          <button className="admin-logout-btn" onClick={() => setShowLogoutModal(true)}>
             <LogOut size={18} />
             Logout
           </button>
@@ -205,43 +145,23 @@ export default function AdminSidebar() {
       </aside>
 
       {showLogoutModal && (
-        <div className="logout-modal-overlay" onClick={(e) => e.target === e.currentTarget && !loggingOut && setShowLogoutModal(false)}>
-
+        <div
+          className="logout-modal-overlay"
+          onClick={(e) => e.target === e.currentTarget && !loggingOut && setShowLogoutModal(false)}
+        >
           <div className="logout-modal">
-
-            <div className="logout-icon">
-              <LogOut size={28} />
-            </div>
-
+            <div className="logout-icon"><LogOut size={28} /></div>
             <h3>Logout Admin?</h3>
-
-            <p>
-              Are you sure you want to logout from
-              the Cube Admin Dashboard?
-            </p>
-
+            <p>Are you sure you want to logout from the Cube Admin Dashboard?</p>
             <div className="logout-actions">
-
-              <button
-                className="cancel-btn"
-                onClick={() => setShowLogoutModal(false)}
-                disabled={loggingOut}
-              >
+              <button className="cancel-btn" onClick={() => setShowLogoutModal(false)} disabled={loggingOut}>
                 Cancel
               </button>
-
-              <button
-                className="confirm-btn"
-                onClick={handleLogout}
-                disabled={loggingOut}
-              >
+              <button className="confirm-btn" onClick={handleLogout} disabled={loggingOut}>
                 {loggingOut ? "Logging out…" : "Logout"}
               </button>
-
             </div>
-
           </div>
-
         </div>
       )}
     </>

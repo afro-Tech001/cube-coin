@@ -5,6 +5,7 @@ import {
   User, Edit, Lock, Bell, Shield, Moon, LogOut, Users, Flame, Wallet, CheckCircle,
 } from "lucide-react";
 import PagerLoader from "../PagerLoader/PagerLoader";
+import CubeIcon from "../../assets/cubecoin-robot-green.png"
 
 export default function ProfileSettings() {
   const [profile,      setProfile]      = useState(null);
@@ -58,7 +59,7 @@ export default function ProfileSettings() {
       {/* PROFILE HERO */}
       <div className="profile-hero">
         <img
-          src={profile?.avatar_url || "https://api.dicebear.com/7.x/bottts/svg?seed=CubeCoin"}
+          src={profile?.avatar_url || CubeIcon}
           alt="profile"
           className="profile-avatar"
         />

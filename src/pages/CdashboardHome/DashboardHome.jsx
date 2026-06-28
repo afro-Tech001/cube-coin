@@ -4,6 +4,8 @@ import { supabase } from "../../libs/supabase";
 import { Bell, Flame, Users, Pickaxe, Gift, ArrowUpRight, X } from "lucide-react";
 import PagerLoader from "../../components/PagerLoader/PagerLoader";
 import AnnouncementModal from "../../Admin/AdminComponents/AdminAnnouncements/AnnouncementModal";
+import CubeIcon from "../../assets/cubecoin-robot-green.png"
+
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const calcEarned = (startedAt, rate, totalPausedSecs = 0, currentlyPausedSince = null) => {
@@ -251,7 +253,7 @@ export default function DashboardHome() {
       <div className="dashboard-topbar">
         <div className="profile-section">
           <img
-            src={userData?.avatar_url || "https://api.dicebear.com/7.x/bottts/svg?seed=CubeCoin"}
+            src={userData?.avatar_url || CubeIcon}
             alt="profile"
             className="profile-image"
           />

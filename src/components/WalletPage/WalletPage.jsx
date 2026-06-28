@@ -16,6 +16,22 @@ const BANKS = [
   "UBA","Fidelity Bank","Opay","Kuda Bank","Palmpay","Other",
 ];
 
+// Titles that count as "Mining Earnings"
+const MINING_TITLES = ["Mining Reward"];
+
+// Titles that count as "Referral Earnings"
+const REFERRAL_TITLES = ["Referral Bonus"];
+
+// Everything else that's a credit and not mining/referral/cashout-related
+// counts as "Rewards Earned" — daily check-ins, streak milestones,
+// mining-amount achievements, subscription bonuses, etc.
+const EXCLUDED_FROM_REWARDS = [
+  ...MINING_TITLES,
+  ...REFERRAL_TITLES,
+  "Cashout Request",
+  "Cashout Refund",
+];
+
 function cubeToNaira(cubes) {
   return (cubes * CUBE_TO_NGN).toFixed(2);
 }
@@ -358,19 +374,38 @@ export default function WalletPage() {
       .maybeSingle();
     setProfile(prof);
 
-    const { data: txs } = await supabase
+    // Fetch ALL transactions for accurate stat totals (not just the
+    // most-recent 10), then separately keep a capped list for the
+    // "Recent Transactions" display below.
+    const { data: allTxs } = await supabase
       .from("wallet_transactions")
       .select("*")
       .eq("user_id", uid)
-      .order("created_at", { ascending: false })
-      .limit(10);
-    setTransactions(txs || []);
+      .order("created_at", { ascending: false });
 
-    // Aggregate stats from transaction titles
-    const mining   = (txs || []).filter(t => t.title === "Mining Reward").reduce((a,t) => a + Number(t.amount), 0);
-    const referral = (txs || []).filter(t => t.title === "Referral Bonus").reduce((a,t) => a + Number(t.amount), 0);
-    const rewards  = (txs || []).filter(t => t.title === "Streak Bonus" || t.title === "Subscription Bonus").reduce((a,t) => a + Number(t.amount), 0);
-    const cashedOut = (txs || []).filter(t => t.title === "Cashout Request" && t.type !== "pending").reduce((a,t) => a + Math.abs(Number(t.amount)), 0);
+    const txs = allTxs || [];
+    setTransactions(txs.slice(0, 10));
+
+    // ── Mining Earnings ──
+    const mining = txs
+      .filter(t => MINING_TITLES.includes(t.title))
+      .reduce((a, t) => a + Number(t.amount), 0);
+
+    // ── Referral Earnings ──
+    const referral = txs
+      .filter(t => REFERRAL_TITLES.includes(t.title))
+      .reduce((a, t) => a + Number(t.amount), 0);
+
+    // ── Rewards Earned ── any credit that isn't mining/referral/cashout
+    // (daily check-ins, streak milestones, mining-amount achievements, etc.)
+    const rewards = txs
+      .filter(t => t.type === "credit" && !EXCLUDED_FROM_REWARDS.includes(t.title))
+      .reduce((a, t) => a + Number(t.amount), 0);
+
+    // ── Cashed out (completed debits only, not pending) ──
+    const cashedOut = txs
+      .filter(t => t.title === "Cashout Request" && t.type !== "pending")
+      .reduce((a, t) => a + Math.abs(Number(t.amount)), 0);
 
     // Pending cashouts
     const { data: pendingCo } = await supabase

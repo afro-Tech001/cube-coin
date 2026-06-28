@@ -21,6 +21,9 @@ import AdminSubscriptionsPage from "./Admin/AdminPages/AdminSubscriptionsPage/Ad
 import SubscriptionStatus from "./components/Subscriptionpage/SubscriptionStatus";
 import ProfileSetup from "./components/Subscriptionpage/Profilesetup";
 import AdminReferralPage from "./Admin/AdminPages/AdminReferralPage/AdminReferralPage";
+import AdminPlanPage from "./Admin/AdminPages/AdminPlanPage/AdminPlanPage";
+import CdashboardSpinWheel from "./pages/CdashboardSpinWheel/CdashboardSpinWheel";
+import AdminRewardPage from "./Admin/AdminPages/AdminRewardPage/AdminRewardPage";
 function App() {
 
   const [loading, setLoading] = useState(true);
@@ -52,6 +55,7 @@ function App() {
       <Route path="/streaks" element={<ProtectedRoute><CdashboardStreak /></ProtectedRoute>} />
       <Route path="/wallet" element={<ProtectedRoute><Cdashboardwallet /></ProtectedRoute>} />
       <Route path="/profilesettings" element={<ProtectedRoute><Cdashboardprofile /></ProtectedRoute>} />
+      <Route path="/spinwheel" element={<ProtectedRoute><CdashboardSpinWheel /></ProtectedRoute>} />
 
       {/* Admin Routes */}
       <Route path="/admin/dashboard" element={<ProtectedRoute><Admindashboard /></ProtectedRoute>} />
@@ -59,9 +63,11 @@ function App() {
       <Route path="/admin/mining" element={<ProtectedRoute><AdminMiningPage /></ProtectedRoute>} />
       <Route path="/admin/subscription" element={<ProtectedRoute><AdminSubscriptionsPage /></ProtectedRoute>} />
       <Route path="/admin/referal" element={<ProtectedRoute><AdminReferralPage /></ProtectedRoute>} />
+      <Route path="/admin/plans" element={<ProtectedRoute><AdminPlanPage /></ProtectedRoute>} />
       <Route path="/admin/withdrawals" element={<ProtectedRoute><AdminWithdrawalPage /></ProtectedRoute>} />
       <Route path="/admin/settings" element={<ProtectedRoute><AdminSettingsPage /></ProtectedRoute>} />
       <Route path="/admin/announcements" element={<ProtectedRoute><AdminAnnouncePage /></ProtectedRoute>} />
+      <Route path="/admin/reward" element={<ProtectedRoute><AdminRewardPage /></ProtectedRoute>} />
     </Routes>
   );
 }

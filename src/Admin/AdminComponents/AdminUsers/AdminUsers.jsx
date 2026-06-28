@@ -6,6 +6,7 @@ import {
   Wallet,
   UserX,
 } from "lucide-react";
+import CubeIcon from "../../../assets/cubecoin-robot-green.png"
 
 import "./AdminUsers.css";
 
@@ -128,7 +129,7 @@ export default function AdminUsers() {
                     <img
                       src={
                         user.avatar_url ||
-                        "https://api.dicebear.com/7.x/bottts/svg?seed=CubeCoin"
+                         CubeIcon
                       }
                       alt=""
                       className="user-avatar"
