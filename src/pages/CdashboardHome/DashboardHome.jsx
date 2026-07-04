@@ -118,13 +118,16 @@ export default function DashboardHome() {
       }
 
       // Recent wallet transactions
-      const { data: txs } = await supabase
-        .from("wallet_transactions")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(5);
-      setTransactions(txs || []);
+      const { data: allTxs } = await supabase
+  .from("wallet_transactions")
+  .select("*")
+  .eq("user_id", user.id)
+  .order("created_at", { ascending: false });
+
+const txs = allTxs || [];
+
+// Only show 5 recent transactions
+setTransactions(txs.slice(0, 5));
 
       // Stats: total mining session time (all sessions)
       const { data: sessions } = await supabase
