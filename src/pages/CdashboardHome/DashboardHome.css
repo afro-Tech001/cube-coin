@@ -69,10 +69,7 @@
   justify-content: center;
 }
 
-.notification-btn:hover {
-  border-color: rgba(127,255,110,.4);
-  transform: translateY(-2px);
-}
+
 
 .notification-dot {
   position: absolute;
