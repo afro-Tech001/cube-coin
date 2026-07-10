@@ -4,11 +4,11 @@
 // Replace WHATSAPP_INVITE_LINK with your actual WhatsApp community invite URL.
 
 import { useState } from "react";
-import "./WhatsAppFAB.css";
+import "./Whatsappfab.css";
 
 const WHATSAPP_INVITE_LINK = "https://chat.whatsapp.com/JFQCEqcpXaZAt5b1YcYkvH";
 
-export default function WhatsAppFAB() {
+export default function Whatsappfab() {
   const [dismissed, setDismissed] = useState(
     () => localStorage.getItem("wa_fab_dismissed") === "true"
   );
