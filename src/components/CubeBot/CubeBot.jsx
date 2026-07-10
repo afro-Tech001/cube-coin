@@ -14,16 +14,16 @@ const KB = [
     reply: "⛏ **How Mining Works:**\n\n1. Go to the **Mining page** from your dashboard\n2. Tap **Start Mining** — your session begins\n3. Mining runs based on your plan's rate (e.g. 0.40 CUBE/hr)\n4. You can **Pause** and **Resume** anytime\n5. When done, tap **Claim** to add earned CUBE to your wallet\n\nYour CUBE accumulates in real time — the longer you mine, the more you earn! 🚀",
     chips: ["What are the rates?","Can I pause mining?","How to claim?"],
   },
-  {
+ {
   keys: ["rate","cube per hour","mining rate","how fast"],
-  reply: "📊 **Mining Rates by Plan:**\n\n⬡ Starter → 0.80 CUBE/hr\n🥉 Bronze → 2.00 CUBE/hr\n🥈 Silver → 4.00 CUBE/hr\n🥇 Gold → 7.20 CUBE/hr\n💎 Diamond → 14.00 CUBE/hr\n\nDiamond earns 17.5× more than Starter per hour!",
+  reply: "📊 **Mining Rates by Plan:**\n\n🆕 Basic → 0.40 CUBE/hr\n⬡ Starter → 0.80 CUBE/hr\n🥉 Bronze → 2.00 CUBE/hr\n🥈 Silver → 4.00 CUBE/hr\n🥇 Gold → 7.20 CUBE/hr\n💎 Diamond → 14.00 CUBE/hr\n\nDiamond earns 35× more than Basic per hour!",
   chips: ["What does Silver cost?","Upgrade my plan","How to claim?"],
 },
-  {
-    keys: ["plan","subscription","starter","bronze","silver","gold","diamond","cost","price","upgrade"],
-    reply: "💳 **Subscription Plans:**\n\n⬡ **Starter** — ₦10,600 → 50,000 CUBE bonus\n🥉 **Bronze** — ₦16,200 → 100,000 CUBE bonus\n🥈 **Silver** — ₦22,500 → 200,000 CUBE bonus ⭐\n🥇 **Gold** — ₦30,350 → 250,000 CUBE bonus\n💎 **Diamond** — ₦50,000 → 300,000 CUBE bonus\n\nEach plan is a **one-time payment** with a big CUBE bonus on activation!",
-    chips: ["How to subscribe?","How do I pay?","Mining rates","What's the best plan?"],
-  },
+{
+  keys: ["plan","subscription","starter","bronze","silver","gold","diamond","basic","cost","price","upgrade"],
+  reply: "💳 **Subscription Plans:**\n\n🆕 **Basic** — ₦5,600 → 20,000 CUBE bonus\n⬡ **Starter** — ₦10,600 → 50,000 CUBE bonus\n🥉 **Bronze** — ₦16,200 → 100,000 CUBE bonus\n🥈 **Silver** — ₦22,500 → 200,000 CUBE bonus ⭐\n🥇 **Gold** — ₦30,350 → 250,000 CUBE bonus\n💎 **Diamond** — ₦50,000 → 300,000 CUBE bonus\n\nEach plan is a **one-time payment** with a big CUBE bonus on activation!",
+  chips: ["How to subscribe?","How do I pay?","Mining rates","What's the best plan?"],
+},
   {
     keys: ["pay","payment","bank","transfer","how to pay","receipt","moniepoint"],
     reply: "🏦 **How to Pay:**\n\n1. Choose your plan on the Subscription page\n2. Transfer to:\n   • **Bank:** Moniepoint  Nigeria\n   • **Name:** Mara's Treat\n   • **Account:** 7077456282\n3. Upload your payment **receipt**\n4. Admin verifies within **1–3 hours**\n\n⚠️ Use your phone/email as narration so we can identify you.",

@@ -9,11 +9,19 @@ import "react-toastify/dist/ReactToastify.css";
 
 const PLANS = [
   {
+    id: 0, name: "Basic", price: 5600,
+    rate: "0.40 CUBE/hr", rateVal: 0.40,
+    subscriptionCubes: 30000,
+    features: ["Entry-level mining", "Daily rewards", "Mobile access", "Community support"],
+    current: false,
+    badge: "New · Best entry",
+  },
+  {
     id: 1, name: "Starter", price: 10600,
     rate: "0.80 CUBE/hr", rateVal: 0.80,
     subscriptionCubes: 50000,
     features: ["Basic mining speed", "Daily rewards", "Mobile access", "Community support"],
-    current: true,
+    current: false,
   },
   {
     id: 2, name: "Bronze", price: 16200,
