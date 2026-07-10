@@ -15,18 +15,18 @@ const KB = [
     chips: ["What are the rates?","Can I pause mining?","How to claim?"],
   },
   {
-    keys: ["rate","cube per hour","mining rate","how fast","0.08","0.20","0.40","0.72","1.40"],
-    reply: "📊 **Mining Rates by Plan:**\n\n⬡ Starter → 0.08 CUBE/hr\n🥉 Bronze → 0.20 CUBE/hr\n🥈 Silver → 0.40 CUBE/hr\n🥇 Gold → 0.72 CUBE/hr\n💎 Diamond → 1.40 CUBE/hr\n\nDiamond earns 17.5× more than Starter per hour!",
-    chips: ["What does Silver cost?","Upgrade my plan","How to claim?"],
-  },
+  keys: ["rate","cube per hour","mining rate","how fast"],
+  reply: "📊 **Mining Rates by Plan:**\n\n⬡ Starter → 0.80 CUBE/hr\n🥉 Bronze → 2.00 CUBE/hr\n🥈 Silver → 4.00 CUBE/hr\n🥇 Gold → 7.20 CUBE/hr\n💎 Diamond → 14.00 CUBE/hr\n\nDiamond earns 17.5× more than Starter per hour!",
+  chips: ["What does Silver cost?","Upgrade my plan","How to claim?"],
+},
   {
     keys: ["plan","subscription","starter","bronze","silver","gold","diamond","cost","price","upgrade"],
     reply: "💳 **Subscription Plans:**\n\n⬡ **Starter** — ₦10,600 → 50,000 CUBE bonus\n🥉 **Bronze** — ₦16,200 → 100,000 CUBE bonus\n🥈 **Silver** — ₦22,500 → 200,000 CUBE bonus ⭐\n🥇 **Gold** — ₦30,350 → 250,000 CUBE bonus\n💎 **Diamond** — ₦50,000 → 300,000 CUBE bonus\n\nEach plan is a **one-time payment** with a big CUBE bonus on activation!",
     chips: ["How to subscribe?","How do I pay?","Mining rates","What's the best plan?"],
   },
   {
-    keys: ["pay","payment","bank","transfer","how to pay","receipt","first bank"],
-    reply: "🏦 **How to Pay:**\n\n1. Choose your plan on the Subscription page\n2. Transfer to:\n   • **Bank:** First Bank Nigeria\n   • **Name:** CUBE Digital Ltd\n   • **Account:** 3094827651\n3. Upload your payment **receipt**\n4. Admin verifies within **1–3 hours**\n\n⚠️ Use your phone/email as narration so we can identify you.",
+    keys: ["pay","payment","bank","transfer","how to pay","receipt","moniepoint"],
+    reply: "🏦 **How to Pay:**\n\n1. Choose your plan on the Subscription page\n2. Transfer to:\n   • **Bank:** Moniepoint  Nigeria\n   • **Name:** Mara's Treat\n   • **Account:** 7077456282\n3. Upload your payment **receipt**\n4. Admin verifies within **1–3 hours**\n\n⚠️ Use your phone/email as narration so we can identify you.",
     chips: ["How long does activation take?","Subscription plans"],
   },
   {

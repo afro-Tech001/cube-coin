@@ -10,42 +10,42 @@ import "react-toastify/dist/ReactToastify.css";
 const PLANS = [
   {
     id: 1, name: "Starter", price: 10600,
-    rate: "0.08 CUBE/hr", rateVal: 0.08,
+    rate: "0.80 CUBE/hr", rateVal: 0.80,
     subscriptionCubes: 50000,
     features: ["Basic mining speed", "Daily rewards", "Mobile access", "Community support"],
     current: true,
   },
   {
     id: 2, name: "Bronze", price: 16200,
-    rate: "0.20 CUBE/hr", rateVal: 0.20,
+    rate: "2.00 CUBE/hr", rateVal: 2.00,
     subscriptionCubes: 100000,
     features: ["2.5× mining speed", "Daily rewards", "Priority queue", "Email support", "Streak bonuses"],
   },
   {
     id: 3, name: "Silver", price: 22500,
-    rate: "0.40 CUBE/hr", rateVal: 0.40,
+    rate: "4.00 CUBE/hr", rateVal: 4.00,
     subscriptionCubes: 200000,
     features: ["5× mining speed", "Daily + bonus rewards", "Referral boost +5%", "24/7 chat support", "Streak bonuses", "Early access"],
     featured: true, badge: "Most popular",
   },
   {
     id: 4, name: "Gold", price: 30350,
-    rate: "0.72 CUBE/hr", rateVal: 0.72,
+    rate: "7.20 CUBE/hr", rateVal: 7.20,
     subscriptionCubes: 250000,
     features: ["9× mining speed", "Double daily rewards", "Referral boost +10%", "VIP support", "Analytics dashboard", "Early access", "Custom avatar"],
   },
   {
     id: 5, name: "Diamond", price: 50000,
-    rate: "1.40 CUBE/hr", rateVal: 1.40,
+    rate: "14.00 CUBE/hr", rateVal: 14.00,
     subscriptionCubes: 300000,
     features: ["17.5× mining speed", "Triple daily rewards", "Referral boost +20%", "Dedicated manager", "Full analytics", "NFT badge", "Priority withdrawals", "Lifetime perks"],
   },
 ];
 
 const BANK = {
-  bankName: "First Bank Nigeria",
-  accountName: "CUBE Digital Ltd",
-  accountNumber: "3094827651",
+  bankName: "Moniepoint Nigeria",
+  accountName: "Mara's Treat",
+  accountNumber: "7077456282",
   sortCode: "011",
 };
 

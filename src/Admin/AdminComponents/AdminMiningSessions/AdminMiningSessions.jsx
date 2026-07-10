@@ -13,9 +13,10 @@ function fmtDate(iso) {
 
 function fmtDuration(startedAt, endsAt) {
   if (!startedAt || !endsAt) return "—";
-  const totalMs  = new Date(endsAt) - new Date(startedAt);
-  const totalHrs = Math.round(totalMs / 3600000);
-  return `${totalHrs}h`;
+  const totalMs   = new Date(endsAt) - new Date(startedAt);
+  const totalMins = Math.round(totalMs / 60000);
+  if (totalMins >= 60) return `${Math.floor(totalMins / 60)}h ${totalMins % 60}m`;
+  return `${totalMins}min`;
 }
 
 function fmtEarned(n) {

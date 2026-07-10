@@ -5,7 +5,7 @@ import { Bell, Flame, Users, Pickaxe, Gift, ArrowUpRight, X } from "lucide-react
 import PagerLoader from "../../components/PagerLoader/PagerLoader";
 import AnnouncementModal from "../../Admin/AdminComponents/AdminAnnouncements/AnnouncementModal";
 import CubeIcon from "../../assets/cubecoin-robot-green.png"
-import Helpbutton from "../../components/Helpbutton/Helpbutton";
+// import Helpbutton from "../../components/Helpbutton/Helpbutton";
 
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -266,9 +266,9 @@ setTransactions(txs.slice(0, 5));
             <h2 className="profile-name">{userData?.full_name || "User"}</h2>
           </div>
         </div>
-        <div className="notification-btn">
-           <Helpbutton />
-        </div>
+        <button className="notification-btn">
+           <Bell />
+        </button>
       </div>
 
       {/* HERO CARD */}
