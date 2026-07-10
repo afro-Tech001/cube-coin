@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import "./HelpButton.css";
+import "./Helpbutton.css";
 
 const FAQS = [
   {
@@ -97,7 +97,7 @@ const CONTACT_OPTIONS = [
   { icon: "💬", label: "WhatsApp", value: "Chat with us", href: "https://wa.me/2348000000000" },
 ];
 
-export default function HelpButton() {
+export default function Helpbutton() {
   const [open,       setOpen]       = useState(false);
   const [activeTab,  setActiveTab]  = useState("faq");     // faq | contact
   const [activeCat,  setActiveCat]  = useState(0);

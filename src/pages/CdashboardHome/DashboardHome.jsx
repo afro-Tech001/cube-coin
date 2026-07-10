@@ -5,7 +5,7 @@ import { Bell, Flame, Users, Pickaxe, Gift, ArrowUpRight, X } from "lucide-react
 import PagerLoader from "../../components/PagerLoader/PagerLoader";
 import AnnouncementModal from "../../Admin/AdminComponents/AdminAnnouncements/AnnouncementModal";
 import CubeIcon from "../../assets/cubecoin-robot-green.png"
-import HelpButton from "../../components/Helpbutton/Helpbutton";
+import Helpbutton from "../../components/Helpbutton/Helpbutton";
 
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -267,7 +267,7 @@ setTransactions(txs.slice(0, 5));
           </div>
         </div>
         <div className="notification-btn">
-           <HelpButton />
+           <Helpbutton />
         </div>
       </div>
 
