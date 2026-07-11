@@ -24,6 +24,7 @@ import AdminReferralPage from "./Admin/AdminPages/AdminReferralPage/AdminReferra
 import AdminPlanPage from "./Admin/AdminPages/AdminPlanPage/AdminPlanPage";
 import CdashboardSpinWheel from "./pages/CdashboardSpinWheel/CdashboardSpinWheel";
 import AdminRewardPage from "./Admin/AdminPages/AdminRewardPage/AdminRewardPage";
+import CdashboardUpgrade from "./pages/CdashboardUpgrade/CdashboardUpgrade";
 function App() {
 
   const [loading, setLoading] = useState(true);
@@ -56,6 +57,7 @@ function App() {
       <Route path="/wallet" element={<ProtectedRoute><Cdashboardwallet /></ProtectedRoute>} />
       <Route path="/profilesettings" element={<ProtectedRoute><Cdashboardprofile /></ProtectedRoute>} />
       <Route path="/spinwheel" element={<ProtectedRoute><CdashboardSpinWheel /></ProtectedRoute>} />
+      <Route path="/upgrade" element={<ProtectedRoute><CdashboardUpgrade /></ProtectedRoute>} />
 
       {/* Admin Routes */}
       <Route path="/admin/dashboard" element={<ProtectedRoute><Admindashboard /></ProtectedRoute>} />

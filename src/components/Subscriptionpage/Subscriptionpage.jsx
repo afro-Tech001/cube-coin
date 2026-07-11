@@ -5,12 +5,15 @@ import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 
+// ── Plans with subscription_cubes ─────────────────────────────────────────────
+
 const PLANS = [
   {
     id: 0, name: "Basic", price: 5600,
     rate: "0.40 CUBE/hr", rateVal: 0.40,
-    subscriptionCubes: 20000,
+    subscriptionCubes: 30000,
     features: ["Entry-level mining", "Daily rewards", "Mobile access", "Community support"],
+    current: false,
     badge: "New · Best entry",
   },
   {
@@ -18,6 +21,7 @@ const PLANS = [
     rate: "0.80 CUBE/hr", rateVal: 0.80,
     subscriptionCubes: 50000,
     features: ["Basic mining speed", "Daily rewards", "Mobile access", "Community support"],
+    current: false,
   },
   {
     id: 2, name: "Bronze", price: 16200,
@@ -47,18 +51,20 @@ const PLANS = [
 ];
 
 const BANK = {
-  bankName:      "Moniepoint Nigeria",
-  accountName:   "Mara's Treat",
+  bankName: "Moniepoint Nigeria",
+  accountName: "Mara's Treat",
   accountNumber: "7077456282",
-  sortCode:      "011",
+  sortCode: "011",
 };
 
+// ── Helper: format large cube numbers ─────────────────────────────────────────
 function fmtCubes(n) {
   if (n >= 1_000_000) return (n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1) + "M";
   if (n >= 1_000)     return (n / 1_000).toFixed(n % 1_000 === 0 ? 0 : 1) + "K";
   return n.toLocaleString();
 }
 
+// ── Cube award badge ──────────────────────────────────────────────────────────
 function CubeAwardBadge({ cubes, size = "normal" }) {
   return (
     <div className={`sub-cube-award ${size}`}>
@@ -71,13 +77,14 @@ function CubeAwardBadge({ cubes, size = "normal" }) {
   );
 }
 
+// ── Step dots ─────────────────────────────────────────────────────────────────
 function StepDots({ current }) {
-  const steps = [{ n:1, label:"Details" }, { n:2, label:"Payment" }, { n:3, label:"Confirm" }];
+  const steps = [{ n: 1, label: "Details" }, { n: 2, label: "Payment" }, { n: 3, label: "Confirm" }];
   return (
     <div className="sub-steps">
       {steps.map((s, i) => (
         <div key={s.n} className="sub-step-item">
-          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:2 }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
             <div className={`sub-step-dot ${current > s.n ? "done" : current === s.n ? "active" : ""}`}>
               {current > s.n ? "✓" : s.n}
             </div>
@@ -90,35 +97,20 @@ function StepDots({ current }) {
   );
 }
 
-// ── Plan card — upgrade-aware ─────────────────────────────────────────────────
-function PlanCard({ plan, currentPlan, onSelect, onUpgrade }) {
-  const currentPlanObj = PLANS.find(p => p.name === currentPlan);
-  const isCurrentPlan  = plan.name === currentPlan;
-  const isLowerTier    = currentPlanObj && plan.id < currentPlanObj.id;
-  const isUpgrade      = currentPlanObj && plan.id > currentPlanObj.id;
-  const upgradeCost    = currentPlanObj ? Math.max(0, plan.price - currentPlanObj.price) : plan.price;
-
+// ── Plan card ─────────────────────────────────────────────────────────────────
+function PlanCard({ plan, onSelect }) {
   return (
-    <div className={`sub-plan ${plan.featured ? "featured" : ""} ${isCurrentPlan ? "current-plan" : ""} ${isLowerTier ? "lower-tier" : ""}`}>
-      {plan.badge && !isCurrentPlan && <div className="sub-plan-badge">{plan.badge}</div>}
-      {isCurrentPlan && <div className="sub-current-badge">✓ Current Plan</div>}
-      {isLowerTier   && <div className="sub-lower-badge">Lower tier</div>}
+    <div className={`sub-plan ${plan.featured ? "featured" : ""}`}>
+      {plan.badge   && <div className="sub-plan-badge">{plan.badge}</div>}
+      {plan.current && <div className="sub-current-badge">Current</div>}
 
       <div className="sub-plan-name">{plan.name}</div>
-      <div className="sub-plan-price">
-        ₦{plan.price.toLocaleString()} <span>/once</span>
-      </div>
-
-      {/* Show upgrade cost if user has a current plan */}
-      {currentPlanObj && isUpgrade && (
-        <div className="sub-upgrade-cost">
-          <span className="sub-upgrade-label">Upgrade cost</span>
-          <span className="sub-upgrade-price">+₦{upgradeCost.toLocaleString()}</span>
-        </div>
-      )}
-
+      <div className="sub-plan-price">₦{plan.price.toLocaleString()} <span>/once</span></div>
       <div className="sub-plan-rate">{plan.rate}</div>
+
+      {/* ── Cube award highlight ── */}
       <CubeAwardBadge cubes={plan.subscriptionCubes} />
+
       <hr className="sub-plan-divider" />
 
       <div className="sub-plan-features">
@@ -130,63 +122,25 @@ function PlanCard({ plan, currentPlan, onSelect, onUpgrade }) {
         )}
       </div>
 
-      {isCurrentPlan ? (
-        <button className="sub-plan-btn current-btn" disabled>
-          ✓ Current Plan
-        </button>
-      ) : isLowerTier ? (
-        <button className="sub-plan-btn lower-btn" disabled>
-          Lower tier
-        </button>
-      ) : isUpgrade ? (
-        <button
-          className={`sub-plan-btn upgrade-btn`}
-          onClick={() => onUpgrade(plan, upgradeCost)}
-        >
-          ↑ Upgrade to {plan.name}
-        </button>
-      ) : (
-        <button
-          className={`sub-plan-btn ${plan.featured ? "featured-btn" : "default-btn"}`}
-          onClick={() => onSelect(plan)}
-        >
-          Get {plan.name}
-        </button>
-      )}
+      <button
+        className={`sub-plan-btn ${plan.featured ? "featured-btn" : "default-btn"}`}
+        onClick={() => onSelect(plan)}
+      >
+        Get {plan.name}
+      </button>
     </div>
   );
 }
 
 // ── Step 1 ────────────────────────────────────────────────────────────────────
-function Step1({ plan, isUpgrade, upgradeCost, currentPlanName, onNext }) {
+function Step1({ plan, onNext }) {
   return (
     <>
-      <div className="sub-plan-label">
-        {isUpgrade ? `Upgrade to ${plan.name}` : `${plan.name} plan`}
-      </div>
-      <div className="sub-sheet-price">
-        ₦{(isUpgrade ? upgradeCost : plan.price).toLocaleString()} <span>{isUpgrade ? "upgrade cost" : "one-time"}</span>
-      </div>
+      <div className="sub-plan-label">{plan.name} plan</div>
+      <div className="sub-sheet-price">₦{plan.price.toLocaleString()} <span>one-time</span></div>
       <StepDots current={1} />
 
-      {isUpgrade && (
-        <div className="sub-upgrade-banner">
-          <div className="sub-upgrade-banner-row">
-            <span>From</span>
-            <strong>{currentPlanName}</strong>
-          </div>
-          <div className="sub-upgrade-arrow">↓</div>
-          <div className="sub-upgrade-banner-row highlight">
-            <span>To</span>
-            <strong style={{ color:"#4ade80" }}>{plan.name}</strong>
-          </div>
-          <div className="sub-upgrade-banner-row" style={{ marginTop:8, borderTop:"1px solid rgba(74,222,128,.1)", paddingTop:8 }}>
-            <span>You pay</span>
-            <strong style={{ color:"#4ade80" }}>₦{upgradeCost.toLocaleString()}</strong>
-          </div>
-        </div>
-      )}
-
+      {/* Cube award — prominent on step 1 */}
       <CubeAwardBadge cubes={plan.subscriptionCubes} size="large" />
 
       <div className="sub-section-title">What you get</div>
@@ -196,7 +150,7 @@ function Step1({ plan, isUpgrade, upgradeCost, currentPlanName, onNext }) {
 
       <div className="sub-rate-box">
         <div>
-          <div className="sub-rate-box-label">New mining rate</div>
+          <div className="sub-rate-box-label">Mining rate</div>
           <div className="sub-rate-box-val">{plan.rate}</div>
         </div>
       </div>
@@ -209,9 +163,8 @@ function Step1({ plan, isUpgrade, upgradeCost, currentPlanName, onNext }) {
 }
 
 // ── Step 2 ────────────────────────────────────────────────────────────────────
-function Step2({ plan, txRef, isUpgrade, upgradeCost, onNext }) {
+function Step2({ plan, txRef, onNext }) {
   const [copied, setCopied] = useState(false);
-  const payAmount = isUpgrade ? upgradeCost : plan.price;
 
   const copyAccNumber = () => {
     navigator.clipboard?.writeText(BANK.accountNumber).catch(() => {});
@@ -221,22 +174,19 @@ function Step2({ plan, txRef, isUpgrade, upgradeCost, onNext }) {
 
   return (
     <>
-      <div className="sub-plan-label">
-        {isUpgrade ? `Upgrade to ${plan.name}` : `${plan.name} plan`}
-      </div>
-      <div className="sub-sheet-price">
-        ₦{payAmount.toLocaleString()} <span>{isUpgrade ? "upgrade cost" : "one-time"}</span>
-      </div>
+      <div className="sub-plan-label">{plan.name} plan</div>
+      <div className="sub-sheet-price">₦{plan.price.toLocaleString()} <span>one-time</span></div>
       <StepDots current={2} />
 
       <div className="sub-amount-highlight">
         <p>Transfer exactly this amount</p>
-        <h2>₦{payAmount.toLocaleString()}</h2>
+        <h2>₦{plan.price.toLocaleString()}</h2>
       </div>
 
+      {/* Compact cube reminder */}
       <div className="sub-cube-reminder">
         <span className="sub-cube-reminder-icon">⬡</span>
-        You'll receive <strong>{fmtCubes(plan.subscriptionCubes)} CUBE</strong> once upgrade is verified
+        You'll receive <strong>{fmtCubes(plan.subscriptionCubes)} CUBE</strong> once payment is verified
       </div>
 
       <div className="sub-section-title">Bank transfer details</div>
@@ -267,7 +217,7 @@ function Step2({ plan, txRef, isUpgrade, upgradeCost, onNext }) {
 
       <div className="sub-ref-field">
         <label>Payment reference (auto-generated)</label>
-        <input type="text" value={txRef} readOnly style={{ color:"#4ade80", letterSpacing:1 }} />
+        <input type="text" value={txRef} readOnly style={{ color: "#4ade80", letterSpacing: 1 }} />
       </div>
 
       <button className="sub-confirm-btn" onClick={onNext}>
@@ -278,12 +228,11 @@ function Step2({ plan, txRef, isUpgrade, upgradeCost, onNext }) {
 }
 
 // ── Step 3 ────────────────────────────────────────────────────────────────────
-function Step3({ plan, txRef, isUpgrade, upgradeCost, onSubmit }) {
+function Step3({ plan, txRef, onSubmit }) {
   const [name,    setName]    = useState("");
   const [contact, setContact] = useState("");
-  const [receipt, setReceipt] = useState(null);
   const [errors,  setErrors]  = useState({});
-  const payAmount = isUpgrade ? upgradeCost : plan.price;
+  const [receipt, setReceipt] = useState(null);
 
   const handleSubmit = () => {
     const errs = {};
@@ -296,25 +245,30 @@ function Step3({ plan, txRef, isUpgrade, upgradeCost, onSubmit }) {
 
   return (
     <>
-      <div className="sub-plan-label">
-        {isUpgrade ? `Upgrade to ${plan.name}` : `${plan.name} plan`}
-      </div>
+      <div className="sub-plan-label">{plan.name} plan</div>
       <StepDots current={3} />
 
       <div className="sub-section-title">Confirm your payment</div>
 
-      <div className="sub-bank-card" style={{ marginBottom:14 }}>
+      {/* Summary including cubes */}
+      <div className="sub-bank-card" style={{ marginBottom: 14 }}>
         {[
-          ["Plan",              isUpgrade ? `Upgrade → ${plan.name}` : plan.name],
-          ["Amount",            `₦${payAmount.toLocaleString()}`],
-          ["Reference",         txRef],
-          ["New mining rate",   plan.rate],
-          ["Activation CUBE",   `${fmtCubes(plan.subscriptionCubes)} CUBE`],
+          ["Plan",             plan.name],
+          ["Amount",           `₦${plan.price.toLocaleString()}`],
+          ["Reference",        txRef],
+          ["Mining rate",      plan.rate],
+          ["Subscription CUBE", `${fmtCubes(plan.subscriptionCubes)} CUBE`],
         ].map(([l, v]) => (
           <div key={l} className="sub-bank-row">
             <span className="sub-bank-label">{l}</span>
-            <span className="sub-bank-val"
-              style={l === "Amount" || l === "New mining rate" || l === "Activation CUBE" ? { color:"#4ade80" } : {}}>
+            <span
+              className="sub-bank-val"
+              style={
+                l === "Amount" || l === "Mining rate" || l === "Subscription CUBE"
+                  ? { color: "#4ade80" }
+                  : {}
+              }
+            >
               {v}
             </span>
           </div>
@@ -323,58 +277,65 @@ function Step3({ plan, txRef, isUpgrade, upgradeCost, onSubmit }) {
 
       <div className="sub-ref-field">
         <label>Your full name *</label>
-        <input type="text" placeholder="Name as used on bank account"
-          value={name} onChange={e => setName(e.target.value)}
-          style={errors.name ? { borderColor:"rgba(229,57,53,.6)" } : {}} />
+        <input
+          type="text"
+          placeholder="Name as used on bank account"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          style={errors.name ? { borderColor: "rgba(229,57,53,.6)" } : {}}
+        />
       </div>
 
       <div className="sub-ref-field">
         <label>Your phone / email *</label>
-        <input type="text" placeholder="Used as transfer narration"
-          value={contact} onChange={e => setContact(e.target.value)}
-          style={errors.contact ? { borderColor:"rgba(229,57,53,.6)" } : {}} />
+        <input
+          type="text"
+          placeholder="Used as transfer narration"
+          value={contact}
+          onChange={e => setContact(e.target.value)}
+          style={errors.contact ? { borderColor: "rgba(229,57,53,.6)" } : {}}
+        />
       </div>
 
       <div className="sub-ref-field">
         <label>Payment Receipt *</label>
-        <input type="file" accept="image/*,.pdf"
+        <input
+          type="file"
+          accept="image/*,.pdf"
           onChange={e => setReceipt(e.target.files[0])}
-          style={errors.receipt ? { borderColor:"rgba(229,57,53,.6)" } : {}} />
+          style={errors.receipt ? { borderColor: "rgba(229,57,53,.6)" } : {}}
+        />
         {errors.receipt && (
-          <span style={{ fontSize:11, color:"rgba(229,57,53,.8)", marginTop:4, display:"block" }}>
+          <span style={{ fontSize: 11, color: "rgba(229,57,53,.8)", marginTop: 4, display: "block" }}>
             Please attach your payment receipt
           </span>
         )}
       </div>
 
-      <div className="sub-notice" style={{ marginBottom:20 }}>
-        ⏱ Your {isUpgrade ? "upgrade" : "plan"} activates within 1–3 hours after payment is verified.
+      <div className="sub-notice" style={{ marginBottom: 20 }}>
+        ⏱ Your plan activates within 1–3 hours after payment is verified. You will receive a confirmation.
       </div>
 
       <button className="sub-confirm-btn" onClick={handleSubmit}>
-        Submit {isUpgrade ? "upgrade" : "confirmation"} →
+        Submit confirmation →
       </button>
     </>
   );
 }
 
-// ── Success screen ─────────────────────────────────────────────────────────────
-function SuccessScreen({ plan, txRef, userName, isUpgrade, upgradeCost, onClose }) {
+// ── Success screen ────────────────────────────────────────────────────────────
+function SuccessScreen({ plan, txRef, userName, onClose }) {
   return (
     <div className="sub-success-wrap">
-      <div className="sub-success-icon">{isUpgrade ? "⬆️" : "🎉"}</div>
-      <h3>{isUpgrade ? "Upgrade submitted!" : "Payment submitted!"}</h3>
+      <div className="sub-success-icon">🎉</div>
+      <h3>Payment submitted!</h3>
       <p>
-        Thank you, <strong style={{ color:"#fff" }}>{userName}</strong>.{" "}
-        {isUpgrade
-          ? <>Your upgrade to <strong style={{ color:"#4ade80" }}>{plan.name}</strong> plan is being processed.</>
-          : <>Your <strong style={{ color:"#4ade80" }}>{plan.name}</strong> plan is being activated.</>
-        }{" "}
-        We'll verify your transfer of <strong style={{ color:"#fff" }}>
-          ₦{(isUpgrade ? upgradeCost : plan.price).toLocaleString()}
-        </strong> within 1–3 hours.
+        Thank you, <strong style={{ color: "#fff" }}>{userName}</strong>.
+        Your <strong style={{ color: "#4ade80" }}>{plan.name}</strong> plan is being activated.
+        We'll verify your transfer of <strong style={{ color: "#fff" }}>₦{plan.price.toLocaleString()}</strong> and notify you within 1–3 hours.
       </p>
 
+      {/* Cube award reminder on success */}
       <div className="sub-success-cube-box">
         <div className="sub-success-cube-icon">⬡</div>
         <div>
@@ -393,68 +354,33 @@ function SuccessScreen({ plan, txRef, userName, isUpgrade, upgradeCost, onClose 
   );
 }
 
-// ── Main component ─────────────────────────────────────────────────────────────
+// ── Main component ────────────────────────────────────────────────────────────
 export default function SubscriptionPage() {
-  const [selectedPlan,  setSelectedPlan]  = useState(null);
-  const [step,          setStep]          = useState(1);
-  const [txRef]                           = useState("CUBE" + Date.now().toString().slice(-8));
-  const [userName,      setUserName]      = useState("");
-  const [success,       setSuccess]       = useState(false);
-  const [currentPlan,   setCurrentPlan]   = useState(null);  // user's active plan name
-  const [currentSubId,  setCurrentSubId]  = useState(null);  // current subscription id
-  const [isUpgrade,     setIsUpgrade]     = useState(false);
-  const [upgradeCost,   setUpgradeCost]   = useState(0);
-  const [userId,        setUserId]        = useState(null);
-  const [pageMode,      setPageMode]      = useState("new"); // "new" | "upgrade"
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [step,         setStep]         = useState(1);
+  const [txRef]                         = useState("CUBE" + Date.now().toString().slice(-8));
+  const [userName,     setUserName]     = useState("");
+  const [success,      setSuccess]      = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const checkProfile = async () => {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData?.user) { navigate("/login"); return; }
-      setUserId(userData.user.id);
 
-      // Check if user already has an approved subscription
-      const { data: activeSub } = await supabase
-        .from("subscriptions")
-        .select("id, plan_name, mining_rate, payment_status")
-        .eq("user_id", userData.user.id)
-        .eq("payment_status", "approved")
-        .order("created_at", { ascending: false })
-        .limit(1)
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("subscription_status")
+        .eq("id", userData.user.id)
         .maybeSingle();
 
-      if (activeSub) {
-        setCurrentPlan(activeSub.plan_name);
-        setCurrentSubId(activeSub.id);
-        setPageMode("upgrade");
-      }
+      if (profile?.subscription_status === "approved") navigate("/dashboard");
     };
     checkProfile();
   }, []);
 
-  const openPlan = (plan) => {
-    setSelectedPlan(plan);
-    setStep(1);
-    setSuccess(false);
-    setIsUpgrade(false);
-    setUpgradeCost(0);
-  };
-
-  const openUpgrade = (plan, cost) => {
-    setSelectedPlan(plan);
-    setStep(1);
-    setSuccess(false);
-    setIsUpgrade(true);
-    setUpgradeCost(cost);
-  };
-
-  const closeSheet = () => {
-    setSelectedPlan(null);
-    setSuccess(false);
-    setStep(1);
-    setIsUpgrade(false);
-  };
+  const openPlan  = (plan) => { setSelectedPlan(plan); setStep(1); setSuccess(false); };
+  const closeSheet = () => { setSelectedPlan(null); setSuccess(false); setStep(1); };
 
   const handleSubmit = async (name, contact, receipt) => {
     try {
@@ -466,98 +392,52 @@ export default function SubscriptionPage() {
       if (receipt) {
         const fileExt  = receipt.name.split(".").pop();
         const filePath = `receipts/${Date.now()}-${Math.random()}.${fileExt}`;
+
         const { error: uploadError } = await supabase.storage
           .from("payment-receipts")
           .upload(filePath, receipt);
+
         if (uploadError) { toast.error(uploadError.message); return; }
-        const { data } = supabase.storage.from("payment-receipts").getPublicUrl(filePath);
+
+        const { data } = supabase.storage
+          .from("payment-receipts")
+          .getPublicUrl(filePath);
+
         receiptUrl = data.publicUrl;
       }
 
-      if (isUpgrade) {
-        // ── Upgrade flow ──
-        const currentPlanObj = PLANS.find(p => p.name === currentPlan);
+      const { error } = await supabase
+        .from("subscriptions")
+        .insert([{
+          user_id:            user.id,
+          full_name:          name,
+          contact,
+          plan_name:          selectedPlan.name,
+          amount:             selectedPlan.price,
+          tx_ref:             txRef,
+          payment_status:     "pending",
+          plan_status:        "pending",
+          mining_rate:        selectedPlan.rateVal,
+          // ── new column ──────────────────────────────
+          subscription_cubes: selectedPlan.subscriptionCubes,
+          // ────────────────────────────────────────────
+          approved_by:        null,
+          approved_at:        null,
+          activated_at:       null,
+          receipt_url:        receiptUrl,
+        }]);
 
-        // 1. Insert upgrade record
-        const { error: upgradeErr } = await supabase
-          .from("subscription_upgrades")
-          .insert([{
-            user_id:        user.id,
-            from_plan:      currentPlan,
-            to_plan:        selectedPlan.name,
-            from_rate:      currentPlanObj?.rateVal || 0,
-            to_rate:        selectedPlan.rateVal,
-            upgrade_amount: upgradeCost,
-            tx_ref:         txRef,
-            receipt_url:    receiptUrl,
-            status:         "pending",
-          }]);
+      if (error) { toast.error(error.message); return; }
 
-        if (upgradeErr) { toast.error(upgradeErr.message); return; }
+      await supabase
+        .from("profiles")
+        .update({ subscription_status: "pending" })
+        .eq("id", user.id);
 
-        // 2. Also insert a new subscription row (pending) for admin to approve
-        const { error: subErr } = await supabase
-          .from("subscriptions")
-          .insert([{
-            user_id:            user.id,
-            full_name:          name,
-            contact,
-            plan_name:          selectedPlan.name,
-            amount:             upgradeCost,
-            tx_ref:             txRef,
-            payment_status:     "pending",
-            plan_status:        "pending",
-            mining_rate:        selectedPlan.rateVal,
-            subscription_cubes: selectedPlan.subscriptionCubes,
-            approved_by:        null,
-            approved_at:        null,
-            activated_at:       null,
-            receipt_url:        receiptUrl,
-          }]);
-
-        if (subErr) { toast.error(subErr.message); return; }
-
-        // 3. Update profile subscription_status to pending
-        await supabase
-          .from("profiles")
-          .update({ subscription_status: "pending" })
-          .eq("id", user.id);
-
-        toast.success("Upgrade submitted! Admin will verify within 1–3 hours 🚀");
-
-      } else {
-        // ── New subscription flow ──
-        const { error } = await supabase
-          .from("subscriptions")
-          .insert([{
-            user_id:            user.id,
-            full_name:          name,
-            contact,
-            plan_name:          selectedPlan.name,
-            amount:             selectedPlan.price,
-            tx_ref:             txRef,
-            payment_status:     "pending",
-            plan_status:        "pending",
-            mining_rate:        selectedPlan.rateVal,
-            subscription_cubes: selectedPlan.subscriptionCubes,
-            approved_by:        null,
-            approved_at:        null,
-            activated_at:       null,
-            receipt_url:        receiptUrl,
-          }]);
-
-        if (error) { toast.error(error.message); return; }
-
-        await supabase
-          .from("profiles")
-          .update({ subscription_status: "pending" })
-          .eq("id", user.id);
-
-        toast.success("Payment submitted! Waiting for admin verification 🚀");
-      }
-
+      toast.success("Payment submitted! Waiting for admin verification 🚀");
       setUserName(name);
       setSuccess(true);
+
       setTimeout(() => navigate("/subscription-status"), 1500);
 
     } catch (err) {
@@ -568,48 +448,22 @@ export default function SubscriptionPage() {
 
   return (
     <div className="sub-page">
-
       <div className="sub-hdr">
-        {pageMode === "upgrade" ? (
-          <>
-            <h1>Upgrade your plan</h1>
-            <p>You're currently on the <strong style={{ color:"#4ade80" }}>{currentPlan}</strong> plan. Select a higher tier to upgrade.</p>
-          </>
-        ) : (
-          <>
-            <h1>Choose your mining plan</h1>
-            <p>Upgrade to mine faster and earn more CUBE daily</p>
-          </>
-        )}
+        <h1>Choose your mining plan</h1>
+        <p>Upgrade to mine faster and earn more CUBE daily</p>
       </div>
-
-      {/* Current plan banner */}
-      {currentPlan && (
-        <div className="sub-current-banner">
-          <div className="sub-current-banner-inner">
-            <span className="sub-current-banner-dot" />
-            <span>Active plan: <strong>{currentPlan}</strong></span>
-            <span className="sub-current-banner-rate">
-              {PLANS.find(p => p.name === currentPlan)?.rate}
-            </span>
-          </div>
-        </div>
-      )}
 
       <div className="sub-plans-grid">
         {PLANS.map(p => (
-          <PlanCard
-            key={p.id}
-            plan={p}
-            currentPlan={currentPlan}
-            onSelect={openPlan}
-            onUpgrade={openUpgrade}
-          />
+          <PlanCard key={p.id} plan={p} onSelect={openPlan} />
         ))}
       </div>
 
       {selectedPlan && (
-        <div className="sub-overlay" onClick={e => e.target === e.currentTarget && closeSheet()}>
+        <div
+          className="sub-overlay"
+          onClick={e => e.target === e.currentTarget && closeSheet()}
+        >
           <div className="sub-sheet">
             <button className="sub-sheet-close" onClick={closeSheet} aria-label="Close">×</button>
 
@@ -618,34 +472,14 @@ export default function SubscriptionPage() {
                 plan={selectedPlan}
                 txRef={txRef}
                 userName={userName}
-                isUpgrade={isUpgrade}
-                upgradeCost={upgradeCost}
                 onClose={closeSheet}
               />
             ) : step === 1 ? (
-              <Step1
-                plan={selectedPlan}
-                isUpgrade={isUpgrade}
-                upgradeCost={upgradeCost}
-                currentPlanName={currentPlan}
-                onNext={() => setStep(2)}
-              />
+              <Step1 plan={selectedPlan} onNext={() => setStep(2)} />
             ) : step === 2 ? (
-              <Step2
-                plan={selectedPlan}
-                txRef={txRef}
-                isUpgrade={isUpgrade}
-                upgradeCost={upgradeCost}
-                onNext={() => setStep(3)}
-              />
+              <Step2 plan={selectedPlan} txRef={txRef} onNext={() => setStep(3)} />
             ) : (
-              <Step3
-                plan={selectedPlan}
-                txRef={txRef}
-                isUpgrade={isUpgrade}
-                upgradeCost={upgradeCost}
-                onSubmit={handleSubmit}
-              />
+              <Step3 plan={selectedPlan} txRef={txRef} onSubmit={handleSubmit} />
             )}
           </div>
         </div>

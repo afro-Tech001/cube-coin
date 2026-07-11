@@ -1,7 +1,7 @@
 import "./Sidebar.css";
 import {
   LayoutDashboard, Pickaxe, Gift, Users,
-  Wallet, Settings, LogOut, Menu, X, Flame,
+  Wallet, Settings, LogOut, Menu, X, Flame, ArrowUpCircle,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -55,6 +55,7 @@ const NAV_ITEMS = [
   { icon: <Flame           size={19} />, label: "Streaks",   path: "/streaks"          },
   { icon: <Wallet          size={19} />, label: "Wallet",    path: "/wallet"           },
   { icon: <Settings        size={19} />, label: "Settings",  path: "/profilesettings"  },
+  { icon: <ArrowUpCircle   size={19} />, label: "Upgrade",   path: "/upgrade"          }
 ];
 
 // ── Main ─────────────────────────────────────────────────────────────────────
