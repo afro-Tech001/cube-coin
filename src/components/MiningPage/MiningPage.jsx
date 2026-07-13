@@ -112,12 +112,12 @@ function CrackLines({ visible }) {
 // ── Plan tiers ────────────────────────────────────────────────────────────────
 // ── Plan tiers — 10× faster rates, 1/10 session duration ─────────────────────
 const PLAN_TIERS = {
-  0.40:  { sessionSecs: 0.25  * 3600, swingEvery: 10, label: "Basic"   },
-  0.80:  { sessionSecs: 0.20  * 3600, swingEvery: 8,  label: "Starter" },
-  2.00:  { sessionSecs: 0.15  * 3600, swingEvery: 7,  label: "Bronze"  },
-  4.00:  { sessionSecs: 0.10  * 3600, swingEvery: 6,  label: "Silver"  },
-  7.20:  { sessionSecs: 0.075 * 3600, swingEvery: 5,  label: "Gold"    },
-  14.00: { sessionSecs: 0.05  * 3600, swingEvery: 4,  label: "Diamond" },
+  0.40:  { sessionSecs: 24 * 3600, swingEvery: 10, label: "Basic"   },
+  0.80:  { sessionSecs: 24 * 3600, swingEvery: 8,  label: "Starter" },
+  2.00:  { sessionSecs: 24 * 3600, swingEvery: 7,  label: "Bronze"  },
+  4.00:  { sessionSecs: 24 * 3600, swingEvery: 6,  label: "Silver"  },
+  7.20:  { sessionSecs: 24 * 3600, swingEvery: 5,  label: "Gold"    },
+  14.00: { sessionSecs: 24 * 3600, swingEvery: 4,  label: "Diamond" },
 };
 
 const getTier = (rate) => PLAN_TIERS[rate] || PLAN_TIERS[0.40];
