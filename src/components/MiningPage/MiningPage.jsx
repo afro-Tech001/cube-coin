@@ -112,15 +112,16 @@ function CrackLines({ visible }) {
 // ── Plan tiers ────────────────────────────────────────────────────────────────
 // ── Plan tiers — 10× faster rates, 1/10 session duration ─────────────────────
 const PLAN_TIERS = {
-  0.40:  { sessionSecs: 24 * 3600, swingEvery: 10, label: "Basic"   },
-  0.80:  { sessionSecs: 24 * 3600, swingEvery: 8,  label: "Starter" },
-  2.00:  { sessionSecs: 24 * 3600, swingEvery: 7,  label: "Bronze"  },
-  4.00:  { sessionSecs: 24 * 3600, swingEvery: 6,  label: "Silver"  },
-  7.20:  { sessionSecs: 24 * 3600, swingEvery: 5,  label: "Gold"    },
-  14.00: { sessionSecs: 24 * 3600, swingEvery: 4,  label: "Diamond" },
+  4:  { sessionSecs: 24 * 3600, swingEvery: 10, label: "Basic"   },
+  8:   { sessionSecs: 24 * 3600, swingEvery: 10, label: "Starter" },
+  20:  { sessionSecs: 24 * 3600, swingEvery: 8,  label: "Bronze"  },
+  40:  { sessionSecs: 24 * 3600, swingEvery: 6,  label: "Silver"  },
+  72:  { sessionSecs: 24 * 3600, swingEvery: 5,  label: "Gold"    },
+  140: { sessionSecs: 24 * 3600, swingEvery: 4,  label: "Diamond" },
 };
 
-const getTier = (rate) => PLAN_TIERS[rate] || PLAN_TIERS[0.40];
+const getTier = (rate) => PLAN_TIERS[rate] || PLAN_TIERS[8];
+
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const calcEarned = (startedAt, rate, totalPausedSecs = 0, currentlyPausedSince = null) => {

@@ -10,7 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 const PLANS = [
   {
     id: 0, name: "Basic", price: 5600,
-    rate: "0.40 CUBE/hr", rateVal: 0.40,
+    rate: "4 CUBE/hr", rateVal: 4,
     subscriptionCubes: 30000,
     features: ["Entry-level mining", "Daily rewards", "Mobile access", "Community support"],
     current: false,
@@ -18,33 +18,33 @@ const PLANS = [
   },
   {
     id: 1, name: "Starter", price: 10600,
-    rate: "0.80 CUBE/hr", rateVal: 0.80,
+    rate: "8 CUBE/hr", rateVal: 8,
     subscriptionCubes: 50000,
     features: ["Basic mining speed", "Daily rewards", "Mobile access", "Community support"],
     current: false,
   },
   {
     id: 2, name: "Bronze", price: 16200,
-    rate: "2.00 CUBE/hr", rateVal: 2.00,
+    rate: "20 CUBE/hr", rateVal: 20,
     subscriptionCubes: 100000,
     features: ["2.5× mining speed", "Daily rewards", "Priority queue", "Email support", "Streak bonuses"],
   },
   {
     id: 3, name: "Silver", price: 22500,
-    rate: "4.00 CUBE/hr", rateVal: 4.00,
+    rate: "40 CUBE/hr", rateVal: 40,
     subscriptionCubes: 200000,
     features: ["5× mining speed", "Daily + bonus rewards", "Referral boost +5%", "24/7 chat support", "Streak bonuses", "Early access"],
     featured: true, badge: "Most popular",
   },
   {
     id: 4, name: "Gold", price: 30350,
-    rate: "7.20 CUBE/hr", rateVal: 7.20,
+    rate: "72 CUBE/hr", rateVal: 72,
     subscriptionCubes: 250000,
     features: ["9× mining speed", "Double daily rewards", "Referral boost +10%", "VIP support", "Analytics dashboard", "Early access", "Custom avatar"],
   },
   {
     id: 5, name: "Diamond", price: 50000,
-    rate: "14.00 CUBE/hr", rateVal: 14.00,
+    rate: "140 CUBE/hr", rateVal: 140,
     subscriptionCubes: 300000,
     features: ["17.5× mining speed", "Triple daily rewards", "Referral boost +20%", "Dedicated manager", "Full analytics", "NFT badge", "Priority withdrawals", "Lifetime perks"],
   },
