@@ -1,6 +1,6 @@
 import "./ReferralPage.css";
 import { useEffect, useState } from "react";
-import { Users, Copy, Share2, Gift, Trophy, CheckCircle } from "lucide-react";
+import { Users, Copy, Share2, Gift, Trophy, CheckCircle, AlertCircle } from "lucide-react";
 import { supabase } from "../../libs/supabase";
 import { useNavigate } from "react-router-dom";
 
@@ -11,20 +11,20 @@ const MILESTONES = [
   { target: 50, reward: 1000 },
 ];
 
-function Toast({ msg, show }) {
+function Toast({ msg, show, type = "success" }) {
   if (!show) return null;
   return (
     <div style={{
       position:"fixed", bottom:28, left:"50%", transform:"translateX(-50%)",
-      background:"#4ade80", color:"#041107", fontWeight:700,
-      padding:"11px 20px", borderRadius:100, fontSize:"0.85rem",
-      zIndex:9999, whiteSpace:"nowrap", fontFamily:"'DM Sans',sans-serif",
-      animation:"toastIn .3s ease",
+      background: type === "error" ? "#f87171" : "#4ade80",
+      color: type === "error" ? "#1a0000" : "#041107",
+      fontWeight:700, padding:"11px 20px", borderRadius:100,
+      fontSize:"0.85rem", zIndex:9999, whiteSpace:"nowrap",
+      fontFamily:"'DM Sans',sans-serif",
       maxWidth:"calc(100vw - 32px)", overflow:"hidden", textOverflow:"ellipsis",
       boxSizing:"border-box",
     }}>
       {msg}
-      <style>{`@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}`}</style>
     </div>
   );
 }
@@ -32,19 +32,20 @@ function Toast({ msg, show }) {
 export default function ReferralPage() {
   const navigate = useNavigate();
 
-  const [referralCode,   setReferralCode]   = useState("");
-  const [referrals,      setReferrals]      = useState([]);   // list of referred users
-  const [cubeBalance,    setCubeBalance]    = useState(0);
-  const [totalMined,     setTotalMined]     = useState(0);
-  const [totalReferrals, setTotalReferrals] = useState(0);
-  const [claimedTargets, setClaimedTargets] = useState([]);
-  const [loading,        setLoading]        = useState(true);
-  const [userId,         setUserId]         = useState(null);
-  const [toast,          setToast]          = useState({ show:false, msg:"" });
+  const [referralCode,    setReferralCode]    = useState("");
+  const [referrals,       setReferrals]       = useState([]);   // all referred users
+  const [cubeBalance,     setCubeBalance]     = useState(0);
+  const [totalMined,      setTotalMined]      = useState(0);
+  const [totalReferrals,  setTotalReferrals]  = useState(0);   // all signups
+  const [activeReferrals, setActiveReferrals] = useState(0);   // subscribed only
+  const [claimedTargets,  setClaimedTargets]  = useState([]);
+  const [loading,         setLoading]         = useState(true);
+  const [userId,          setUserId]          = useState(null);
+  const [toast,           setToast]           = useState({ show:false, msg:"", type:"success" });
 
-  const showToast = (msg) => {
-    setToast({ show:true, msg });
-    setTimeout(() => setToast({ show:false, msg:"" }), 2800);
+  const showToast = (msg, type = "success") => {
+    setToast({ show:true, msg, type });
+    setTimeout(() => setToast({ show:false, msg:"", type:"success" }), 2800);
   };
 
   useEffect(() => { init(); }, []);
@@ -58,96 +59,79 @@ export default function ReferralPage() {
   };
 
   const loadAll = async (uid) => {
-    // ── 1. Fetch profile ──────────────────────────────────────────────────────
-    const { data: profile, error: profErr } = await supabase
+    // ── 1. Profile ────────────────────────────────────────────────────────────
+    const { data: profile } = await supabase
       .from("profiles")
       .select("referral_code, cube_balance, total_mined")
       .eq("id", uid)
       .maybeSingle();
 
-    if (profErr) console.error("Profile error:", profErr);
-
-    const myCode        = profile?.referral_code || "";
-    const currentBalance = Number(profile?.cube_balance || 0);
-
-    setReferralCode(myCode);
-    setCubeBalance(currentBalance);
+    const myCode = profile?.referral_code || "";
+    setCubeBalance(Number(profile?.cube_balance || 0));
     setTotalMined(Number(profile?.total_mined || 0));
+    setReferralCode(myCode);
 
     if (!myCode) return;
 
-    // ── 2. Count how many profiles have referred_by_code = my referral_code ──
-    const { count, error: countErr } = await supabase
+    // ── 2. All referred users (signed up with this code) ──────────────────────
+    const { data: referredUsers } = await supabase
       .from("profiles")
-      .select("*", { count:"exact", head:true })
-      .eq("referred_by_code", myCode);
-
-    if (countErr) console.error("Count error:", countErr);
-    const referralCount = count || 0;
-    setTotalReferrals(referralCount);
-
-    // ── 3. Fetch the actual referred users (for the list) ─────────────────────
-    const { data: referredUsers, error: usersErr } = await supabase
-      .from("profiles")
-      .select("id, full_name, email, created_at, subscription_status")
+      .select("id, full_name, email, created_at, subscription_status, plan_name")
       .eq("referred_by_code", myCode)
-      .order("created_at", { ascending: false })
-      .limit(20);
+      .order("created_at", { ascending: false });
 
-    if (usersErr) console.error("Users error:", usersErr);
-    setReferrals(referredUsers || []);
+    const allRefs = referredUsers || [];
+    setReferrals(allRefs);
+    setTotalReferrals(allRefs.length);
 
-    // ── 4. Load claimed milestones ────────────────────────────────────────────
-    const { data: claims, error: claimsErr } = await supabase
+    // Active = those who have an approved subscription
+    const activeCount = allRefs.filter(r => r.subscription_status === "approved").length;
+    setActiveReferrals(activeCount);
+
+    // ── 3. Claimed milestones ─────────────────────────────────────────────────
+    const { data: claims } = await supabase
       .from("claimed_milestones")
       .select("target")
       .eq("user_id", uid);
 
-    if (claimsErr) console.error("Claims error:", claimsErr);
     const claimedSet = new Set((claims || []).map(c => c.target));
     setClaimedTargets([...claimedSet]);
 
-    // ── 5. Auto-claim newly reached milestones ────────────────────────────────
+    // ── 4. Auto-claim milestones (based on ALL referrals, not just active) ────
+    // Milestone rewards are for getting people to sign up.
+    // Active referral requirement is only enforced at withdrawal time.
     const newlyEarned = MILESTONES.filter(
-      m => referralCount >= m.target && !claimedSet.has(m.target)
+      m => allRefs.length >= m.target && !claimedSet.has(m.target)
     );
 
     if (newlyEarned.length > 0) {
-      let runningBalance = currentBalance;
+      let runningBalance = Number(profile?.cube_balance || 0);
 
       for (const m of newlyEarned) {
         const { error: claimErr } = await supabase
           .from("claimed_milestones")
           .insert([{ user_id: uid, target: m.target, reward: m.reward }]);
 
-        if (claimErr) {
-          // Already claimed — unique constraint fired, skip
-          console.warn("Milestone already claimed:", m.target, claimErr.message);
-          continue;
-        }
+        if (claimErr) continue; // already claimed
 
         runningBalance += m.reward;
         claimedSet.add(m.target);
 
-        // Log to wallet_transactions
         await supabase.from("wallet_transactions").insert([{
           user_id: uid,
-          title:   "Referral Bonus",
-          amount:  m.reward,
-          type:    "credit",
+          title: "Referral Bonus",
+          amount: m.reward,
+          type: "credit",
         }]);
       }
 
-      if (runningBalance !== currentBalance) {
-        const { error: balErr } = await supabase
+      if (runningBalance !== Number(profile?.cube_balance || 0)) {
+        await supabase
           .from("profiles")
           .update({ cube_balance: runningBalance })
           .eq("id", uid);
-
-        if (!balErr) {
-          setCubeBalance(runningBalance);
-          showToast(`🎉 Referral milestone bonus credited!`);
-        }
+        setCubeBalance(runningBalance);
+        showToast("🎉 Referral milestone bonus credited!");
       }
 
       setClaimedTargets([...claimedSet]);
@@ -165,8 +149,8 @@ export default function ReferralPage() {
     if (navigator.share) {
       await navigator.share({
         title: "Join CubeCoin",
-        text:  `Use my referral code ${referralCode} to join CubeCoin and start mining!`,
-        url:   referralLink,
+        text: `Use my referral code ${referralCode} to join CubeCoin and start mining!`,
+        url: referralLink,
       }).catch(() => {});
     } else {
       await navigator.clipboard.writeText(referralLink).catch(() => {});
@@ -175,14 +159,16 @@ export default function ReferralPage() {
   };
 
   // Progress to next milestone
-  const nextMilestone = MILESTONES.find(m => totalReferrals < m.target);
-  const prevTarget    = (() => {
+  const nextMilestone     = MILESTONES.find(m => totalReferrals < m.target);
+  const prevTarget        = (() => {
     const reached = MILESTONES.filter(m => totalReferrals >= m.target);
     return reached.length ? reached[reached.length - 1].target : 0;
   })();
   const progPct = nextMilestone
     ? Math.round(((totalReferrals - prevTarget) / (nextMilestone.target - prevTarget)) * 100)
     : 100;
+
+  const inactiveCount = totalReferrals - activeReferrals;
 
   if (loading) {
     return (
@@ -203,7 +189,6 @@ export default function ReferralPage() {
         <div className="hero-icon"><Users size={42} /></div>
         <h1>Invite Friends</h1>
         <p>Earn CUBE rewards when your friends join and start mining.</p>
-
         <div className="referral-code-box">
           <span>{referralCode || "—"}</span>
           <button onClick={copyCode} disabled={!referralCode}>
@@ -220,16 +205,30 @@ export default function ReferralPage() {
           <p>Total Referrals</p>
         </div>
         <div className="ref-stat-card">
+          <CheckCircle size={22} />
+          <h2>{activeReferrals}</h2>
+          <p>Active Miners</p>
+        </div>
+        <div className="ref-stat-card">
           <Gift size={22} />
           <h2>{cubeBalance.toFixed(2)}</h2>
           <p>CUBE Balance</p>
         </div>
-        <div className="ref-stat-card">
-          <Trophy size={22} />
-          <h2>{totalMined.toFixed(2)}</h2>
-          <p>Total Mined</p>
-        </div>
       </div>
+
+      {/* ── Inactive referrals warning ── */}
+      {inactiveCount > 0 && (
+        <div className="ref-inactive-banner">
+          <AlertCircle size={16} />
+          <div>
+            <strong>{inactiveCount} referral{inactiveCount !== 1 ? "s" : ""} not yet subscribed</strong>
+            <p>
+              Encourage {inactiveCount === 1 ? "them" : "these friends"} to subscribe to a mining plan.
+              Only active subscribers count toward your withdrawal referral requirement.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* ── Progress to next milestone ── */}
       {nextMilestone && (
@@ -261,7 +260,7 @@ export default function ReferralPage() {
 
       {/* ── Milestones ── */}
       <div className="milestone-card">
-        <h3><Trophy size={16} style={{verticalAlign:"middle",marginRight:6}} />Referral Milestones</h3>
+        <h3><Trophy size={16} style={{verticalAlign:"middle",marginRight:6}}/>Referral Milestones</h3>
         {MILESTONES.map(m => {
           const isDone    = claimedTargets.includes(m.target);
           const isReached = !isDone && totalReferrals >= m.target;
@@ -273,8 +272,7 @@ export default function ReferralPage() {
               </div>
               {isDone ? (
                 <span className="completed">
-                  <CheckCircle size={13} style={{verticalAlign:"middle",marginRight:4}} />
-                  Claimed
+                  <CheckCircle size={13} style={{verticalAlign:"middle",marginRight:4}}/>Claimed
                 </span>
               ) : isReached ? (
                 <span className="completed">Completed ✓</span>
@@ -291,33 +289,39 @@ export default function ReferralPage() {
         <h3>Your Referrals ({totalReferrals})</h3>
 
         {referrals.length === 0 ? (
-          <div style={{
-            textAlign:"center", padding:"32px 0",
-            color:"rgba(255,255,255,.35)", fontSize:"0.88rem",
-          }}>
+          <div style={{ textAlign:"center", padding:"32px 0", color:"rgba(255,255,255,.35)", fontSize:"0.88rem" }}>
             No referrals yet — share your code to start earning!
           </div>
-        ) : referrals.map(ref => (
-          <div key={ref.id} className="referral-user">
-            <div className="ref-user-avatar">
-              {(ref.full_name || ref.email || "?").charAt(0).toUpperCase()}
+        ) : referrals.map(ref => {
+          const isActive = ref.subscription_status === "approved";
+          const isPending = ref.subscription_status === "pending";
+          return (
+            <div key={ref.id} className="referral-user">
+              <div className="ref-user-avatar">
+                {(ref.full_name || ref.email || "?").charAt(0).toUpperCase()}
+              </div>
+              <div style={{flex:1, minWidth:0}}>
+                <h4>{ref.full_name || ref.email?.split("@")[0] || "User"}</h4>
+                <p>Joined {new Date(ref.created_at).toLocaleDateString("en-NG", {
+                  day:"numeric", month:"short", year:"numeric",
+                })}</p>
+              </div>
+              <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:3,flexShrink:0}}>
+                <span className={`ref-status ${isActive ? "approved" : isPending ? "pending" : "none"}`}>
+                  {isActive ? "✓ Miner" : isPending ? "⏳ Pending" : "Signed up"}
+                </span>
+                {!isActive && (
+                  <span style={{fontSize:"0.68rem",color:"rgba(255,255,255,.3)"}}>
+                    Not subscribed
+                  </span>
+                )}
+              </div>
             </div>
-            <div style={{flex:1}}>
-              <h4>{ref.full_name || ref.email?.split("@")[0] || "User"}</h4>
-              <p>Joined {new Date(ref.created_at).toLocaleDateString("en-NG", {
-                day:"numeric", month:"short", year:"numeric",
-              })}</p>
-            </div>
-            <span className={`ref-status ${ref.subscription_status || "none"}`}>
-              {ref.subscription_status === "approved"  ? "✓ Miner"
-               : ref.subscription_status === "pending" ? "⏳ Pending"
-               : "Signed up"}
-            </span>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      <Toast msg={toast.msg} show={toast.show} />
+      <Toast msg={toast.msg} show={toast.show} type={toast.type} />
     </div>
   );
 }

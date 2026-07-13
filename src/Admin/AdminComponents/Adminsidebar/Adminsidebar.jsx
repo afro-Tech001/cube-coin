@@ -13,6 +13,7 @@ import {
   Megaphone,
   PackageSearch,
   Trophy,
+  ArrowUpCircle,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -82,6 +83,7 @@ export default function AdminSidebar() {
     { icon: <PackageSearch   size={20} />, name: "Plans",         path: "/admin/plans"         },
     { icon: <Megaphone       size={20} />, name: "Announcements", path: "/admin/announcements" },
     { icon: <Settings        size={20} />, name: "Settings",      path: "/admin/settings"      },
+    { icon: <ArrowUpCircle        size={20} />, name:"Plan Ugrade",      path: "/admin/upgrades"      },
   ];
 
   const handleLogout = async () => {
