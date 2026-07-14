@@ -110,18 +110,36 @@ function CrackLines({ visible }) {
 }
 
 // ── Plan tiers ────────────────────────────────────────────────────────────────
-// ── Plan tiers — 10× faster rates, 1/10 session duration ─────────────────────
+// Keys MUST match the exact mining_rate decimal values stored in subscriptions
+// sessionSecs: how long one mining session runs
+// swingEvery:  lower = faster pickaxe animation (more hits per second)
+// ─────────────────────────────────────────────────────────────────────────────
 const PLAN_TIERS = {
-  4:  { sessionSecs: 24 * 3600, swingEvery: 10, label: "Basic"   },
-  8:   { sessionSecs: 24 * 3600, swingEvery: 10, label: "Starter" },
-  20:  { sessionSecs: 24 * 3600, swingEvery: 8,  label: "Bronze"  },
-  40:  { sessionSecs: 24 * 3600, swingEvery: 6,  label: "Silver"  },
-  72:  { sessionSecs: 24 * 3600, swingEvery: 5,  label: "Gold"    },
-  140: { sessionSecs: 24 * 3600, swingEvery: 4,  label: "Diamond" },
+  0.40:  { sessionSecs: 24 * 3600, swingEvery: 10, label: "Basic"   },
+  0.80:  { sessionSecs: 24 * 3600, swingEvery: 9,  label: "Starter" },
+  2.00:  { sessionSecs: 24 * 3600, swingEvery: 7,  label: "Bronze"  },
+  4.00:  { sessionSecs: 24 * 3600, swingEvery: 5,  label: "Silver"  },
+  7.20:  { sessionSecs: 24 * 3600, swingEvery: 4,  label: "Gold"    },
+  14.00: { sessionSecs: 24 * 3600, swingEvery: 3,  label: "Diamond" },
 };
 
-const getTier = (rate) => PLAN_TIERS[rate] || PLAN_TIERS[8];
-
+// ── Fuzzy tier lookup ─────────────────────────────────────────────────────────
+// Handles floating point precision issues (e.g. 0.8000000001 → 0.80)
+const getTier = (rate) => {
+  if (!rate) return PLAN_TIERS[0.40];
+  const r = Number(rate);
+  // Try exact match first
+  if (PLAN_TIERS[r]) return PLAN_TIERS[r];
+  // Fuzzy match — find closest key within 0.01 tolerance
+  const keys = Object.keys(PLAN_TIERS).map(Number);
+  const closest = keys.reduce((prev, curr) =>
+    Math.abs(curr - r) < Math.abs(prev - r) ? curr : prev
+  );
+  if (Math.abs(closest - r) < 0.01) return PLAN_TIERS[closest];
+  // Final fallback
+  console.warn("[MiningPage] Unknown mining rate:", r, "— defaulting to Basic tier");
+  return PLAN_TIERS[0.40];
+};
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const calcEarned = (startedAt, rate, totalPausedSecs = 0, currentlyPausedSince = null) => {
@@ -132,7 +150,7 @@ const calcEarned = (startedAt, rate, totalPausedSecs = 0, currentlyPausedSince =
   }
   const activeMs = Math.max(0, elapsedMs - pausedMs);
   const hrs = activeMs / 3600000;
-  return Math.max(0, hrs * rate);
+  return Math.max(0, hrs * Number(rate));
 };
 
 const fmt = (t) => {
@@ -146,24 +164,24 @@ const fmt = (t) => {
 export default function MiningPage() {
   const navigate = useNavigate();
 
-  const [user,       setUser]       = useState(null);
-  const [profile,    setProfile]    = useState(null);
-  const [sub,        setSub]        = useState(null);
-  const [isMining,   setIsMining]   = useState(false);
-  const [isPaused,   setIsPaused]   = useState(false);
-  const [session,    setSession]    = useState(null);
-  const [claimable,  setClaimable]  = useState(0);
-  const [timeLeft,   setTimeLeft]   = useState(0);
-  const [showClaim,  setShowClaim]  = useState(false);
-  const [showInvite, setShowInvite] = useState(false);
-  const [toast,      setToast]      = useState(null);
-  const [swinging,   setSwinging]   = useState("idle");
-  const [cubeHit,    setCubeHit]    = useState(false);
-  const [showCracks, setShowCracks] = useState(false);
-  const [chips,      setChips]      = useState([]);
-  const [impactFlash,setImpactFlash]= useState(false);
-  const [claiming,   setClaiming]   = useState(false);
-  const [loading,    setLoading]    = useState(true);
+  const [user,        setUser]        = useState(null);
+  const [profile,     setProfile]     = useState(null);
+  const [sub,         setSub]         = useState(null);
+  const [isMining,    setIsMining]    = useState(false);
+  const [isPaused,    setIsPaused]    = useState(false);
+  const [session,     setSession]     = useState(null);
+  const [claimable,   setClaimable]   = useState(0);
+  const [timeLeft,    setTimeLeft]    = useState(0);
+  const [showClaim,   setShowClaim]   = useState(false);
+  const [showInvite,  setShowInvite]  = useState(false);
+  const [toast,       setToast]       = useState(null);
+  const [swinging,    setSwinging]    = useState("idle");
+  const [cubeHit,     setCubeHit]     = useState(false);
+  const [showCracks,  setShowCracks]  = useState(false);
+  const [chips,       setChips]       = useState([]);
+  const [impactFlash, setImpactFlash] = useState(false);
+  const [claiming,    setClaiming]    = useState(false);
+  const [loading,     setLoading]     = useState(true);
 
   const frameRef = useRef(null);
   const timerRef = useRef(null);
@@ -172,9 +190,10 @@ export default function MiningPage() {
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3200); };
 
-  const tier = sub ? getTier(sub.mining_rate) : getTier(0.08);
+  // tier is derived AFTER sub loads — safe because loading gate prevents early render
+  const tier = sub ? getTier(sub.mining_rate) : getTier(0.40);
 
-  // ── Initial load ──────────────────────────────────────────────────────────────
+  // ── Initial load ──────────────────────────────────────────────────────────
   useEffect(() => {
     const init = async () => {
       const { data: { user: u } } = await supabase.auth.getUser();
@@ -191,6 +210,9 @@ export default function MiningPage() {
         .maybeSingle();
 
       if (!subData) { navigate("/subscription"); return; }
+
+      // Log the rate so you can see what's coming from DB
+      console.log("[MiningPage] subscription mining_rate:", subData.mining_rate, typeof subData.mining_rate);
       setSub(subData);
 
       let { data: prof } = await supabase
@@ -216,6 +238,9 @@ export default function MiningPage() {
 
       setProfile({ ...prof, referral_code: prof?.referral_code || "" });
 
+      const tierInfo = getTier(subData.mining_rate);
+      console.log("[MiningPage] tier resolved:", tierInfo);
+
       const { data: active, error: sessErr } = await supabase
         .from("mining_sessions")
         .select("*")
@@ -226,8 +251,6 @@ export default function MiningPage() {
         .maybeSingle();
 
       if (sessErr) console.error("Session fetch error:", sessErr);
-
-      const tierInfo = getTier(subData.mining_rate);
 
       if (active) {
         setSession(active);
@@ -263,7 +286,7 @@ export default function MiningPage() {
     init();
   }, []);
 
-  // ── Swing animation ───────────────────────────────────────────────────────────
+  // ── Swing animation ───────────────────────────────────────────────────────
   const doSwing = useCallback(() => {
     if (swingRef.current) return;
     swingRef.current = true;
@@ -295,7 +318,7 @@ export default function MiningPage() {
     }, 180);
   }, []);
 
-  // ── Mining loop ───────────────────────────────────────────────────────────────
+  // ── Mining loop ───────────────────────────────────────────────────────────
   useEffect(() => {
     if (!isMining || !session || isPaused) return;
     const swingEvery = tier.swingEvery;
@@ -319,7 +342,13 @@ export default function MiningPage() {
         }
         return t - 1;
       });
-      setClaimable(calcEarned(session.started_at, session.mining_rate, session.total_paused_secs, null));
+      // Pass the rate from the session (already in DB) not from sub state
+      setClaimable(calcEarned(
+        session.started_at,
+        session.mining_rate,
+        session.total_paused_secs,
+        null
+      ));
     }, 1000);
 
     return () => {
@@ -328,7 +357,7 @@ export default function MiningPage() {
     };
   }, [isMining, session, isPaused, doSwing, tier.swingEvery]);
 
-  // ── Start mining ──────────────────────────────────────────────────────────────
+  // ── Start mining ──────────────────────────────────────────────────────────
   const startMining = async () => {
     if (!user || !sub) return;
     const start = new Date();
@@ -337,7 +366,7 @@ export default function MiningPage() {
       .from("mining_sessions")
       .insert({
         user_id:           user.id,
-        mining_rate:       sub.mining_rate,
+        mining_rate:       sub.mining_rate,  // decimal value e.g. 4.00
         plan_name:         sub.plan_name,
         started_at:        start.toISOString(),
         ends_at:           end.toISOString(),
@@ -358,7 +387,7 @@ export default function MiningPage() {
     setIsPaused(false);
   };
 
-  // ── Pause mining ──────────────────────────────────────────────────────────────
+  // ── Pause mining ──────────────────────────────────────────────────────────
   const pauseMining = async () => {
     if (!session) return;
     cancelAnimationFrame(frameRef.current);
@@ -372,14 +401,14 @@ export default function MiningPage() {
       .eq("id", session.id)
       .select()
       .single();
-    if (error) { console.error("Pause error:", error); showToast("Failed to pause"); return; }
+    if (error) { showToast("Failed to pause"); return; }
     setSession(data);
     setIsMining(false);
     setIsPaused(true);
     showToast("⏸ Mining paused — your progress is saved");
   };
 
-  // ── Resume mining ─────────────────────────────────────────────────────────────
+  // ── Resume mining ─────────────────────────────────────────────────────────
   const resumeMining = async () => {
     if (!session) return;
     const pausedDurationSecs = session.paused_at
@@ -388,11 +417,16 @@ export default function MiningPage() {
     const newEndsAt = new Date(new Date(session.ends_at).getTime() + pausedDurationSecs * 1000);
     const { data, error } = await supabase
       .from("mining_sessions")
-      .update({ is_paused: false, paused_at: null, total_paused_secs: newTotalPaused, ends_at: newEndsAt.toISOString(), is_mining: true })
+      .update({
+        is_paused: false, paused_at: null,
+        total_paused_secs: newTotalPaused,
+        ends_at: newEndsAt.toISOString(),
+        is_mining: true,
+      })
       .eq("id", session.id)
       .select()
       .single();
-    if (error) { console.error("Resume error:", error); showToast("Failed to resume"); return; }
+    if (error) { showToast("Failed to resume"); return; }
     setSession(data);
     setTimeLeft(Math.max(0, Math.floor((new Date(data.ends_at) - Date.now()) / 1000)));
     setIsPaused(false);
@@ -400,7 +434,7 @@ export default function MiningPage() {
     showToast("▶ Mining resumed");
   };
 
-  // ── Stop mining ───────────────────────────────────────────────────────────────
+  // ── Stop mining ───────────────────────────────────────────────────────────
   const stopMining = async () => {
     cancelAnimationFrame(frameRef.current);
     clearInterval(timerRef.current);
@@ -409,21 +443,18 @@ export default function MiningPage() {
     setSwinging("idle");
     swingRef.current = false;
     if (session) {
-      const { error } = await supabase
-        .from("mining_sessions")
+      await supabase.from("mining_sessions")
         .update({ is_mining: false, is_paused: false })
         .eq("id", session.id);
-      if (error) console.error("Stop error:", error);
     }
   };
 
-  // ── Claim reward ──────────────────────────────────────────────────────────────
+  // ── Claim reward ──────────────────────────────────────────────────────────
   const confirmClaim = async () => {
     if (!user || !session || claiming) return;
     setClaiming(true);
 
     try {
-      // Step 1: Calculate exactly how much was earned from the session record
       const earned = calcEarned(
         session.started_at,
         session.mining_rate,
@@ -431,15 +462,12 @@ export default function MiningPage() {
         session.is_paused ? session.paused_at : null
       );
 
-      console.log("[Claim] earned:", earned);
-
       if (earned <= 0) {
         showToast("Nothing to claim yet — mine longer first");
         setClaiming(false);
         return;
       }
 
-      // Step 2: Pull the LIVE balance from Supabase right now (never use stale state)
       const { data: liveProfile, error: fetchErr } = await supabase
         .from("profiles")
         .select("cube_balance, total_mined, streak")
@@ -447,80 +475,57 @@ export default function MiningPage() {
         .single();
 
       if (fetchErr || !liveProfile) {
-        console.error("[Claim] Profile fetch failed:", fetchErr);
         showToast("Could not load your balance — try again");
         setClaiming(false);
         return;
       }
 
-      console.log("[Claim] live balance before:", liveProfile.cube_balance);
-
       const newBalance = Number(liveProfile.cube_balance) + earned;
       const newTotal   = Number(liveProfile.total_mined)  + earned;
       const newStreak  = Number(liveProfile.streak || 0)  + 1;
 
-      console.log("[Claim] writing new balance:", newBalance);
-
-      // Step 3: Write the new balance to DB
       const { error: updateErr } = await supabase
         .from("profiles")
-        .update({
-          cube_balance: newBalance,
-          total_mined:  newTotal,
-          streak:       newStreak,
-        })
+        .update({ cube_balance: newBalance, total_mined: newTotal, streak: newStreak })
         .eq("id", user.id);
 
       if (updateErr) {
-        console.error("[Claim] Profile update failed:", updateErr);
         showToast(`Claim failed: ${updateErr.message}`);
         setClaiming(false);
         return;
       }
 
-      // Step 4: Re-fetch to confirm what was actually saved (source of truth)
-      const { data: confirmedProfile, error: confirmErr } = await supabase
+      const { data: confirmed, error: confirmErr } = await supabase
         .from("profiles")
         .select("cube_balance, total_mined, streak")
         .eq("id", user.id)
         .single();
 
-      if (confirmErr || !confirmedProfile) {
-        console.error("[Claim] Confirm re-fetch failed:", confirmErr);
-        // Update failed or was blocked — don't show success
+      if (confirmErr || !confirmed) {
         showToast("Balance update may have failed — please refresh");
         setClaiming(false);
         return;
       }
 
-      console.log("[Claim] confirmed balance after:", confirmedProfile.cube_balance);
-
-      // Step 5: Verify the balance actually increased (catches silent RLS blocks)
-      const balanceDiff = Number(confirmedProfile.cube_balance) - Number(liveProfile.cube_balance);
-      if (balanceDiff <= 0) {
-        console.error("[Claim] Balance did not increase! RLS may be blocking the update.");
-        showToast("Claim failed — balance not updated. Check your permissions.");
+      const diff = Number(confirmed.cube_balance) - Number(liveProfile.cube_balance);
+      if (diff <= 0) {
+        showToast("Claim failed — balance not updated. Check permissions.");
         setClaiming(false);
         return;
       }
 
-      // Step 6: Mark session as claimed
-      await supabase
-        .from("mining_sessions")
+      await supabase.from("mining_sessions")
         .update({ claimed: true, is_mining: false, is_paused: false, mined_amount: earned })
         .eq("id", session.id);
 
-      // Step 7: Log the transaction
-      await supabase
-        .from("wallet_transactions")
+      await supabase.from("wallet_transactions")
         .insert([{ user_id: user.id, title: "Mining Reward", amount: earned, type: "credit" }]);
 
-      // Step 8: Update UI from the confirmed DB values
       setProfile(p => ({
         ...p,
-        cube_balance: confirmedProfile.cube_balance,
-        total_mined:  confirmedProfile.total_mined,
-        streak:       confirmedProfile.streak,
+        cube_balance: confirmed.cube_balance,
+        total_mined:  confirmed.total_mined,
+        streak:       confirmed.streak,
       }));
 
       setClaimable(0);
@@ -541,7 +546,7 @@ export default function MiningPage() {
     }
   };
 
-  // ── Copy referral ─────────────────────────────────────────────────────────────
+  // ── Copy referral ─────────────────────────────────────────────────────────
   const copyCode = () => {
     navigator.clipboard?.writeText(profile?.referral_code || "").catch(() => {});
     showToast("Referral code copied!");
@@ -555,21 +560,19 @@ export default function MiningPage() {
   };
 
   const pickRot = swinging==="windup" ? -65 : swinging==="strike" ? 15 : swinging==="return" ? -45 : -50;
-  const pickTrans = swinging==="windup" ? "transform 0.18s ease-in"
+  const pickTrans = swinging==="windup"  ? "transform 0.18s ease-in"
     : swinging==="strike" ? "transform 0.16s cubic-bezier(0.4,0,0.2,1.8)"
     : swinging==="return" ? "transform 0.2s ease-out"
     : "transform 0.3s ease";
 
-  if (loading) {
-    return (
-      <div className="mining-page">
-        <div className="mining-hero" style={{ textAlign: "center", padding: "60px 30px" }}>
-          <div style={{ fontSize: "2rem", marginBottom: 10 }}>⛏</div>
-          <p style={{ color: "rgba(255,255,255,.5)" }}>Loading your mining dashboard…</p>
-        </div>
+  if (loading) return (
+    <div className="mining-page">
+      <div className="mining-hero" style={{ textAlign:"center", padding:"60px 30px" }}>
+        <div style={{ fontSize:"2rem", marginBottom:10 }}>⛏</div>
+        <p style={{ color:"rgba(255,255,255,.5)" }}>Loading your mining dashboard…</p>
       </div>
-    );
-  }
+    </div>
+  );
 
   const hasActiveSession = session && !session.claimed;
 
@@ -578,12 +581,14 @@ export default function MiningPage() {
 
       {/* ── Hero ── */}
       <div className="mining-hero">
-        <div className="plan-badge">{sub?.plan_name} plan · {sub?.mining_rate} CUBE/hr</div>
+        <div className="plan-badge">
+          {sub?.plan_name} plan · {sub?.mining_rate} CUBE/hr
+        </div>
 
         <div className="scene-wrap">
           {impactFlash && <div className="impact-flash" />}
           {isMining && !isPaused && (
-            <div className="pickaxe-wrap" style={{ transform:`rotate(${pickRot}deg)`, transition: pickTrans }}>
+            <div className="pickaxe-wrap" style={{ transform:`rotate(${pickRot}deg)`, transition:pickTrans }}>
               <PickaxeSVG />
             </div>
           )}
@@ -607,16 +612,16 @@ export default function MiningPage() {
         </div>
 
         <h2>
-          {isPaused ? "Mining paused"
-            : isMining ? "Mining active"
-            : claimable > 0 ? "Session complete"
-            : "Ready to mine"}
+          {isPaused    ? "Mining paused"
+           : isMining  ? "Mining active"
+           : claimable > 0 ? "Session complete"
+           : "Ready to mine"}
         </h2>
         <p className="sub">
-          {isPaused ? "Resume to continue earning"
-            : isMining ? fmt(timeLeft)
-            : claimable > 0 ? "Claim your earned CUBE"
-      : `Start a ${(tier.sessionSecs / 60).toFixed(0)}min mining session`}
+          {isPaused     ? "Resume to continue earning"
+           : isMining   ? fmt(timeLeft)
+           : claimable > 0 ? "Claim your earned CUBE"
+           : `24hr mining session · ${sub?.mining_rate} CUBE/hr`}
         </p>
 
         <div className="btn-row">
@@ -707,7 +712,7 @@ export default function MiningPage() {
             <div className="modal-icon">👥</div>
             <h3>Invite friends</h3>
             <p className="modal-sub">
-              Share your code and earn <strong style={{color:"#4ade80"}}>+10%</strong> bonus on every friend's session.
+              Share your code and earn <strong style={{color:"#4ade80"}}>+10%</strong> bonus on every friend who subscribes.
             </p>
             <div className="invite-code-box">
               <div className="invite-code-label">Referral code</div>
