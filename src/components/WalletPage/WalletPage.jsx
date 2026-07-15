@@ -1,25 +1,18 @@
 import { useState, useEffect, useCallback } from "react";
 import {
   Layers, ArrowUp, Clock, TrendingUp,
-  Users, Gift, ArrowRight, X, AlertCircle, CheckCircle, Lock,
+  Users, Gift, ArrowRight, X, AlertCircle, CheckCircle, Lock, Calendar,
 } from "lucide-react";
 import { supabase } from "../../libs/supabase";
 import { useNavigate } from "react-router-dom";
 import "./WalletPage.css";
 
-// ── Constants ─────────────────────────────────────────────────────────────────
 const CUBE_TO_NGN = 0.05;
 const MIN_CASHOUT = 100;
-
 const BANKS = [
   "First Bank Nigeria","GTBank","Access Bank","Zenith Bank",
   "UBA","Fidelity Bank","Opay","Kuda Bank","Palmpay","Other",
 ];
-
-// ── Plan withdrawal rules ─────────────────────────────────────────────────────
-// key = plan price, value = { firstWithdrawalNaira, requiredReferrals }
-// firstWithdrawalNaira: naira threshold that triggers the referral gate
-// requiredReferrals: number of active miners they must have referred
 const PLAN_RULES = {
   5600:  { firstWithdrawalNaira: 2000,  requiredReferrals: 3 },
   10600: { firstWithdrawalNaira: 5000,  requiredReferrals: 3 },
@@ -28,20 +21,18 @@ const PLAN_RULES = {
   30350: { firstWithdrawalNaira: 20000, requiredReferrals: 3 },
   50000: { firstWithdrawalNaira: 25000, requiredReferrals: 3 },
 };
-
 const MINING_TITLES   = ["Mining Reward"];
 const REFERRAL_TITLES = ["Referral Bonus"];
 const EXCLUDED_FROM_REWARDS = [
-  ...MINING_TITLES, ...REFERRAL_TITLES,
-  "Cashout Request", "Cashout Refund",
+  ...MINING_TITLES, ...REFERRAL_TITLES, "Cashout Request", "Cashout Refund",
 ];
+const DAY_NAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 
 function cubeToNaira(cubes) { return (cubes * CUBE_TO_NGN).toFixed(2); }
 function nairaFromCube(cubes) { return cubes * CUBE_TO_NGN; }
-
 function fmtNaira(amount) {
   return "₦" + parseFloat(amount).toLocaleString("en-NG", {
-    minimumFractionDigits: 2, maximumFractionDigits: 2,
+    minimumFractionDigits:2, maximumFractionDigits:2,
   });
 }
 function genRef() { return "CO" + Date.now().toString().slice(-8); }
@@ -52,6 +43,38 @@ function fmtDate(iso) {
   if (diff === 0) return `Today · ${time}`;
   if (diff === 1) return `Yesterday · ${time}`;
   return `${diff} days ago`;
+}
+
+// ── Check if withdrawals are open right now ───────────────────────────────────
+function isWithdrawalOpen(settings) {
+  if (!settings || !settings.enabled) return false;
+  const now     = new Date();
+  const today   = now.getDay(); // 0=Sun
+  const allowed = settings.allowed_days || [0];
+  if (!allowed.includes(today)) return false;
+
+  // Optional time window check
+  if (settings.open_time && settings.close_time) {
+    const [oh, om] = settings.open_time.split(":").map(Number);
+    const [ch, cm] = settings.close_time.split(":").map(Number);
+    const nowMins  = now.getHours() * 60 + now.getMinutes();
+    const openMins = oh * 60 + om;
+    const closeMins= ch * 60 + cm;
+    if (nowMins < openMins || nowMins >= closeMins) return false;
+  }
+  return true;
+}
+
+function nextAllowedDay(settings) {
+  if (!settings) return "Sunday";
+  const allowed = settings.allowed_days || [0];
+  const today   = new Date().getDay();
+  // Find next occurrence
+  for (let i = 1; i <= 7; i++) {
+    const d = (today + i) % 7;
+    if (allowed.includes(d)) return DAY_NAMES[d];
+  }
+  return DAY_NAMES[allowed[0]] || "Sunday";
 }
 
 // ── Toast hook ────────────────────────────────────────────────────────────────
@@ -78,10 +101,79 @@ function ToastStack({ toasts }) {
   );
 }
 
-// ── Referral Gate Modal ───────────────────────────────────────────────────────
-function ReferralGateModal({ open, onClose, planRule, activeReferrals, planPrice }) {
-  if (!open || !planRule) return null;
+// ── Withdrawal Window Modal ───────────────────────────────────────────────────
+function WithdrawalWindowModal({ open, onClose, settings }) {
+  if (!open || !settings) return null;
+  const allowed    = (settings.allowed_days || [0]).map(d => DAY_NAMES[d]).join(", ");
+  const nextDay    = nextAllowedDay(settings);
+  const customMsg  = settings.locked_msg || "Withdrawals are only available on Sundays.";
+  const hasWindow  = settings.open_time && settings.close_time;
 
+  return (
+    <div className="modal-overlay open" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal-sheet" style={{ maxHeight:"75vh" }}>
+        <div className="modal-handle" />
+        <div style={{ padding:"28px 24px 32px", textAlign:"center" }}>
+
+          <div style={{
+            width:72, height:72, borderRadius:"50%",
+            background:"rgba(96,165,250,.1)", border:"1.5px solid rgba(96,165,250,.35)",
+            display:"flex", alignItems:"center", justifyContent:"center",
+            margin:"0 auto 18px", fontSize:"2.2rem",
+          }}>
+            📅
+          </div>
+
+          <h3 style={{ color:"#fff", fontSize:"1.2rem", fontWeight:800, marginBottom:10 }}>
+            Withdrawals Not Available
+          </h3>
+
+          <p style={{ color:"rgba(255,255,255,.55)", fontSize:"0.88rem", lineHeight:1.65, marginBottom:20 }}>
+            {customMsg}
+          </p>
+
+          {/* Window info */}
+          <div style={{
+            background:"rgba(96,165,250,.06)", border:"1px solid rgba(96,165,250,.2)",
+            borderRadius:14, padding:"16px 18px", marginBottom:22, textAlign:"left",
+            display:"flex", flexDirection:"column", gap:10,
+          }}>
+            <div style={{ display:"flex", justifyContent:"space-between", fontSize:13 }}>
+              <span style={{ color:"rgba(255,255,255,.4)" }}>Available days</span>
+              <span style={{ color:"#60a5fa", fontWeight:700 }}>{allowed}</span>
+            </div>
+            {hasWindow && (
+              <div style={{ display:"flex", justifyContent:"space-between", fontSize:13 }}>
+                <span style={{ color:"rgba(255,255,255,.4)" }}>Time window</span>
+                <span style={{ color:"#60a5fa", fontWeight:700 }}>
+                  {settings.open_time?.slice(0,5)} – {settings.close_time?.slice(0,5)}
+                </span>
+              </div>
+            )}
+            <div style={{ display:"flex", justifyContent:"space-between", fontSize:13 }}>
+              <span style={{ color:"rgba(255,255,255,.4)" }}>Next available</span>
+              <span style={{ color:"#4ade80", fontWeight:700 }}>{nextDay}</span>
+            </div>
+            <div style={{ display:"flex", justifyContent:"space-between", fontSize:13 }}>
+              <span style={{ color:"rgba(255,255,255,.4)" }}>Today</span>
+              <span style={{ color:"rgba(255,255,255,.6)", fontWeight:600 }}>
+                {DAY_NAMES[new Date().getDay()]}
+              </span>
+            </div>
+          </div>
+
+          <button className="modal-done-btn" onClick={onClose} style={{ width:"100%", marginBottom:0 }}>
+            Got it
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Referral Gate Modal ───────────────────────────────────────────────────────
+function ReferralGateModal({ open, onClose, planRule, activeReferrals }) {
+  if (!open || !planRule) return null;
   const needed    = planRule.requiredReferrals;
   const have      = activeReferrals;
   const remaining = Math.max(0, needed - have);
@@ -91,35 +183,29 @@ function ReferralGateModal({ open, onClose, planRule, activeReferrals, planPrice
     <div className="modal-overlay open" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal-sheet" style={{ maxHeight:"80vh" }}>
         <div className="modal-handle" />
-
         <div style={{ padding:"24px 24px 32px", textAlign:"center" }}>
-          {/* Icon */}
           <div style={{
             width:72, height:72, borderRadius:"50%",
             background:"rgba(251,191,36,.1)", border:"1.5px solid rgba(251,191,36,.35)",
             display:"flex", alignItems:"center", justifyContent:"center",
             margin:"0 auto 18px", fontSize:"2rem",
-          }}>
-            🔒
-          </div>
+          }}>🔒</div>
 
           <h3 style={{ color:"#fff", fontSize:"1.2rem", fontWeight:800, marginBottom:10 }}>
             Referral Requirement
           </h3>
 
           <p style={{ color:"rgba(255,255,255,.55)", fontSize:"0.88rem", lineHeight:1.65, marginBottom:22 }}>
-  You've crossed the{" "}
-  <strong style={{ color:"#fbbf24" }}>{threshold}</strong> withdrawal threshold for your plan.
-  To make further withdrawals, you need{" "}
-  <strong style={{ color:"#4ade80" }}>{needed} active miners</strong> from your referrals.
-  <br /><br />
-  <span style={{ color:"rgba(248,113,113,.8)", fontSize:"0.82rem" }}>
-    ⚠ Users who signed up using your code but <strong>haven't subscribed</strong> do NOT count —
-    only those with an <strong>approved subscription</strong> qualify as active miners.
-  </span>
-</p>
+            You've crossed the <strong style={{ color:"#fbbf24" }}>{threshold}</strong> withdrawal
+            threshold for your plan. To make further withdrawals, you need{" "}
+            <strong style={{ color:"#4ade80" }}>{needed} active miners</strong> from your referrals.
+            <br /><br />
+            <span style={{ color:"rgba(248,113,113,.8)", fontSize:"0.82rem" }}>
+              ⚠ Users who signed up using your code but <strong>haven't subscribed</strong> do NOT count —
+              only those with an <strong>approved subscription</strong> qualify as active miners.
+            </span>
+          </p>
 
-          {/* Progress */}
           <div style={{
             background:"rgba(74,222,128,.06)", border:"1px solid rgba(74,222,128,.18)",
             borderRadius:16, padding:"18px 20px", marginBottom:22, textAlign:"left",
@@ -132,17 +218,13 @@ function ReferralGateModal({ open, onClose, planRule, activeReferrals, planPrice
                 {have} / {needed}
               </span>
             </div>
-
-            {/* Progress bar */}
             <div style={{ height:6, background:"rgba(255,255,255,.08)", borderRadius:3, overflow:"hidden", marginBottom:12 }}>
               <div style={{
-                height:"100%",
-                width:`${Math.min(100, (have / needed) * 100)}%`,
+                height:"100%", width:`${Math.min(100,(have/needed)*100)}%`,
                 background: have >= needed ? "#4ade80" : "#fbbf24",
                 borderRadius:3, transition:"width .4s ease",
               }} />
             </div>
-
             {have >= needed ? (
               <div style={{ display:"flex", alignItems:"center", gap:8, color:"#4ade80", fontSize:13, fontWeight:700 }}>
                 <CheckCircle size={15} /> You meet the referral requirement!
@@ -150,30 +232,12 @@ function ReferralGateModal({ open, onClose, planRule, activeReferrals, planPrice
             ) : (
               <div style={{ color:"rgba(255,255,255,.45)", fontSize:12, lineHeight:1.55 }}>
                 You need <strong style={{ color:"#fbbf24" }}>{remaining} more active miner{remaining !== 1 ? "s" : ""}</strong> before
-                you can make your next withdrawal. Share your referral code to invite friends.
+                you can make your next withdrawal.
               </div>
             )}
           </div>
 
-          {/* What counts as active miner */}
-          <div style={{
-            background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.08)",
-            borderRadius:12, padding:"12px 14px", marginBottom:22, textAlign:"left",
-          }}>
-            <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", fontWeight:700, textTransform:"uppercase", letterSpacing:".06em", marginBottom:8 }}>
-              What counts as an active miner?
-            </div>
-            <div style={{ fontSize:12, color:"rgba(255,255,255,.5)", lineHeight:1.6 }}>
-              A person who signed up using <strong style={{ color:"rgba(255,255,255,.75)" }}>your referral code</strong> and has
-              an <strong style={{ color:"#4ade80" }}>approved subscription</strong> on CubeCoin.
-            </div>
-          </div>
-
-          <button
-            className="modal-done-btn"
-            onClick={onClose}
-            style={{ width:"100%", marginBottom:0 }}
-          >
+          <button className="modal-done-btn" onClick={onClose} style={{ width:"100%", marginBottom:0 }}>
             Got it — I'll invite friends
           </button>
         </div>
@@ -202,8 +266,7 @@ function CurrencyConverter() {
         <div className="converter-arrow"><ArrowRight size={14} /></div>
         <div className="converter-field">
           <label>Naira Value</label>
-          <input className="converter-input naira-out" type="text"
-            placeholder="₦0.00" value={nairaVal} readOnly />
+          <input className="converter-input naira-out" type="text" placeholder="₦0.00" value={nairaVal} readOnly />
           <span className="conv-unit">ngn</span>
         </div>
       </div>
@@ -213,20 +276,17 @@ function CurrencyConverter() {
 
 // ── Cashout Modal ─────────────────────────────────────────────────────────────
 function CashoutModal({ balance, userId, open, onClose, onSuccess }) {
-  const [amount,  setAmount]  = useState("");
-  const [bank,    setBank]    = useState("");
-  const [acct,    setAcct]    = useState("");
-  const [name,    setName]    = useState("");
-  const [errors,  setErrors]  = useState({});
-  const [loading, setLoading] = useState(false);
-  const [done,    setDone]    = useState(false);
-  const [ref,     setRef]     = useState("");
+  const [amount, setAmount] = useState("");
+  const [bank,   setBank]   = useState("");
+  const [acct,   setAcct]   = useState("");
+  const [name,   setName]   = useState("");
+  const [errors, setErrors] = useState({});
+  const [loading,setLoading]= useState(false);
+  const [done,   setDone]   = useState(false);
+  const [ref,    setRef]    = useState("");
 
   useEffect(() => {
-    if (open) {
-      setAmount(""); setBank(""); setAcct(""); setName("");
-      setErrors({}); setLoading(false); setDone(false); setRef("");
-    }
+    if (open) { setAmount(""); setBank(""); setAcct(""); setName(""); setErrors({}); setLoading(false); setDone(false); setRef(""); }
   }, [open]);
 
   useEffect(() => {
@@ -251,56 +311,34 @@ function CashoutModal({ balance, userId, open, onClose, onSuccess }) {
   const handleSubmit = async () => {
     if (!validate()) return;
     setLoading(true);
-
-    const txRef    = genRef();
+    const txRef = genRef();
     const nairaVal = parseFloat(cubeToNaira(parsedAmount));
-
-    const { error: cashoutErr } = await supabase
-      .from("cashout_requests")
-      .insert([{
-        user_id: userId, amount: parsedAmount,
-        naira_value: nairaVal, bank_name: bank,
-        account_number: acct, account_name: name,
-        tx_ref: txRef, status: "pending",
-      }]);
-
-    if (cashoutErr) {
-      setLoading(false);
-      onSuccess(null, null, null, cashoutErr.message);
-      return;
-    }
-
-    await supabase.from("profiles")
-      .update({ cube_balance: balance - parsedAmount })
-      .eq("id", userId);
-
-    await supabase.from("wallet_transactions").insert([{
-      user_id: userId, title: "Cashout Request",
-      amount: -parsedAmount, type: "pending",
+    const { error: cashoutErr } = await supabase.from("cashout_requests").insert([{
+      user_id: userId, amount: parsedAmount, naira_value: nairaVal,
+      bank_name: bank, account_number: acct, account_name: name,
+      tx_ref: txRef, status: "pending",
     }]);
-
-    setRef(txRef);
-    setDone(true);
-    setLoading(false);
+    if (cashoutErr) { setLoading(false); onSuccess(null, null, null, cashoutErr.message); return; }
+    await supabase.from("profiles").update({ cube_balance: balance - parsedAmount }).eq("id", userId);
+    await supabase.from("wallet_transactions").insert([{
+      user_id: userId, title: "Cashout Request", amount: -parsedAmount, type: "pending",
+    }]);
+    setRef(txRef); setDone(true); setLoading(false);
     onSuccess(parsedAmount, txRef, name, null);
   };
 
   return (
-    <div className={`modal-overlay ${open ? "open" : ""}`}
-      onClick={e => e.target === e.currentTarget && onClose()}>
+    <div className={`modal-overlay ${open ? "open" : ""}`} onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal-sheet">
         <div className="modal-handle" />
-
         {done ? (
           <div className="modal-success">
             <div className="modal-success-icon"><CheckCircle size={28} /></div>
             <h3>Request Submitted!</h3>
             <p>
-              Your cashout of{" "}
-              <strong style={{ color:"#e8ffe6" }}>{parsedAmount} CUBE</strong> →{" "}
-              <strong style={{ color:"#4ade80" }}>{fmtNaira(cubeToNaira(parsedAmount))}</strong>{" "}
-              is being processed. We'll pay to <strong style={{ color:"#e8ffe6" }}>{name}</strong>{" "}
-              within 1–24 hours.
+              Your cashout of <strong style={{ color:"#e8ffe6" }}>{parsedAmount} CUBE</strong> →{" "}
+              <strong style={{ color:"#4ade80" }}>{fmtNaira(cubeToNaira(parsedAmount))}</strong> is being processed.
+              We'll pay to <strong style={{ color:"#e8ffe6" }}>{name}</strong> within 1–24 hours.
             </p>
             <div className="modal-success-ref">
               <div className="msr-label">Reference</div>
@@ -314,18 +352,14 @@ function CashoutModal({ balance, userId, open, onClose, onSuccess }) {
               <span className="modal-title">Cash Out CUBE</span>
               <button className="modal-close" onClick={onClose}><X size={15} /></button>
             </div>
-
             <div className="modal-body">
               <div className="cashout-cube-row">
                 <div className="converter-field">
                   <label>CUBE to cash out</label>
-                  <input
-                    className={`converter-input ${errors.amount ? "error" : ""}`}
+                  <input className={`converter-input ${errors.amount ? "error" : ""}`}
                     type="number" min={MIN_CASHOUT} max={balance}
-                    placeholder={`Min ${MIN_CASHOUT} CUBE`}
-                    value={amount}
-                    onChange={e => { setAmount(e.target.value); setErrors(p => ({ ...p, amount:null })); }}
-                  />
+                    placeholder={`Min ${MIN_CASHOUT} CUBE`} value={amount}
+                    onChange={e => { setAmount(e.target.value); setErrors(p => ({ ...p, amount:null })); }} />
                   <span className="conv-unit">cube</span>
                 </div>
                 <button className="cashout-max-btn"
@@ -333,9 +367,7 @@ function CashoutModal({ balance, userId, open, onClose, onSuccess }) {
                   Max
                 </button>
               </div>
-              {errors.amount && (
-                <p style={{ fontSize:11, color:"#f87171", marginTop:-10, marginBottom:10 }}>{errors.amount}</p>
-              )}
+              {errors.amount && <p style={{ fontSize:11, color:"#f87171", marginTop:-10, marginBottom:10 }}>{errors.amount}</p>}
 
               <div className="cashout-summary">
                 {[
@@ -381,7 +413,7 @@ function CashoutModal({ balance, userId, open, onClose, onSuccess }) {
 
               <div className="modal-notice">
                 <AlertCircle size={15} />
-                <p>Cashout requests are processed within 1–24 hours. Your CUBE balance will be deducted immediately upon submission.</p>
+                <p>Cashout requests are processed within 1–24 hours. Your CUBE balance will be deducted immediately.</p>
               </div>
 
               <button className="modal-submit" onClick={handleSubmit} disabled={loading}>
@@ -400,97 +432,184 @@ export default function WalletPage() {
   const { toasts, addToast } = useToasts();
   const navigate = useNavigate();
 
-  const [modalOpen,        setModalOpen]        = useState(false);
-  const [gateOpen,         setGateOpen]         = useState(false);
-  const [user,             setUser]             = useState(null);
-  const [profile,          setProfile]          = useState(null);
-  const [transactions,     setTransactions]     = useState([]);
-  const [stats,            setStats]            = useState({ mining:0, referral:0, rewards:0, cashedOut:0, pending:0 });
-  const [loading,          setLoading]          = useState(true);
-  const [planPrice,        setPlanPrice]        = useState(null);
-  const [planRule,         setPlanRule]         = useState(null);
-  const [activeReferrals,  setActiveReferrals]  = useState(0);
-  const [totalCashedOutNgn,setTotalCashedOutNgn]= useState(0);
+  const [modalOpen,          setModalOpen]          = useState(false);
+  const [gateOpen,           setGateOpen]           = useState(false);
+  const [windowModalOpen,    setWindowModalOpen]    = useState(false);
+  const [user,               setUser]               = useState(null);
+  const [profile,            setProfile]            = useState(null);
+  const [transactions,       setTransactions]       = useState([]);
+  const [stats,              setStats]              = useState({ mining:0, referral:0, rewards:0, cashedOut:0, pending:0 });
+  const [loading,            setLoading]            = useState(true);
+  const [planPrice,          setPlanPrice]          = useState(null);
+  const [planRule,           setPlanRule]           = useState(null);
+  const [activeReferrals,    setActiveReferrals]    = useState(0);
+  const [totalCashedOutNgn,  setTotalCashedOutNgn]  = useState(0);
+  const [withdrawalSettings, setWithdrawalSettings] = useState(null);
 
   const balance = Number(profile?.cube_balance || 0);
+// ── Add this component near the top of WalletPage.jsx ────────────────────────
+function RejectionNotices({ userId }) {
+  const [rejected, setRejected] = useState([]);
+  const [dismissed, setDismissed] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("dismissed_rejections") || "[]"); }
+    catch { return []; }
+  });
 
-  // ── Load wallet ─────────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!userId) return;
+    const load = async () => {
+      const { data } = await supabase
+        .from("cashout_requests")
+        .select("id, amount, naira_value, rejection_reason, refunded_at, refund_amount, created_at")
+        .eq("user_id", userId)
+        .eq("status", "rejected")
+        .not("rejection_reason", "is", null)
+        .order("created_at", { ascending: false })
+        .limit(5);
+      setRejected(data || []);
+    };
+    load();
+  }, [userId]);
+
+  const dismiss = (id) => {
+    const updated = [...dismissed, id];
+    setDismissed(updated);
+    localStorage.setItem("dismissed_rejections", JSON.stringify(updated));
+  };
+
+  const visible = rejected.filter(r => !dismissed.includes(r.id));
+  if (visible.length === 0) return null;
+
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:8 }}>
+      {visible.map(r => (
+        <div key={r.id} style={{
+          background:"rgba(248,113,113,.07)",
+          border:"1px solid rgba(248,113,113,.25)",
+          borderRadius:18, padding:"16px 18px",
+          fontFamily:"'DM Sans', sans-serif",
+          animation:"fadeIn .3s ease",
+        }}>
+          <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}`}</style>
+
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:12 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+              <div style={{
+                width:36, height:36, borderRadius:"50%",
+                background:"rgba(248,113,113,.12)", border:"1px solid rgba(248,113,113,.3)",
+                display:"flex", alignItems:"center", justifyContent:"center",
+                fontSize:"1.1rem", flexShrink:0,
+              }}>❌</div>
+              <div>
+                <div style={{ fontWeight:800, color:"#fff", fontSize:14, marginBottom:2 }}>
+                  Withdrawal Rejected
+                </div>
+                <div style={{ fontSize:11, color:"rgba(255,255,255,.4)" }}>
+                  {Number(r.amount||0).toLocaleString()} CUBE · {new Date(r.created_at).toLocaleDateString("en-NG", { day:"numeric", month:"short" })}
+                </div>
+              </div>
+            </div>
+            <button onClick={() => dismiss(r.id)} style={{
+              background:"transparent", border:"none",
+              color:"rgba(255,255,255,.3)", cursor:"pointer", fontSize:18,
+              width:28, height:28, display:"flex", alignItems:"center", justifyContent:"center",
+              borderRadius:"50%", transition:".15s",
+            }}>×</button>
+          </div>
+
+          {/* Reason box */}
+          <div style={{
+            background:"rgba(0,0,0,.2)", border:"1px solid rgba(248,113,113,.15)",
+            borderRadius:12, padding:"12px 14px", marginBottom:12,
+          }}>
+            <div style={{ fontSize:10, color:"rgba(248,113,113,.7)", fontWeight:700, textTransform:"uppercase", letterSpacing:".06em", marginBottom:6 }}>
+              Reason from admin
+            </div>
+            <div style={{ fontSize:13, color:"rgba(255,255,255,.75)", lineHeight:1.6 }}>
+              "{r.rejection_reason}"
+            </div>
+          </div>
+
+          {/* Refund confirmation */}
+          {r.refunded_at && (
+            <div style={{
+              display:"flex", alignItems:"center", gap:8,
+              background:"rgba(74,222,128,.07)", border:"1px solid rgba(74,222,128,.18)",
+              borderRadius:10, padding:"9px 12px",
+            }}>
+              <span style={{ color:"#4ade80", fontSize:14 }}>✓</span>
+              <div style={{ fontSize:12, color:"rgba(255,255,255,.6)" }}>
+                <strong style={{ color:"#4ade80" }}>{Number(r.refund_amount||0).toLocaleString()} CUBE</strong> has been
+                refunded to your wallet balance.
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
   const loadWallet = useCallback(async (uid) => {
     // 1. Profile
     const { data: prof } = await supabase
       .from("profiles")
       .select("cube_balance, total_mined, referral_code, first_withdrawal_done, first_withdrawal_amount")
-      .eq("id", uid)
-      .maybeSingle();
+      .eq("id", uid).maybeSingle();
     setProfile(prof);
 
-    // 2. Active subscription
+    // 2. Withdrawal settings
+    const { data: wSettings } = await supabase
+      .from("withdrawal_settings")
+      .select("*")
+      .eq("id", "00000000-0000-0000-0000-000000000001")
+      .maybeSingle();
+    setWithdrawalSettings(wSettings);
+
+    // 3. Active subscription
     const { data: sub } = await supabase
       .from("subscriptions")
       .select("amount, plan_name, mining_rate")
-      .eq("user_id", uid)
-      .eq("payment_status", "approved")
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
+      .eq("user_id", uid).eq("payment_status", "approved")
+      .order("created_at", { ascending: false }).limit(1).maybeSingle();
     if (sub) {
       const price = Number(sub.amount);
       setPlanPrice(price);
       setPlanRule(PLAN_RULES[price] || null);
     }
 
-    // 3. Active referrals (referred users with an approved subscription)
+    // 4. Active referrals
     let activeRefCount = 0;
     if (prof?.referral_code) {
-      // Get all users referred by this user
       const { data: referredProfiles } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("referred_by_code", prof.referral_code);
-
-      if (referredProfiles && referredProfiles.length > 0) {
-        const referredIds = referredProfiles.map(p => p.id);
-        // Count how many have an approved subscription
-        const { count } = await supabase
-          .from("subscriptions")
+        .from("profiles").select("id").eq("referred_by_code", prof.referral_code);
+      if (referredProfiles?.length > 0) {
+        const ids = referredProfiles.map(p => p.id);
+        const { count } = await supabase.from("subscriptions")
           .select("*", { count:"exact", head:true })
-          .in("user_id", referredIds)
-          .eq("payment_status", "approved");
+          .in("user_id", ids).eq("payment_status", "approved");
         activeRefCount = count || 0;
       }
     }
     setActiveReferrals(activeRefCount);
 
-    // 4. Transactions
+    // 5. Transactions
     const { data: allTxs } = await supabase
-      .from("wallet_transactions")
-      .select("*")
-      .eq("user_id", uid)
+      .from("wallet_transactions").select("*").eq("user_id", uid)
       .order("created_at", { ascending: false });
-
     const txs = allTxs || [];
     setTransactions(txs.slice(0, 10));
 
-    const mining   = txs.filter(t => MINING_TITLES.includes(t.title)).reduce((a,t)=>a+Number(t.amount),0);
-    const referral = txs.filter(t => REFERRAL_TITLES.includes(t.title)).reduce((a,t)=>a+Number(t.amount),0);
-    const rewards  = txs.filter(t => t.type==="credit" && !EXCLUDED_FROM_REWARDS.includes(t.title)).reduce((a,t)=>a+Number(t.amount),0);
-    const cashedOut= txs.filter(t => t.title==="Cashout Request" && t.type!=="pending").reduce((a,t)=>a+Math.abs(Number(t.amount)),0);
+    const mining    = txs.filter(t => MINING_TITLES.includes(t.title)).reduce((a,t)=>a+Number(t.amount),0);
+    const referral  = txs.filter(t => REFERRAL_TITLES.includes(t.title)).reduce((a,t)=>a+Number(t.amount),0);
+    const rewards   = txs.filter(t => t.type==="credit" && !EXCLUDED_FROM_REWARDS.includes(t.title)).reduce((a,t)=>a+Number(t.amount),0);
+    const cashedOut = txs.filter(t => t.title==="Cashout Request" && t.type!=="pending").reduce((a,t)=>a+Math.abs(Number(t.amount)),0);
 
-    const { data: pendingCo } = await supabase
-      .from("cashout_requests")
-      .select("amount")
-      .eq("user_id", uid)
-      .eq("status", "pending");
+    const { data: pendingCo } = await supabase.from("cashout_requests")
+      .select("amount").eq("user_id", uid).eq("status", "pending");
     const pending = (pendingCo || []).reduce((a,c)=>a+Number(c.amount),0);
 
-    // 5. Total cashed out in naira (from approved cashout_requests)
-    const { data: approvedCashouts } = await supabase
-      .from("cashout_requests")
-      .select("naira_value")
-      .eq("user_id", uid)
-      .eq("status", "approved");
-
+    const { data: approvedCashouts } = await supabase.from("cashout_requests")
+      .select("naira_value").eq("user_id", uid).eq("status", "approved");
     const totalNaira = (approvedCashouts || []).reduce((a,c)=>a+Number(c.naira_value),0);
     setTotalCashedOutNgn(totalNaira);
 
@@ -508,54 +627,38 @@ export default function WalletPage() {
     init();
   }, [loadWallet]);
 
-  // ── Check withdrawal eligibility ──────────────────────────────────────────
   const handleCashoutClick = () => {
-    if (!planRule) {
-      // No rule for this plan — allow freely
-      setModalOpen(true);
+    // 1. Check withdrawal window first
+    if (!isWithdrawalOpen(withdrawalSettings)) {
+      setWindowModalOpen(true);
       return;
     }
 
-    const firstThresholdNaira = planRule.firstWithdrawalNaira;
-
-    // Has the user already cashed out >= the first threshold?
-    const crossedThreshold = totalCashedOutNgn >= firstThresholdNaira ||
-      (profile?.first_withdrawal_done && Number(profile?.first_withdrawal_amount || 0) >= firstThresholdNaira);
-
-    if (crossedThreshold) {
-      // Check referral gate
-      if (activeReferrals < planRule.requiredReferrals) {
-        // Show the gate modal — block cashout
+    // 2. Check referral gate
+    if (planRule) {
+      const crossedThreshold = totalCashedOutNgn >= planRule.firstWithdrawalNaira ||
+        (profile?.first_withdrawal_done && Number(profile?.first_withdrawal_amount||0) >= planRule.firstWithdrawalNaira);
+      if (crossedThreshold && activeReferrals < planRule.requiredReferrals) {
         setGateOpen(true);
         return;
       }
     }
 
-    // All clear — open cashout modal
     setModalOpen(true);
   };
 
   const handleCashoutSuccess = async (amount, ref, name, errMsg) => {
-    if (errMsg) {
-      addToast(`Cashout failed: ${errMsg}`, "error");
-      return;
-    }
+    if (errMsg) { addToast(`Cashout failed: ${errMsg}`, "error"); return; }
     addToast("Cashout submitted successfully!", "success");
     setModalOpen(false);
-
-    // Mark first withdrawal done on the profile if rule exists and threshold crossed
     if (planRule && user) {
-      const withdrawnNaira = nairaFromCube(amount);
-      const newTotalNaira  = totalCashedOutNgn + withdrawnNaira;
-
+      const newTotalNaira = totalCashedOutNgn + nairaFromCube(amount);
       if (newTotalNaira >= planRule.firstWithdrawalNaira && !profile?.first_withdrawal_done) {
         await supabase.from("profiles").update({
-          first_withdrawal_done:   true,
-          first_withdrawal_amount: amount,
+          first_withdrawal_done: true, first_withdrawal_amount: amount,
         }).eq("id", user.id);
       }
     }
-
     if (user) await loadWallet(user.id);
   };
 
@@ -588,12 +691,14 @@ export default function WalletPage() {
     </div>
   );
 
-  // Compute gate status for the cashout button hint
   const crossedThreshold = planRule && (
     totalCashedOutNgn >= planRule.firstWithdrawalNaira ||
     (profile?.first_withdrawal_done && Number(profile?.first_withdrawal_amount||0) >= planRule.firstWithdrawalNaira)
   );
-  const isGated = crossedThreshold && activeReferrals < (planRule?.requiredReferrals || 0);
+  const isGated        = crossedThreshold && activeReferrals < (planRule?.requiredReferrals || 0);
+  const windowOpen     = isWithdrawalOpen(withdrawalSettings);
+  const isLocked       = !windowOpen || isGated;
+  const allowedDays    = (withdrawalSettings?.allowed_days || [0]).map(d => DAY_NAMES[d]).join(", ");
 
   return (
     <div className="wallet-page">
@@ -612,6 +717,7 @@ export default function WalletPage() {
             <div className="wallet-title-sub">Manage your CUBE balance &amp; cashouts</div>
           </div>
         </div>
+        <RejectionNotices userId={user?.id} />
 
         {/* Hero */}
         <div className="wallet-hero">
@@ -630,8 +736,19 @@ export default function WalletPage() {
             100 CUBE = ₦5.00 NGN
           </div>
 
-          {/* Gate hint banner */}
-          {isGated && (
+          {/* Withdrawal window banner */}
+          {!windowOpen && withdrawalSettings && (
+            <div className="wallet-gate-hint info">
+              <Calendar size={13} />
+              <span>
+                Withdrawals are only available on <strong>{allowedDays}</strong>.
+                Next: <strong style={{ color:"#4ade80" }}>{nextAllowedDay(withdrawalSettings)}</strong>.
+              </span>
+            </div>
+          )}
+
+          {/* Referral gate banner */}
+          {isGated && windowOpen && (
             <div className="wallet-gate-hint">
               <Lock size={13} />
               <span>
@@ -641,42 +758,71 @@ export default function WalletPage() {
             </div>
           )}
 
-          {/* Plan rule info (before threshold) */}
-           {planRule &&
- profile?.first_withdrawal_done &&
- activeReferrals < planRule.requiredReferrals && (
-  <div className="wallet-gate-hint info">
-    <AlertCircle size={13} />
-    <span>
-      You've completed your first withdrawal.
-      Future withdrawals now require{" "}
-      <strong>{planRule.requiredReferrals} active referrals</strong>.
-    </span>
-  </div>
-)}
+          {/* First withdrawal hint */}
+          {planRule && profile?.first_withdrawal_done && activeReferrals < planRule.requiredReferrals && windowOpen && (
+            <div className="wallet-gate-hint info">
+              <AlertCircle size={13} />
+              <span>
+                Future withdrawals require <strong>{planRule.requiredReferrals} active referrals</strong>.
+              </span>
+            </div>
+          )}
 
           <div className="wallet-hero-actions">
             <button
-              className={`hero-btn cashout-btn ${isGated ? "gated" : ""}`}
+              className={`hero-btn cashout-btn ${isLocked ? "gated" : ""}`}
               onClick={handleCashoutClick}
             >
-              {isGated ? <Lock size={16} /> : <ArrowUp size={16} />}
-              {isGated ? "Locked" : "Cash Out"}
+              {isLocked ? <Lock size={16} /> : <ArrowUp size={16} />}
+              {isLocked ? (!windowOpen ? "Window Closed" : "Locked") : "Cash Out"}
             </button>
-            <button className="hero-btn history-btn" onClick={() => addToast("Full history coming soon", "success")}>
-              <Clock size={16} />
-              History
+            <button className="hero-btn history-btn">
+              <Clock size={16} /> History
             </button>
           </div>
         </div>
 
-        {/* Referral status card (only show when gated or approaching threshold) */}
+        {/* Withdrawal window status card */}
+        {withdrawalSettings && (
+          <div className="wallet-referral-status">
+            <div className="wrs-header">
+              <Calendar size={14} />
+              <span>Withdrawal Window</span>
+              {windowOpen
+                ? <span className="wrs-badge ok">✓ Open now</span>
+                : <span className="wrs-badge warn">⏰ Closed</span>
+              }
+            </div>
+            <div className="wrs-body">
+              <div className="wrs-row">
+                <span>Available days</span>
+                <span style={{ color:"#60a5fa", fontWeight:600 }}>{allowedDays}</span>
+              </div>
+              {withdrawalSettings.open_time && withdrawalSettings.close_time && (
+                <div className="wrs-row">
+                  <span>Time window</span>
+                  <span style={{ color:"#60a5fa", fontWeight:600 }}>
+                    {withdrawalSettings.open_time?.slice(0,5)} – {withdrawalSettings.close_time?.slice(0,5)}
+                  </span>
+                </div>
+              )}
+              <div className="wrs-row">
+                <span>Today</span>
+                <span style={{ color: windowOpen ? "#4ade80" : "#f87171", fontWeight:600 }}>
+                  {DAY_NAMES[new Date().getDay()]} {windowOpen ? "✓" : "✗"}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Referral status */}
         {planRule && (
           <div className="wallet-referral-status">
             <div className="wrs-header">
               <Users size={14} />
               <span>Referral Status</span>
-              {activeReferrals >= (planRule?.requiredReferrals || 0)
+              {activeReferrals >= planRule.requiredReferrals
                 ? <span className="wrs-badge ok">✓ Requirement met</span>
                 : crossedThreshold
                   ? <span className="wrs-badge warn">⚠ Required</span>
@@ -689,8 +835,7 @@ export default function WalletPage() {
                 <span style={{ color:"#4ade80", fontWeight:700 }}>{activeReferrals} / {planRule.requiredReferrals}</span>
               </div>
               <div className="wrs-bar-wrap">
-                <div className="wrs-bar"
-                  style={{ width:`${Math.min(100,(activeReferrals/planRule.requiredReferrals)*100)}%` }} />
+                <div className="wrs-bar" style={{ width:`${Math.min(100,(activeReferrals/planRule.requiredReferrals)*100)}%` }} />
               </div>
               <div className="wrs-row" style={{ marginTop:6 }}>
                 <span>Withdrawal threshold</span>
@@ -727,11 +872,11 @@ export default function WalletPage() {
         <div className="earnings-card">
           <div className="card-title"><TrendingUp size={15} />Earnings Overview</div>
           {[
-            ["Total Earned",       `${Number(profile?.total_mined||0).toLocaleString(undefined,{maximumFractionDigits:2})} CUBE`, ""],
-            ["Available Balance",  `${balance.toLocaleString(undefined,{maximumFractionDigits:2})} CUBE`, "green"],
-            ["Pending Cashouts",   `${stats.pending.toFixed(0)} CUBE`, "amber"],
-            ["Total Cashed Out",   `${stats.cashedOut.toFixed(0)} CUBE`, ""],
-            ["Naira Value",        fmtNaira(cubeToNaira(balance)), "green"],
+            ["Total Earned",      `${Number(profile?.total_mined||0).toLocaleString(undefined,{maximumFractionDigits:2})} CUBE`, ""],
+            ["Available Balance", `${balance.toLocaleString(undefined,{maximumFractionDigits:2})} CUBE`, "green"],
+            ["Pending Cashouts",  `${stats.pending.toFixed(0)} CUBE`, "amber"],
+            ["Total Cashed Out",  `${stats.cashedOut.toFixed(0)} CUBE`, ""],
+            ["Naira Value",       fmtNaira(cubeToNaira(balance)), "green"],
           ].map(([l, v, c]) => (
             <div className="earning-row" key={l}>
               <span className="earning-label">{l}</span>
@@ -769,22 +914,14 @@ export default function WalletPage() {
 
       </div>
 
-      {/* Modals */}
-      <CashoutModal
-        balance={balance}
-        userId={user?.id}
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSuccess={handleCashoutSuccess}
-      />
+      <CashoutModal balance={balance} userId={user?.id} open={modalOpen}
+        onClose={() => setModalOpen(false)} onSuccess={handleCashoutSuccess} />
 
-      <ReferralGateModal
-        open={gateOpen}
-        onClose={() => setGateOpen(false)}
-        planRule={planRule}
-        activeReferrals={activeReferrals}
-        planPrice={planPrice}
-      />
+      <ReferralGateModal open={gateOpen} onClose={() => setGateOpen(false)}
+        planRule={planRule} activeReferrals={activeReferrals} />
+
+      <WithdrawalWindowModal open={windowModalOpen} onClose={() => setWindowModalOpen(false)}
+        settings={withdrawalSettings} />
 
       <ToastStack toasts={toasts} />
     </div>

@@ -27,6 +27,7 @@ import AdminRewardPage from "./Admin/AdminPages/AdminRewardPage/AdminRewardPage"
 import CdashboardUpgrade from "./pages/CdashboardUpgrade/CdashboardUpgrade";
 import AdminUpgrades from "./Admin/AdminComponents/AdminUpgrades/AdminUpgrades";
 import AdminUpgradePage from "./Admin/AdminPages/AdminUpgradePage/AdminUpgradePage";
+import AdminWithdrawalSettingsPage from "./Admin/AdminPages/AdminWithdrawalPage/AdminWithdrawalSettingsPage";
 function App() {
 
   const [loading, setLoading] = useState(true);
@@ -73,6 +74,7 @@ function App() {
       <Route path="/admin/announcements" element={<ProtectedRoute><AdminAnnouncePage /></ProtectedRoute>} />
       <Route path="/admin/reward" element={<ProtectedRoute><AdminRewardPage /></ProtectedRoute>} />
       <Route path="/admin/upgrades" element={<ProtectedRoute><AdminUpgradePage /></ProtectedRoute>} />
+      <Route path="/admin/withdrawal-settings" element={<ProtectedRoute><AdminWithdrawalSettingsPage /></ProtectedRoute>} />
     </Routes>
   );
 }

@@ -84,6 +84,7 @@ export default function AdminSidebar() {
     { icon: <Megaphone       size={20} />, name: "Announcements", path: "/admin/announcements" },
     { icon: <Settings        size={20} />, name: "Settings",      path: "/admin/settings"      },
     { icon: <ArrowUpCircle        size={20} />, name:"Plan Ugrade",      path: "/admin/upgrades"      },
+    { icon: <ArrowUpCircle        size={20} />, name:"Withdrawal Settings",      path: "/admin/withdrawal-settings"      },
   ];
 
   const handleLogout = async () => {
