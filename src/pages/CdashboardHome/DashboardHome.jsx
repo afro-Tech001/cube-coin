@@ -49,7 +49,12 @@ export default function DashboardHome() {
   const [claiming,     setClaiming]     = useState(false);
   const [toast,        setToast]        = useState(null);
   const timerRef = useRef(null);
+  const CUBE_TO_NGN = 0.05;
 
+const fmtNaira = (cube) => {
+  const naira = Number(cube || 0) * CUBE_TO_NGN;
+  return naira.toLocaleString("en-NG", { maximumFractionDigits: 0 });
+};
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3200); };
   const [userId, setUserId] = useState(null);
 
@@ -272,33 +277,35 @@ setTransactions(txs.slice(0, 5));
       </div>
 
       {/* HERO CARD */}
-      <div className="hero-card">
-        <p className="hero-label">Total Earned</p>
-        <h1 className="hero-balance">{Number(userData?.cube_balance || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}</h1>
-        <span className="hero-unit">CUBE</span>
+      {/* HERO CARD */}
+<div className="hero-card">
+  <p className="hero-label">Total Earned</p>
+  <h1 className="hero-balance">{Number(userData?.cube_balance || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}</h1>
+  <span className="hero-unit">CUBE</span>
+  <p className="hero-naira">≈ ₦{fmtNaira(userData?.cube_balance)}</p>
 
-        <div className="mining-active">
-          <span className={`active-dot ${isMiningActive ? "pulse" : ""}`} />
-          {isMiningActive ? "Mining Active" : isMiningPaused ? "Mining Paused" : "Mining Idle"}
-        </div>
+  <div className="mining-active">
+    <span className={`active-dot ${isMiningActive ? "pulse" : ""}`} />
+    {isMiningActive ? "Mining Active" : isMiningPaused ? "Mining Paused" : "Mining Idle"}
+  </div>
 
-        <p className="mining-rate">{subscription?.mining_rate || 0} CUBE / Hour</p>
+  <p className="mining-rate">{subscription?.mining_rate || 0} CUBE / Hour</p>
+  {/* Live claimable */}
+  {hasActiveSession && claimable > 0 && (
+    <p className="claimable-hint">
+      ⛏ <strong style={{ color: "#4ade80" }}>{claimable.toFixed(4)} CUBE</strong>
+      {" "}<span className="claimable-naira">(≈ ₦{fmtNaira(claimable)})</span> ready to claim
+    </p>
+  )}
 
-        {/* Live claimable */}
-        {hasActiveSession && claimable > 0 && (
-          <p className="claimable-hint">
-            ⛏ <strong style={{ color: "#4ade80" }}>{claimable.toFixed(4)} CUBE</strong> ready to claim
-          </p>
-        )}
-
-        <button
-          className="claim-btn"
-          onClick={() => hasActiveSession && claimable > 0 ? setShowClaim(true) : null}
-          style={{ opacity: hasActiveSession && claimable > 0 ? 1 : 0.45, cursor: hasActiveSession && claimable > 0 ? "pointer" : "not-allowed" }}
-        >
-          {hasActiveSession && claimable > 0 ? `Claim ${claimable.toFixed(4)} CUBE` : "Claim Reward"}
-        </button>
-      </div>
+  <button
+    className="claim-btn"
+    onClick={() => hasActiveSession && claimable > 0 ? setShowClaim(true) : null}
+    style={{ opacity: hasActiveSession && claimable > 0 ? 1 : 0.45, cursor: hasActiveSession && claimable > 0 ? "pointer" : "not-allowed" }}
+  >
+    {hasActiveSession && claimable > 0 ? `Claim ${claimable.toFixed(4)} CUBE` : "Claim Reward"}
+  </button>
+</div>
 
       {/* STATS GRID */}
       <div className="stats-grid">

@@ -988,6 +988,121 @@
   border-radius: 3px;
   transition: width .4s ease;
 }
+/* ── Weekly limit card ── */
+.wallet-limit-card {
+  background: rgba(10,28,14,.88);
+  border: 1px solid rgba(251,191,36,.18);
+  border-radius: 20px;
+  padding: 18px 20px;
+  margin-bottom: 4px;
+}
+
+.wlc-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255,255,255,.7);
+  margin-bottom: 14px;
+}
+.wlc-header svg { color: #fbbf24; }
+
+.wlc-badge {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.wlc-badge.ok      { background: rgba(74,222,128,.12);  border:1px solid rgba(74,222,128,.3);  color:#4ade80; }
+.wlc-badge.low     { background: rgba(251,191,36,.1);   border:1px solid rgba(251,191,36,.3);  color:#fbbf24; }
+.wlc-badge.reached { background: rgba(248,113,113,.1);  border:1px solid rgba(248,113,113,.3); color:#f87171; }
+
+.wlc-body { display: flex; flex-direction: column; gap: 8px; }
+
+.wlc-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: rgba(255,255,255,.45);
+}
+
+.wlc-bar-wrap {
+  height: 6px;
+  background: rgba(255,255,255,.07);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.wlc-bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width .4s ease, background .3s ease;
+  min-width: 0;
+}
+
+/* ── Limit banner hint ── */
+.wallet-gate-hint.limit {
+  background: rgba(248,113,113,.07);
+  border-color: rgba(248,113,113,.22);
+}
+.wallet-gate-hint.limit svg { color: #f87171; }
+.wallet-gate-hint.limit strong { color: #f87171; }
+
+/* ── Cashout limit progress bar inside modal ── */
+.cashout-limit-bar {
+  background: rgba(74,222,128,.05);
+  border: 1px solid rgba(74,222,128,.15);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.clb-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: rgba(255,255,255,.55);
+  margin-bottom: 10px;
+}
+.clb-header svg { color: #4ade80; flex-shrink: 0; }
+.clb-header strong { color: #fff; }
+.clb-remaining {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 700;
+  color: #4ade80;
+}
+
+.clb-track {
+  height: 5px;
+  background: rgba(255,255,255,.07);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.clb-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width .4s ease;
+  min-width: 0;
+}
+
+.clb-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: rgba(255,255,255,.3);
+}
+
+/* ── Red cs-val for limit reached ── */
+.cs-val.red { color: #f87171; font-weight: 700; }
 /* ── Responsive ── */
 @media (max-width: 480px) {
   .wallet-page { padding: 20px 14px 60px; }

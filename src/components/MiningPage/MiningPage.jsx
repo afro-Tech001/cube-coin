@@ -115,25 +115,26 @@ function CrackLines({ visible }) {
 // swingEvery:  lower = faster pickaxe animation (more hits per second)
 // ─────────────────────────────────────────────────────────────────────────────
 const PLAN_TIERS = {
-  62.50:  { sessionSecs: 24 * 3600, swingEvery: 10, label: "Basic"   },
-  125.00: { sessionSecs: 24 * 3600, swingEvery: 9,  label: "Starter" },
-  187.50: { sessionSecs: 24 * 3600, swingEvery: 7,  label: "Bronze"  },
-  250.00: { sessionSecs: 24 * 3600, swingEvery: 5,  label: "Silver"  },
-  312.50: { sessionSecs: 24 * 3600, swingEvery: 4,  label: "Gold"    },
-  408.33: { sessionSecs: 24 * 3600, swingEvery: 3,  label: "Diamond" },
+  1250.00:  { sessionSecs: 24 * 3600, swingEvery: 10, label: "Basic",   dailyCube: 30000,  dailyNaira: 1500 },
+  2500.00:  { sessionSecs: 24 * 3600, swingEvery: 9,  label: "Starter", dailyCube: 60000,  dailyNaira: 3000 },
+  3750.00:  { sessionSecs: 24 * 3600, swingEvery: 7,  label: "Bronze",  dailyCube: 90000,  dailyNaira: 4500 },
+  5000.00:  { sessionSecs: 24 * 3600, swingEvery: 5,  label: "Silver",  dailyCube: 120000, dailyNaira: 6000 },
+  6250.00:  { sessionSecs: 24 * 3600, swingEvery: 4,  label: "Gold",    dailyCube: 150000, dailyNaira: 7500 },
+  8166.67:  { sessionSecs: 24 * 3600, swingEvery: 3,  label: "Diamond", dailyCube: 196000, dailyNaira: 9800 },
 };
 
 const getTier = (rate) => {
-  if (!rate) return PLAN_TIERS[62.50];
+  if (!rate) return PLAN_TIERS[1250.00];
   const r = Number(rate);
   if (PLAN_TIERS[r]) return PLAN_TIERS[r];
+  // Fuzzy match within 5 tolerance for floating point
   const keys    = Object.keys(PLAN_TIERS).map(Number);
   const closest = keys.reduce((prev, curr) =>
     Math.abs(curr - r) < Math.abs(prev - r) ? curr : prev
   );
-  if (Math.abs(closest - r) < 1) return PLAN_TIERS[closest];
+  if (Math.abs(closest - r) < 5) return PLAN_TIERS[closest];
   console.warn("[MiningPage] Unknown mining rate:", r, "— defaulting to Basic");
-  return PLAN_TIERS[62.50];
+  return PLAN_TIERS[1250.00];
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -612,12 +613,13 @@ export default function MiningPage() {
            : claimable > 0 ? "Session complete"
            : "Ready to mine"}
         </h2>
-        <p className="sub">
-          {isPaused     ? "Resume to continue earning"
-           : isMining   ? fmt(timeLeft)
-           : claimable > 0 ? "Claim your earned CUBE"
-           : `24hr mining session · ${sub?.mining_rate} CUBE/hr`}
-        </p>
+        {/* Update this line in your mining hero section */}
+<p className="sub">
+  {isPaused     ? "Resume to continue earning"
+   : isMining   ? fmt(timeLeft)
+   : claimable > 0 ? "Claim your earned CUBE"
+   : `Mine ${tier.dailyCube?.toLocaleString() || ""} CUBE/day · ₦${tier.dailyNaira?.toLocaleString() || ""} value`}
+</p>
 
         <div className="btn-row">
           {!hasActiveSession && (

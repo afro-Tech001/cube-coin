@@ -20,9 +20,11 @@ function fmtDuration(startedAt, endsAt) {
 }
 
 function fmtEarned(n) {
-  if (!n && n !== 0) return "0.00";
+  if (!n && n !== 0) return "0";
   const num = Number(n);
-  if (num >= 1000) return num.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  if (num >= 1000) {
+    return num.toLocaleString(undefined, { maximumFractionDigits: 0 });
+  }
   return num.toFixed(2);
 }
 

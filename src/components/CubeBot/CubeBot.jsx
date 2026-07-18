@@ -15,9 +15,9 @@ const KB = [
     chips: ["What are the rates?","Can I pause mining?","How to claim?"],
   },
 {
-  keys: ["rate","cube per hour","mining rate","how fast","daily","earn per day"],
-  reply: "📊 **Mining Rates & Daily Earnings:**\n\n🟢 Basic → 62.50 CUBE/hr · **1,500 CUBE/day**\n⬡ Starter → 125.00 CUBE/hr · **3,000 CUBE/day**\n🥉 Bronze → 187.50 CUBE/hr · **4,500 CUBE/day**\n🥈 Silver → 250.00 CUBE/hr · **6,000 CUBE/day**\n🥇 Gold → 312.50 CUBE/hr · **7,500 CUBE/day**\n💎 Diamond → 408.33 CUBE/hr · **9,800 CUBE/day**\n\nAll sessions run 24 hours. Higher plans earn significantly more daily!",
-  chips: ["What does Silver cost?","Upgrade my plan","How to claim?"],
+  keys: ["rate","cube per hour","mining rate","how fast","daily","earn per day","naira daily"],
+  reply: "📊 **Mining Rates & Daily Earnings:**\n\n🟢 Basic → **30,000 CUBE/day** (₦1,500 value)\n⬡ Starter → **60,000 CUBE/day** (₦3,000 value)\n🥉 Bronze → **90,000 CUBE/day** (₦4,500 value)\n🥈 Silver → **120,000 CUBE/day** (₦6,000 value)\n🥇 Gold → **150,000 CUBE/day** (₦7,500 value)\n💎 Diamond → **196,000 CUBE/day** (₦9,800 value)\n\n📌 Exchange rate: 1 CUBE = ₦0.05 (100 CUBE = ₦5)\nAll sessions run 24 hours — claim daily to keep earning!",
+  chips: ["What does Silver cost?","How to cash out?","Upgrade my plan"],
 },
 {
   keys: ["plan","subscription","starter","bronze","silver","gold","diamond","basic","cost","price","upgrade"],
