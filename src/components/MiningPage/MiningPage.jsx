@@ -115,30 +115,25 @@ function CrackLines({ visible }) {
 // swingEvery:  lower = faster pickaxe animation (more hits per second)
 // ─────────────────────────────────────────────────────────────────────────────
 const PLAN_TIERS = {
-  0.40:  { sessionSecs: 24 * 3600, swingEvery: 10, label: "Basic"   },
-  0.80:  { sessionSecs: 24 * 3600, swingEvery: 9,  label: "Starter" },
-  2.00:  { sessionSecs: 24 * 3600, swingEvery: 7,  label: "Bronze"  },
-  4.00:  { sessionSecs: 24 * 3600, swingEvery: 5,  label: "Silver"  },
-  7.20:  { sessionSecs: 24 * 3600, swingEvery: 4,  label: "Gold"    },
-  14.00: { sessionSecs: 24 * 3600, swingEvery: 3,  label: "Diamond" },
+  62.50:  { sessionSecs: 24 * 3600, swingEvery: 10, label: "Basic"   },
+  125.00: { sessionSecs: 24 * 3600, swingEvery: 9,  label: "Starter" },
+  187.50: { sessionSecs: 24 * 3600, swingEvery: 7,  label: "Bronze"  },
+  250.00: { sessionSecs: 24 * 3600, swingEvery: 5,  label: "Silver"  },
+  312.50: { sessionSecs: 24 * 3600, swingEvery: 4,  label: "Gold"    },
+  408.33: { sessionSecs: 24 * 3600, swingEvery: 3,  label: "Diamond" },
 };
 
-// ── Fuzzy tier lookup ─────────────────────────────────────────────────────────
-// Handles floating point precision issues (e.g. 0.8000000001 → 0.80)
 const getTier = (rate) => {
-  if (!rate) return PLAN_TIERS[0.40];
+  if (!rate) return PLAN_TIERS[62.50];
   const r = Number(rate);
-  // Try exact match first
   if (PLAN_TIERS[r]) return PLAN_TIERS[r];
-  // Fuzzy match — find closest key within 0.01 tolerance
-  const keys = Object.keys(PLAN_TIERS).map(Number);
+  const keys    = Object.keys(PLAN_TIERS).map(Number);
   const closest = keys.reduce((prev, curr) =>
     Math.abs(curr - r) < Math.abs(prev - r) ? curr : prev
   );
-  if (Math.abs(closest - r) < 0.01) return PLAN_TIERS[closest];
-  // Final fallback
-  console.warn("[MiningPage] Unknown mining rate:", r, "— defaulting to Basic tier");
-  return PLAN_TIERS[0.40];
+  if (Math.abs(closest - r) < 1) return PLAN_TIERS[closest];
+  console.warn("[MiningPage] Unknown mining rate:", r, "— defaulting to Basic");
+  return PLAN_TIERS[62.50];
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

@@ -435,6 +435,238 @@
   line-height: 1.5;
   font-family: 'DM Sans', sans-serif;
 }
+/* ── How it works ── */
+.ref-how-it-works {
+  background: rgba(10,28,14,.88);
+  border: 1px solid rgba(74,222,128,.12);
+  border-radius: 18px;
+  padding: 18px 20px;
+  margin-bottom: 4px;
+}
+
+.ref-how-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,.35);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 14px;
+}
+
+.ref-how-steps {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ref-how-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 100px;
+}
+
+.ref-how-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(74,222,128,.12);
+  border: 1px solid rgba(74,222,128,.25);
+  color: #4ade80;
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ref-how-text {
+  font-size: 11px;
+  color: rgba(255,255,255,.5);
+  line-height: 1.45;
+}
+
+.ref-how-arrow {
+  color: rgba(74,222,128,.4);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+/* ── Earnings potential card ── */
+.ref-earnings-card {
+  background: rgba(10,28,14,.88);
+  border: 1px solid rgba(74,222,128,.2);
+  border-radius: 18px;
+  padding: 18px 20px;
+  margin-bottom: 4px;
+}
+
+.ref-earnings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: .9rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 5px;
+}
+
+.ref-earnings-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,.35);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.ref-earnings-progress {
+  height: 6px;
+  background: rgba(255,255,255,.07);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 7px;
+}
+
+.ref-earnings-progress div {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+  border-radius: 3px;
+  transition: width .5s ease;
+  min-width: 4px;
+}
+
+.ref-earnings-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: rgba(255,255,255,.3);
+}
+
+/* ── Milestone reward size bump ── */
+.milestone h4 {
+  font-size: .9rem;
+}
+
+.milestone p {
+  font-size: .8rem;
+  margin-top: 3px;
+}
+/* ── Withdrawal requirement card ── */
+.ref-withdrawal-card {
+  background: rgba(10,28,14,.92);
+  border: 1px solid rgba(251,191,36,.22);
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ref-withdrawal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ref-wr-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .95rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.ref-wr-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.ref-wr-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ref-wr-badge.met {
+  background: rgba(74,222,128,.12);
+  border: 1px solid rgba(74,222,128,.3);
+  color: #4ade80;
+}
+
+.ref-wr-badge.unmet {
+  background: rgba(248,113,113,.1);
+  border: 1px solid rgba(248,113,113,.28);
+  color: #f87171;
+}
+
+.ref-withdrawal-desc {
+  font-size: .84rem;
+  color: rgba(255,255,255,.5);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.ref-wr-progress-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(0,0,0,.2);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.ref-wr-progress-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: rgba(255,255,255,.4);
+}
+
+.ref-wr-count {
+  font-size: 14px;
+  font-weight: 800;
+  color: #4ade80;
+}
+
+.ref-wr-bar-wrap {
+  height: 7px;
+  background: rgba(255,255,255,.07);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.ref-wr-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+  border-radius: 4px;
+  transition: width .5s ease;
+  min-width: 0;
+}
+
+.ref-wr-hint {
+  font-size: 11px;
+  color: rgba(255,255,255,.38);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.ref-wr-hint.met {
+  color: rgba(74,222,128,.7);
+  font-weight: 600;
+}
 /* ══════════════════════════════════════════════════════════
    RESPONSIVE
    ══════════════════════════════════════════════════════════ */

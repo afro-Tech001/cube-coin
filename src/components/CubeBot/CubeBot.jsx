@@ -14,9 +14,9 @@ const KB = [
     reply: "⛏ **How Mining Works:**\n\n1. Go to the **Mining page** from your dashboard\n2. Tap **Start Mining** — your session begins\n3. Mining runs based on your plan's rate (e.g. 0.40 CUBE/hr)\n4. You can **Pause** and **Resume** anytime\n5. When done, tap **Claim** to add earned CUBE to your wallet\n\nYour CUBE accumulates in real time — the longer you mine, the more you earn! 🚀",
     chips: ["What are the rates?","Can I pause mining?","How to claim?"],
   },
- {
-  keys: ["rate","cube per hour","mining rate","how fast"],
-  reply: "📊 **Mining Rates by Plan:**\n\n🆕 Basic → 0.40 CUBE/hr\n⬡ Starter → 0.80 CUBE/hr\n🥉 Bronze → 2.00 CUBE/hr\n🥈 Silver → 4.00 CUBE/hr\n🥇 Gold → 7.20 CUBE/hr\n💎 Diamond → 14.00 CUBE/hr\n\nDiamond earns 35× more than Basic per hour!",
+{
+  keys: ["rate","cube per hour","mining rate","how fast","daily","earn per day"],
+  reply: "📊 **Mining Rates & Daily Earnings:**\n\n🟢 Basic → 62.50 CUBE/hr · **1,500 CUBE/day**\n⬡ Starter → 125.00 CUBE/hr · **3,000 CUBE/day**\n🥉 Bronze → 187.50 CUBE/hr · **4,500 CUBE/day**\n🥈 Silver → 250.00 CUBE/hr · **6,000 CUBE/day**\n🥇 Gold → 312.50 CUBE/hr · **7,500 CUBE/day**\n💎 Diamond → 408.33 CUBE/hr · **9,800 CUBE/day**\n\nAll sessions run 24 hours. Higher plans earn significantly more daily!",
   chips: ["What does Silver cost?","Upgrade my plan","How to claim?"],
 },
 {
@@ -45,10 +45,10 @@ const KB = [
     chips: ["How to cash out?","How to earn more CUBE?"],
   },
   {
-    keys: ["referral","refer","invite","code","friend","bonus"],
-    reply: "👥 **Referral Program:**\n\nShare your referral code and earn CUBE milestones:\n\n• 5 referrals → 100 CUBE\n• 10 referrals → 250 CUBE\n• 25 referrals → 500 CUBE\n• 50 referrals → 1,000 CUBE\n\nFind your code on the **Referrals** page. Milestones auto-claim when reached!",
-    chips: ["Where is my referral code?","Referral milestones"],
-  },
+  keys: ["referral","refer","invite","code","friend","bonus","earn"],
+  reply: "👥 **Referral Program:**\n\nShare your unique code. When a friend subscribes to any plan using your code, they count as an **active referral**.\n\n🎯 **Milestone Rewards (subscribed users only):**\n• 5 subscribers → **5,000 CUBE**\n• 10 subscribers → **10,000 CUBE**\n• 25 subscribers → **25,000 CUBE**\n• 50 subscribers → **50,000 CUBE**\n\n⚠️ Just signing up doesn't count — your friend must **subscribe to a plan** to unlock your bonus.\n\nBonuses are auto-credited the moment a milestone is reached! 🚀",
+  chips: ["Where is my referral code?","Withdrawal requirement","How to share?"],
+},
   {
     keys: ["streak","daily","check in","checkin","consecutive","fire"],
     reply: "🔥 **Streak Bonuses:**\n\n• 7 days → 100 CUBE + 10% boost\n• 14 days → 250 CUBE + 20% boost\n• 30 days → 1,000 CUBE + 40% boost\n• 60 days → VIP + 60% boost\n• 100 days → Legendary + 100% boost\n\nDon't miss a day — missing resets your streak! 😅",

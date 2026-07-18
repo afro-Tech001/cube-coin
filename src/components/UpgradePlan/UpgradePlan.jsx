@@ -4,18 +4,12 @@ import { useNavigate } from "react-router-dom";
 import "./UpgradePlan.css";
 
 const PLANS = [
-  {
-    id: 0, name: "Basic",   price: 5600,  rateVal: 0.40,  rate: "0.40 CUBE/hr",  subscriptionCubes: 20000,  color: "#86efac" },
-  {
-    id: 1, name: "Starter", price: 10600, rateVal: 0.80,  rate: "0.80 CUBE/hr",  subscriptionCubes: 50000,  color: "#4ade80" },
-  {
-    id: 2, name: "Bronze",  price: 16200, rateVal: 2.00,  rate: "2.00 CUBE/hr",  subscriptionCubes: 100000, color: "#fb923c" },
-  {
-    id: 3, name: "Silver",  price: 22500, rateVal: 4.00,  rate: "4.00 CUBE/hr",  subscriptionCubes: 200000, color: "#94a3b8", featured: true },
-  {
-    id: 4, name: "Gold",    price: 30350, rateVal: 7.20,  rate: "7.20 CUBE/hr",  subscriptionCubes: 250000, color: "#fbbf24" },
-  {
-    id: 5, name: "Diamond", price: 50000, rateVal: 14.00, rate: "14.00 CUBE/hr", subscriptionCubes: 300000, color: "#60a5fa" },
+  { id:0, name:"Basic",   price:5600,  rateVal:62.50,  rate:"62.50 CUBE/hr",  subscriptionCubes:20000,  color:"#86efac", daily:1500 },
+  { id:1, name:"Starter", price:10600, rateVal:125.00, rate:"125.00 CUBE/hr", subscriptionCubes:50000,  color:"#4ade80", daily:3000 },
+  { id:2, name:"Bronze",  price:16200, rateVal:187.50, rate:"187.50 CUBE/hr", subscriptionCubes:100000, color:"#fb923c", daily:4500 },
+  { id:3, name:"Silver",  price:22500, rateVal:250.00, rate:"250.00 CUBE/hr", subscriptionCubes:200000, color:"#94a3b8", daily:6000, featured:true },
+  { id:4, name:"Gold",    price:30350, rateVal:312.50, rate:"312.50 CUBE/hr", subscriptionCubes:250000, color:"#fbbf24", daily:7500 },
+  { id:5, name:"Diamond", price:50000, rateVal:408.33, rate:"408.33 CUBE/hr", subscriptionCubes:300000, color:"#60a5fa", daily:9800 },
 ];
 
 const PLAN_ICONS = {
@@ -300,7 +294,9 @@ export default function UpgradePlan() {
                   {plan.featured && !isCurrentPlan && <span className="up-popular-badge">Popular</span>}
                 </div>
                 <div className="up-plan-rate" style={{ color: plan.color }}>{plan.rate}</div>
-                <div className="up-plan-bonus">+{fmtCubes(plan.subscriptionCubes)} CUBE on activation</div>
+<div className="up-plan-bonus">
+  {plan.daily.toLocaleString()} CUBE/day · +{fmtCubes(plan.subscriptionCubes)} on activation
+</div>
               </div>
 
               <div className="up-plan-right">

@@ -20,8 +20,10 @@ function fmtDuration(startedAt, endsAt) {
 }
 
 function fmtEarned(n) {
-  if (!n && n !== 0) return "0.0000";
-  return Number(n).toFixed(4);
+  if (!n && n !== 0) return "0.00";
+  const num = Number(n);
+  if (num >= 1000) return num.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  return num.toFixed(2);
 }
 
 function getStatus(session) {
