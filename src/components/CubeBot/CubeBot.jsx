@@ -44,10 +44,10 @@ const KB = [
     reply: "💱 **CUBE Exchange Rate:**\n\n**100 CUBE = ₦5.00** (1 CUBE = ₦0.05)\n\nExamples:\n• 1,000 CUBE = ₦50\n• 10,000 CUBE = ₦500\n• 100,000 CUBE = ₦5,000",
     chips: ["How to cash out?","How to earn more CUBE?"],
   },
-  {
+ {
   keys: ["referral","refer","invite","code","friend","bonus","earn"],
-  reply: "👥 **Referral Program:**\n\nShare your unique code. When a friend subscribes to any plan using your code, they count as an **active referral**.\n\n🎯 **Milestone Rewards (subscribed users only):**\n• 5 subscribers → **5,000 CUBE**\n• 10 subscribers → **10,000 CUBE**\n• 25 subscribers → **25,000 CUBE**\n• 50 subscribers → **50,000 CUBE**\n\n⚠️ Just signing up doesn't count — your friend must **subscribe to a plan** to unlock your bonus.\n\nBonuses are auto-credited the moment a milestone is reached! 🚀",
-  chips: ["Where is my referral code?","Withdrawal requirement","How to share?"],
+  reply: "👥 **Referral Program:**\n\nEvery friend who subscribes earns you **30,000 CUBE**!\n\n🎯 **Milestone Rewards (subscribed users only):**\n• 5 subscribers → **150,000 CUBE**\n• 10 subscribers → **300,000 CUBE**\n• 25 subscribers → **750,000 CUBE**\n• 50 subscribers → **1,500,000 CUBE**\n\n⚠️ Your friend must **subscribe to a plan** — sign-ups alone don't count.\n\nBonuses are auto-credited the moment a milestone is reached! 🚀",
+  chips: ["Where is my referral code?","How to share?","Withdrawal requirement"],
 },
   {
     keys: ["streak","daily","check in","checkin","consecutive","fire"],

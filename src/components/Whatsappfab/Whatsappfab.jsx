@@ -6,7 +6,7 @@
 import { useState } from "react";
 import "./Whatsappfab.css";
 
-const WHATSAPP_INVITE_LINK = "https://chat.whatsapp.com/JFQCEqcpXaZAt5b1YcYkvH";
+const WHATSAPP_INVITE_LINK = "https://chat.whatsapp.com/HUl7oUi9CARJASid1DAwON?s=cl&p=a&ilr=1";
 
 export default function Whatsappfab() {
   const [dismissed, setDismissed] = useState(

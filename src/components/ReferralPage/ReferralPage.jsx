@@ -6,10 +6,10 @@ import { useNavigate } from "react-router-dom";
 
 // Every 5 SUBSCRIBED referrals = 5,000 CUBE
 const MILESTONES = [
-  { target: 5,  reward: 5000,  label: "5 active miners"  },
-  { target: 10, reward: 10000, label: "10 active miners" },
-  { target: 25, reward: 25000, label: "25 active miners" },
-  { target: 50, reward: 50000, label: "50 active miners" },
+  { target: 5,  reward: 150000,  label: "5 active miners"  },
+  { target: 10, reward: 300000,  label: "10 active miners" },
+  { target: 25, reward: 750000,  label: "25 active miners" },
+  { target: 50, reward: 1500000, label: "50 active miners" },
 ];
 
 const PLAN_RULES = {
