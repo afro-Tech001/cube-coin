@@ -487,48 +487,145 @@ function CashoutModal({ balance, userId, open, onClose, onSuccess, maxNaira, wit
   const remainingNaira  = Math.max(0, weeklyLimit - withdrawnThisWeek);
 
   const validate = () => {
-    const errs = {};
-    if (parsedCube < MIN_CASHOUT)       errs.amount = `Minimum cashout is ${MIN_CASHOUT} CUBE`;
-    if (parsedCube > balance)           errs.amount = "Insufficient balance";
-    if (maxNaira > 0 && nairaValue > maxNaira)
-      errs.amount = `You can only withdraw ${fmtNaira(maxNaira)} more this week (plan limit)`;
-    if (!bank)                          errs.bank   = "Select a bank";
-    if (acct.length !== 10)             errs.acct   = "Enter a valid 10-digit account number";
-    if (!name.trim())                   errs.name   = "Account name is required";
-    setErrors(errs);
-    return Object.keys(errs).length === 0;
-  };
+  const errs = {};
+  const nairaEquivalent = nairaValue;
+  const remaining       = weeklyLimit > 0 ? Math.max(0, weeklyLimit - withdrawnThisWeek) : Infinity;
+
+  if (parsedCube < MIN_CASHOUT) {
+    errs.amount = `Minimum cashout is ${MIN_CASHOUT} CUBE`;
+  } else if (parsedCube > balance) {
+    errs.amount = "Insufficient balance";
+  } else if (weeklyLimit > 0 && nairaEquivalent > remaining + 0.01) {
+    errs.amount = `Plan limit: you can only withdraw ${fmtNaira(remaining)} more this week (≈ ${Math.floor(remaining / CUBE_TO_NGN).toLocaleString()} CUBE)`;
+  }
+
+  if (!bank)           errs.bank = "Select a bank";
+  if (acct.length !== 10) errs.acct = "Enter a valid 10-digit account number";
+  if (!name.trim())    errs.name = "Account name is required";
+
+  setErrors(errs);
+  return Object.keys(errs).length === 0;
+};
 
   const handleSubmit = async () => {
-    if (!validate()) return;
-    setLoading(true);
-    const txRef    = genRef();
-    const nairaVal = nairaValue;
+  if (!validate()) return;
+  setLoading(true);
 
-    const { error: cashoutErr } = await supabase.from("cashout_requests").insert([{
-      user_id: userId, amount: parsedCube, naira_value: nairaVal,
-      bank_name: bank, account_number: acct, account_name: name,
-      tx_ref: txRef, status: "pending",
-    }]);
-    if (cashoutErr) { setLoading(false); onSuccess(null, null, null, cashoutErr.message); return; }
+  const nairaVal = nairaValue;
 
-    await supabase.from("profiles").update({ cube_balance: balance - parsedCube }).eq("id", userId);
+  try {
+    // ── SERVER-SIDE LIMIT CHECK (the real gate) ───────────────────────────────
+    const { data: limitCheck, error: limitErr } = await supabase
+      .rpc("check_withdrawal_limit", {
+        p_user_id:     userId,
+        p_naira_amount: nairaVal,
+      });
+
+    console.log("[Cashout] Server limit check:", limitCheck, limitErr);
+
+    if (limitErr) {
+      console.error("[Cashout] Limit check RPC error:", limitErr);
+      // Don't block if RPC fails — fall through to client check
+    } else if (limitCheck && !limitCheck.allowed) {
+      const remaining = Number(limitCheck.remaining || 0);
+      const limit     = Number(limitCheck.limit || 0);
+      setErrors(p => ({
+        ...p,
+        amount: `Weekly limit: you can only withdraw ${fmtNaira(remaining)} more (${fmtNaira(limit)} limit, ${fmtNaira(limitCheck.withdrawn)} used)`,
+      }));
+      setLoading(false);
+      return;
+    }
+
+    // ── Client-side double check ───────────────────────────────────────────────
+    const remaining = weeklyLimit - withdrawnThisWeek;
+    if (weeklyLimit > 0 && nairaVal > remaining + 0.01) {
+      setErrors(p => ({
+        ...p,
+        amount: `You can only withdraw ${fmtNaira(Math.max(0, remaining))} more this week`,
+      }));
+      setLoading(false);
+      return;
+    }
+
+    const txRef = genRef();
+
+    // ── Insert cashout request ────────────────────────────────────────────────
+    const { error: cashoutErr } = await supabase
+      .from("cashout_requests")
+      .insert([{
+        user_id:        userId,
+        amount:         parsedCube,
+        naira_value:    nairaVal,
+        bank_name:      bank,
+        account_number: acct,
+        account_name:   name,
+        tx_ref:         txRef,
+        status:         "pending",
+      }]);
+
+    if (cashoutErr) {
+      console.error("[Cashout] Insert error:", cashoutErr);
+      onSuccess(null, null, null, cashoutErr.message);
+      setLoading(false);
+      return;
+    }
+
+    // ── Deduct CUBE balance ───────────────────────────────────────────────────
+    const { error: balErr } = await supabase
+      .from("profiles")
+      .update({ cube_balance: balance - parsedCube })
+      .eq("id", userId);
+
+    if (balErr) console.error("[Cashout] Balance deduct error:", balErr);
+
+    // ── Log transaction ───────────────────────────────────────────────────────
     await supabase.from("wallet_transactions").insert([{
-      user_id: userId, title: "Cashout Request", amount: -parsedCube, type: "pending",
+      user_id: userId,
+      title:   "Cashout Request",
+      amount:  -parsedCube,
+      type:    "pending",
     }]);
 
-    // Update weekly withdrawal tracker
-    const weekStart = getWeekStart();
-    await supabase.from("withdrawal_limits").upsert([{
-      user_id: userId,
-      week_start: weekStart,
-      withdrawn_this_week: withdrawnThisWeek + nairaVal,
-      last_reset_at: new Date().toISOString(),
-    }], { onConflict: "user_id" });
+    // ── Update weekly withdrawal tracker (upsert) ─────────────────────────────
+    const weekStart      = getWeekStart();
+    const newWeeklyTotal = withdrawnThisWeek + nairaVal;
 
-    setRef(txRef); setDone(true); setLoading(false);
+    const { error: upsertErr } = await supabase
+      .from("withdrawal_limits")
+      .upsert([{
+        user_id:             userId,
+        week_start:          weekStart,
+        withdrawn_this_week: newWeeklyTotal,
+        last_reset_at:       new Date().toISOString(),
+      }], { onConflict: "user_id" });
+
+    if (upsertErr) {
+      console.error("[Cashout] withdrawal_limits upsert error:", upsertErr);
+      // Try update fallback
+      await supabase
+        .from("withdrawal_limits")
+        .update({
+          week_start:          weekStart,
+          withdrawn_this_week: newWeeklyTotal,
+          last_reset_at:       new Date().toISOString(),
+        })
+        .eq("user_id", userId);
+    }
+
+    console.log("[Cashout] Limit updated:", withdrawnThisWeek, "+", nairaVal, "=", newWeeklyTotal);
+
+    setRef(txRef);
+    setDone(true);
     onSuccess(parsedCube, txRef, name, null, nairaVal);
-  };
+
+  } catch (err) {
+    console.error("[Cashout] Unexpected error:", err);
+    onSuccess(null, null, null, "Something went wrong — please try again");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className={`modal-overlay ${open ? "open" : ""}`} onClick={e => e.target === e.currentTarget && onClose()}>
@@ -592,11 +689,15 @@ function CashoutModal({ balance, userId, open, onClose, onSuccess, maxNaira, wit
                   />
                   <span className="conv-unit">cube</span>
                 </div>
-                <button className="cashout-max-btn" onClick={() => {
-                  const maxCube = Math.min(Math.floor(balance), maxCubeThisWeek > 0 ? Math.floor(maxCubeThisWeek) : Math.floor(balance));
-                  setAmount(String(maxCube));
-                  setErrors(p => ({ ...p, amount:null }));
-                }}>Max</button>
+                 <button className="cashout-max-btn" onClick={() => {
+  const remainingNaira    = weeklyLimit > 0 ? Math.max(0, weeklyLimit - withdrawnThisWeek) : Infinity;
+  const maxByLimit        = remainingNaira < Infinity ? Math.floor(remainingNaira / CUBE_TO_NGN) : balance;
+  const maxCube           = Math.min(Math.floor(balance), maxByLimit);
+  setAmount(String(Math.max(0, maxCube)));
+  setErrors(p => ({ ...p, amount: null }));
+}}>
+  Max
+</button>
               </div>
               {errors.amount && (
                 <p style={{ fontSize:11, color:"#f87171", marginTop:-10, marginBottom:10 }}>{errors.amount}</p>
@@ -787,26 +888,34 @@ export default function WalletPage() {
   }, [loadWallet]);
 
   const handleCashoutClick = () => {
-    // 1. Withdrawal window check
-    if (!isWithdrawalOpen(withdrawalSettings)) { setWindowModalOpen(true); return; }
+  // 1. Withdrawal window check
+  if (!isWithdrawalOpen(withdrawalSettings)) {
+    setWindowModalOpen(true);
+    return;
+  }
 
-    // 2. Referral gate check
-    if (planRule) {
-      const crossedThreshold = totalCashedOutNgn >= planRule.firstWithdrawalNaira ||
-        (profile?.first_withdrawal_done);
-      if (crossedThreshold && activeReferrals < planRule.requiredReferrals) {
-        setGateOpen(true); return;
-      }
+  // 2. Referral gate check
+  if (planRule) {
+    const crossedThreshold =
+      profile?.first_withdrawal_done ||
+      totalCashedOutNgn >= (planRule.firstWithdrawalNaira || 0);
+    if (crossedThreshold && activeReferrals < planRule.requiredReferrals) {
+      setGateOpen(true);
+      return;
     }
+  }
 
-    // 3. Weekly limit check
-    if (planRule) {
-      const remaining = planRule.weeklyLimitNaira - withdrawnThisWeek;
-      if (remaining <= 0) { setLimitModalOpen(true); return; }
+  // 3. Weekly limit check — block if NO naira remaining at all
+  if (planRule) {
+    const remaining = planRule.weeklyLimitNaira - withdrawnThisWeek;
+    if (remaining <= 0) {
+      setLimitModalOpen(true);
+      return;
     }
+  }
 
-    setModalOpen(true);
-  };
+  setModalOpen(true);
+};
 
   const handleCashoutSuccess = async (amount, ref, name, errMsg, nairaSpent) => {
     if (errMsg) { addToast(`Cashout failed: ${errMsg}`, "error"); return; }
