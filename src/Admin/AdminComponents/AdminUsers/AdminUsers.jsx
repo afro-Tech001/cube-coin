@@ -13,6 +13,10 @@ function fmtNaira(n) {
   return "₦" + Number(n || 0).toLocaleString("en-NG");
 }
 
+function fmtCube(n) {
+  return Number(n || 0).toLocaleString();
+}
+
 const PLAN_COLORS = {
   Basic:   { color:"#86efac", bg:"rgba(134,239,172,.12)", bd:"rgba(134,239,172,.3)"  },
   Starter: { color:"#4ade80", bg:"rgba(74,222,128,.12)",  bd:"rgba(74,222,128,.3)"   },
@@ -65,8 +69,9 @@ function PlanBadge({ planName }) {
 function DetailSheet({ user, onClose }) {
   if (!user) return null;
 
-  const sub    = user.subscription;
+  const sub     = user.subscription;
   const subMeta = STATUS_META[sub?.payment_status || "none"];
+  const withdrawn = user.withdrawn || { cube: 0, naira: 0, count: 0 };
 
   const rows = [
     ["User ID",           user.id],
@@ -78,8 +83,9 @@ function DetailSheet({ user, onClose }) {
     ["Referral Code",     user.referral_code || "—"],
     ["Referred By",       user.referred_by_code || "—"],
     ["Streak",            user.streak ? `${user.streak} days` : "—"],
-    ["CUBE Balance",      Number(user.cube_balance || 0).toLocaleString() + " CUBE"],
-    ["Total Mined",       Number(user.total_mined  || 0).toLocaleString() + " CUBE"],
+    ["CUBE Balance",      fmtCube(user.cube_balance) + " CUBE"],
+    ["Total Mined",       fmtCube(user.total_mined) + " CUBE"],
+    ["Total Withdrawn",   `${fmtNaira(withdrawn.naira)} (${fmtCube(withdrawn.cube)} CUBE · ${withdrawn.count}x)`],
   ];
 
   const subRows = sub ? [
@@ -88,7 +94,7 @@ function DetailSheet({ user, onClose }) {
     ["Mining Rate",       sub.mining_rate ? `${sub.mining_rate} CUBE/hr` : "—"],
     ["Plan Amount",       sub.amount ? fmtNaira(sub.amount) : "—"],
     ["Activated At",      fmtDate(sub.activated_at)],
-    ["Subscription CUBE", sub.subscription_cubes ? Number(sub.subscription_cubes).toLocaleString() : "—"],
+    ["Subscription CUBE", sub.subscription_cubes ? fmtCube(sub.subscription_cubes) : "—"],
   ] : [];
 
   return (
@@ -111,7 +117,7 @@ function DetailSheet({ user, onClose }) {
         {/* Header */}
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:22 }}>
           <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-              <Avatar user={user} size={48} fontSize={20} />
+            <Avatar user={user} size={48} fontSize={20} />
             <div>
               <div style={{ fontSize:"1.1rem", fontWeight:800, color:"#fff" }}>
                 {user.full_name || "Unknown"}
@@ -124,6 +130,28 @@ function DetailSheet({ user, onClose }) {
             width:30, height:30, borderRadius:"50%", fontSize:18, cursor:"pointer",
             display:"flex", alignItems:"center", justifyContent:"center",
           }}>×</button>
+        </div>
+
+        {/* Withdrawal summary highlight card */}
+        <div style={{
+          background:"rgba(96,165,250,.06)", border:"1px solid rgba(96,165,250,.2)",
+          borderRadius:14, padding:"14px 16px", marginBottom:18,
+          display:"flex", justifyContent:"space-between", alignItems:"center",
+        }}>
+          <div>
+            <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", fontWeight:700, textTransform:"uppercase", letterSpacing:".06em", marginBottom:4 }}>
+              Total Withdrawn
+            </div>
+            <div style={{ fontSize:"1.3rem", fontWeight:800, color:"#60a5fa" }}>
+              {fmtNaira(withdrawn.naira)}
+            </div>
+          </div>
+          <div style={{ textAlign:"right" }}>
+            <div style={{ fontSize:12, color:"rgba(255,255,255,.5)" }}>{fmtCube(withdrawn.cube)} CUBE</div>
+            <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", marginTop:2 }}>
+              {withdrawn.count} withdrawal{withdrawn.count !== 1 ? "s" : ""}
+            </div>
+          </div>
         </div>
 
         {/* Profile info */}
@@ -140,7 +168,9 @@ function DetailSheet({ user, onClose }) {
               <span style={{ fontSize:11, color:"rgba(255,255,255,.4)", flexShrink:0 }}>{l}</span>
               <span style={{
                 fontSize:12, fontWeight:600, color:
-                  l === "CUBE Balance" || l === "Total Mined" ? "#4ade80" : "#fff",
+                  l === "CUBE Balance" || l === "Total Mined" ? "#4ade80"
+                  : l === "Total Withdrawn" ? "#60a5fa"
+                  : "#fff",
                 textAlign:"right", wordBreak:"break-all", maxWidth:"65%",
               }}>{v}</span>
             </div>
@@ -206,10 +236,9 @@ function Avatar({ user, size = 40, fontSize = 15 }) {
   const [imgErr, setImgErr] = useState(false);
   const initial = (user.full_name || user.email || "?").charAt(0).toUpperCase();
 
-  // Try avatar_url first, then dicebear fallback
-  const seed      = encodeURIComponent(user.full_name || user.email || user.id || "user");
-  const dicebear  = `https://api.dicebear.com/7.x/bottts/svg?seed=${seed}`;
-  const imgSrc    = (!imgErr && user.avatar_url) ? user.avatar_url : dicebear;
+  const seed     = encodeURIComponent(user.full_name || user.email || user.id || "user");
+  const dicebear = `https://api.dicebear.com/7.x/bottts/svg?seed=${seed}`;
+  const imgSrc   = (!imgErr && user.avatar_url) ? user.avatar_url : dicebear;
 
   return (
     <div style={{
@@ -217,16 +246,12 @@ function Avatar({ user, size = 40, fontSize = 15 }) {
       background:"rgba(74,222,128,.1)", border:"1px solid rgba(74,222,128,.22)",
       overflow:"hidden", display:"flex", alignItems:"center", justifyContent:"center",
     }}>
-      {user.avatar_url || true ? (
-        <img
-          src={imgSrc}
-          alt={user.full_name || "user"}
-          onError={() => setImgErr(true)}
-          style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
-        />
-      ) : (
-        <span style={{ fontSize, fontWeight:800, color:"#4ade80" }}>{initial}</span>
-      )}
+      <img
+        src={imgSrc}
+        alt={user.full_name || "user"}
+        onError={() => setImgErr(true)}
+        style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
+      />
     </div>
   );
 }
@@ -246,32 +271,33 @@ export default function AdminUserManagement() {
     const approved = users.filter(u => u.subscription?.payment_status === "approved").length;
     const pending  = users.filter(u => u.subscription?.payment_status === "pending").length;
     const noplan   = users.filter(u => !u.subscription).length;
-    const plans    = {};
+    const totalWithdrawnNaira = users.reduce((a, u) => a + (u.withdrawn?.naira || 0), 0);
+    const plans = {};
     users.forEach(u => {
       if (u.subscription?.plan_name && u.subscription?.payment_status === "approved") {
         plans[u.subscription.plan_name] = (plans[u.subscription.plan_name] || 0) + 1;
       }
     });
-    return { total, approved, pending, noplan, plans };
+    return { total, approved, pending, noplan, plans, totalWithdrawnNaira };
   }, [users]);
 
-  // ── Fetch users + subscriptions ───────────────────────────────────────────
+  // ── Fetch users + subscriptions + withdrawals ─────────────────────────────
   const fetchData = useCallback(async () => {
     setLoading(true);
     setErrMsg(null);
 
     // Step 1: fetch all profiles
     const { data: profiles, error: profErr } = await supabase
-  .from("profiles")
-  .select(`
-    id, full_name, email, phone, country,
-    referral_code, referred_by_code,
-    cube_balance, total_mined, streak,
-    subscription_status, plan_name,
-    avatar_url,
-    created_at, profile_completed
-  `)
-  .order("created_at", { ascending: false });
+      .from("profiles")
+      .select(`
+        id, full_name, email, phone, country,
+        referral_code, referred_by_code,
+        cube_balance, total_mined, streak,
+        subscription_status, plan_name,
+        avatar_url,
+        created_at, profile_completed
+      `)
+      .order("created_at", { ascending: false });
 
     if (profErr) {
       console.error("Profiles fetch error:", profErr);
@@ -281,10 +307,9 @@ export default function AdminUserManagement() {
     }
 
     const profileRows = profiles || [];
-
-    // Step 2: fetch latest approved subscription per user
     const userIds = profileRows.map(p => p.id);
 
+    // Step 2: fetch latest subscription per user (prefer approved)
     let subMap = {};
     if (userIds.length > 0) {
       const { data: subs, error: subErr } = await supabase
@@ -300,26 +325,45 @@ export default function AdminUserManagement() {
       if (subErr) {
         console.error("Subscriptions fetch error:", subErr);
       } else {
-        // Keep only the most recent subscription per user
-        // Prioritise approved > pending > others
         (subs || []).forEach(s => {
           const existing = subMap[s.user_id];
           if (!existing) {
             subMap[s.user_id] = s;
-          } else {
-            // Prefer approved over others
-            if (s.payment_status === "approved" && existing.payment_status !== "approved") {
-              subMap[s.user_id] = s;
-            }
+          } else if (s.payment_status === "approved" && existing.payment_status !== "approved") {
+            subMap[s.user_id] = s;
           }
         });
       }
     }
 
-    // Step 3: merge
+    // Step 3: fetch approved cashouts to compute total withdrawn per user
+    let withdrawnMap = {};
+    if (userIds.length > 0) {
+      const { data: cashouts, error: cashoutErr } = await supabase
+        .from("cashout_requests")
+        .select("user_id, amount, naira_value, status")
+        .in("user_id", userIds)
+        .eq("status", "approved");
+
+      if (cashoutErr) {
+        console.error("Cashouts fetch error:", cashoutErr);
+      } else {
+        (cashouts || []).forEach(c => {
+          if (!withdrawnMap[c.user_id]) {
+            withdrawnMap[c.user_id] = { cube: 0, naira: 0, count: 0 };
+          }
+          withdrawnMap[c.user_id].cube  += Number(c.amount || 0);
+          withdrawnMap[c.user_id].naira += Number(c.naira_value || 0);
+          withdrawnMap[c.user_id].count += 1;
+        });
+      }
+    }
+
+    // Step 4: merge everything together
     const merged = profileRows.map(p => ({
       ...p,
       subscription: subMap[p.id] || null,
+      withdrawn: withdrawnMap[p.id] || { cube: 0, naira: 0, count: 0 },
     }));
 
     setUsers(merged);
@@ -418,10 +462,11 @@ export default function AdminUserManagement() {
         {/* ── Stats ── */}
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(130px, 1fr))", gap:10, marginBottom:20 }}>
           {[
-            { label:"Total users",   value:stats.total,    color:T.white  },
-            { label:"Subscribed",    value:stats.approved, color:T.green  },
-            { label:"Pending",       value:stats.pending,  color:"#fbbf24"},
-            { label:"No plan",       value:stats.noplan,   color:T.muted  },
+            { label:"Total users",    value:stats.total,    color:T.white  },
+            { label:"Subscribed",     value:stats.approved, color:T.green  },
+            { label:"Pending",        value:stats.pending,  color:"#fbbf24"},
+            { label:"No plan",        value:stats.noplan,   color:T.muted  },
+            { label:"Total paid out", value:fmtNaira(stats.totalWithdrawnNaira), color:"#60a5fa" },
           ].map(s => (
             <div key={s.label} style={{
               background:T.surface, border:`1px solid ${T.border}`,
@@ -430,7 +475,7 @@ export default function AdminUserManagement() {
               <div style={{ fontSize:10, color:T.muted, fontWeight:700, textTransform:"uppercase", letterSpacing:".08em", marginBottom:6 }}>
                 {s.label}
               </div>
-              <div style={{ fontSize:"1.5rem", fontWeight:800, color:s.color }}>{s.value}</div>
+              <div style={{ fontSize:"1.5rem", fontWeight:800, color:s.color, wordBreak:"break-word" }}>{s.value}</div>
             </div>
           ))}
         </div>
@@ -517,8 +562,9 @@ export default function AdminUserManagement() {
         ) : (
           <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
             {visible.map(u => {
-              const sub     = u.subscription;
-              const subMeta = STATUS_META[sub?.payment_status || "none"];
+              const sub       = u.subscription;
+              const subMeta   = STATUS_META[sub?.payment_status || "none"];
+              const withdrawn = u.withdrawn || { cube: 0, naira: 0, count: 0 };
 
               return (
                 <div
@@ -546,8 +592,7 @@ export default function AdminUserManagement() {
                   }}
                 >
                   {/* Avatar */}
-                  {/* Avatar */}
-<Avatar user={u} size={40} fontSize={15} />
+                  <Avatar user={u} size={40} fontSize={15} />
 
                   {/* User info */}
                   <div style={{ flex:1.5, minWidth:150 }}>
@@ -581,7 +626,7 @@ export default function AdminUserManagement() {
                     {sub?.mining_rate ? (
                       <>
                         <div style={{ fontWeight:700, fontSize:13, color:T.green }}>
-                          {Number(sub.mining_rate).toLocaleString()}
+                          {fmtCube(sub.mining_rate)}
                         </div>
                         <div style={{ fontSize:10, color:T.muted }}>CUBE/hr</div>
                       </>
@@ -593,9 +638,19 @@ export default function AdminUserManagement() {
                   {/* Balance */}
                   <div style={{ minWidth:90, textAlign:"right" }}>
                     <div style={{ fontWeight:700, fontSize:13, color:T.white }}>
-                      {Number(u.cube_balance || 0).toLocaleString()}
+                      {fmtCube(u.cube_balance)}
                     </div>
                     <div style={{ fontSize:10, color:T.muted }}>CUBE</div>
+                  </div>
+
+                  {/* Total Withdrawn */}
+                  <div style={{ minWidth:100, textAlign:"right" }}>
+                    <div style={{ fontWeight:700, fontSize:13, color: withdrawn.naira > 0 ? "#60a5fa" : T.muted }}>
+                      {fmtNaira(withdrawn.naira)}
+                    </div>
+                    <div style={{ fontSize:10, color:T.muted }}>
+                      {withdrawn.count} withdrawal{withdrawn.count !== 1 ? "s" : ""}
+                    </div>
                   </div>
 
                   {/* Joined */}

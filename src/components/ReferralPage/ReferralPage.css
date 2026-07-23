@@ -1,83 +1,74 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
 
-*, *::before, *::after { box-sizing: border-box; }
-
+/* ── Page ── */
 .referral-page {
   min-height: 100vh;
-  padding: 28px 20px 60px;
-  /* background: #050b07; */
   font-family: 'DM Sans', sans-serif;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  padding: 24px 18px 80px;
   max-width: 680px;
   margin: 0 auto;
-  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 /* ── Hero ── */
 .referral-hero {
-  background: rgba(10, 28, 14, 0.9);
-  border: 1px solid rgba(127, 255, 110, 0.15);
+  background: rgba(10,28,14,.92);
+  border: 1px solid rgba(74,222,128,.18);
   border-radius: 28px;
-  padding: 36px 24px;
+  padding: 34px 24px;
   text-align: center;
 }
 
 .hero-icon {
-  width: 80px;
-  height: 80px;
+  width: 76px;
+  height: 76px;
   border-radius: 50%;
-  background: rgba(74, 222, 128, 0.1);
-  border: 1px solid rgba(74, 222, 128, 0.25);
+  background: rgba(74,222,128,.1);
+  border: 1px solid rgba(74,222,128,.25);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #4ade80;
-  font-size: 2rem;
   margin: 0 auto 18px;
-  animation: flamePulse 2s ease-in-out infinite;
+  animation: heroPulse 2.5s ease-in-out infinite;
 }
 
-@keyframes flamePulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.3); }
-  50%       { box-shadow: 0 0 0 16px rgba(74, 222, 128, 0); }
+@keyframes heroPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(74,222,128,.3); }
+  50%      { box-shadow: 0 0 0 16px rgba(74,222,128,0); }
 }
 
 .referral-hero h1 {
-  color: #fff;
-  font-size: clamp(1.4rem, 5vw, 1.8rem);
+  font-size: 1.75rem;
   font-weight: 800;
-  margin-bottom: 8px;
-  word-break: break-word;
+  color: #fff;
+  margin: 0 0 8px;
 }
 
 .referral-hero p {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.88rem;
+  color: rgba(255,255,255,.5);
+  font-size: .9rem;
   line-height: 1.6;
-  margin-bottom: 22px;
+  margin: 0 0 22px;
 }
 
 .referral-code-box {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  background: rgba(74, 222, 128, 0.08);
-  border: 1px solid rgba(74, 222, 128, 0.25);
+  background: rgba(74,222,128,.08);
+  border: 1px solid rgba(74,222,128,.28);
   border-radius: 14px;
-  padding: 12px 16px;
-  max-width: 100%;
-  flex-wrap: wrap;
-  justify-content: center;
+  padding: 12px 18px;
 }
 
 .referral-code-box span {
-  font-size: clamp(1rem, 4vw, 1.3rem);
+  font-size: 1.25rem;
   font-weight: 800;
   color: #4ade80;
-  letter-spacing: 1.5px;
-  word-break: break-all;
+  letter-spacing: 2px;
 }
 
 .referral-code-box button {
@@ -89,359 +80,21 @@
   border: none;
   border-radius: 10px;
   padding: 8px 14px;
-  font-size: 0.85rem;
+  font-size: .84rem;
   font-weight: 700;
   cursor: pointer;
   font-family: 'DM Sans', sans-serif;
-  transition: 0.2s;
-  flex-shrink: 0;
+  transition: .18s;
 }
-
 .referral-code-box button:hover { filter: brightness(1.08); }
-.referral-code-box button:disabled { opacity: 0.4; cursor: default; }
+.referral-code-box button:disabled { opacity: .4; cursor: default; }
 
-/* ── Stats ── */
-.referral-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
-
-.ref-stat-card {
-  background: rgba(10, 28, 14, 0.9);
-  border: 1px solid rgba(127, 255, 110, 0.12);
-  border-radius: 20px;
-  padding: 18px 10px;
-  text-align: center;
-  color: #fff;
-  transition: 0.2s;
-  min-width: 0;
-}
-
-.ref-stat-card:hover {
-  border-color: rgba(74, 222, 128, 0.3);
-  transform: translateY(-3px);
-}
-
-.ref-stat-card svg { color: #4ade80; margin-bottom: 8px; }
-
-.ref-stat-card h2 {
-  font-size: clamp(1.1rem, 4vw, 1.5rem);
-  font-weight: 800;
-  margin-bottom: 4px;
-  word-break: break-word;
-}
-
-.ref-stat-card p {
-  font-size: 0.74rem;
-  color: rgba(255, 255, 255, 0.45);
-}
-
-/* ── Progress card ── */
-.ref-progress-card {
-  background: rgba(10, 28, 14, 0.9);
-  border: 1px solid rgba(74, 222, 128, 0.2);
-  border-radius: 18px;
-  padding: 18px 20px;
-}
-
-.ref-progress-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.55);
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-}
-
-.ref-progress-bar-wrap {
-  height: 6px;
-  background: rgba(255, 255, 255, 0.07);
-  border-radius: 3px;
-  overflow: hidden;
-  margin-bottom: 8px;
-}
-
-.ref-progress-bar {
-  height: 100%;
-  background: #4ade80;
-  border-radius: 3px;
-  transition: width 0.6s ease;
-}
-
-.ref-progress-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.3);
-}
-
-/* ── Invite card ── */
-.invite-card {
-  background: rgba(10, 28, 14, 0.9);
-  border: 1px solid rgba(127, 255, 110, 0.12);
-  border-radius: 20px;
-  padding: 20px 22px;
-}
-
-.invite-card h3 {
-  color: #fff;
-  font-size: 0.9rem;
-  font-weight: 700;
-  margin-bottom: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.invite-link {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.invite-link input {
-  flex: 1 1 140px;
-  min-width: 0;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  padding: 10px 14px;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 12px;
-  font-family: 'DM Sans', sans-serif;
-  outline: none;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.invite-link button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: linear-gradient(135deg, #4ade80, #22c55e);
-  color: #041107;
-  border: none;
-  border-radius: 10px;
-  padding: 10px 16px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-  font-family: 'DM Sans', sans-serif;
-  transition: 0.2s;
-  flex-shrink: 0;
-}
-
-.invite-link button:hover { filter: brightness(1.08); }
-
-/* ── Milestones ── */
-.milestone-card {
-  background: rgba(10, 28, 14, 0.9);
-  border: 1px solid rgba(127, 255, 110, 0.12);
-  border-radius: 20px;
-  padding: 20px 22px;
-}
-
-.milestone-card h3 {
-  color: #fff;
-  font-size: 0.9rem;
-  font-weight: 700;
-  margin-bottom: 16px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.milestone {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  transition: 0.2s;
-}
-
-.milestone:last-child { border-bottom: none; }
-
-.milestone.done { opacity: 0.6; }
-
-.milestone > div:first-child {
-  min-width: 0;
-  flex: 1;
-}
-
-.milestone h4 {
-  color: #fff;
-  font-size: 0.9rem;
-  font-weight: 600;
-  margin-bottom: 3px;
-  word-break: break-word;
-}
-
-.milestone p {
-  font-size: 0.76rem;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.completed {
-  background: rgba(74, 222, 128, 0.12);
-  border: 1px solid rgba(74, 222, 128, 0.3);
-  color: #4ade80;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 100px;
-  white-space: nowrap;
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-}
-
-.progress {
-  background: rgba(251, 191, 36, 0.1);
-  border: 1px solid rgba(251, 191, 36, 0.25);
-  color: #fbbf24;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 100px;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-/* ── Referral list ── */
-.referral-list {
-  background: rgba(10, 28, 14, 0.9);
-  border: 1px solid rgba(127, 255, 110, 0.12);
-  border-radius: 20px;
-  padding: 20px 22px;
-}
-
-.referral-list h3 {
-  color: #fff;
-  font-size: 0.9rem;
-  font-weight: 700;
-  margin-bottom: 16px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  word-break: break-word;
-}
-
-.referral-user {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.referral-user:last-child { border-bottom: none; }
-
-.ref-user-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(74, 222, 128, 0.12);
-  border: 1px solid rgba(74, 222, 128, 0.25);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #4ade80;
-  font-size: 14px;
-  font-weight: 800;
-  flex-shrink: 0;
-}
-
-.referral-user > div {
-  min-width: 0;
-}
-
-.referral-user h4 {
-  color: #fff;
-  font-size: 0.86rem;
-  font-weight: 600;
-  margin-bottom: 2px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.referral-user p {
-  font-size: 0.73rem;
-  color: rgba(255, 255, 255, 0.35);
-}
-
-.ref-status {
-  font-size: 11px;
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 100px;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.ref-status.approved {
-  background: rgba(74, 222, 128, 0.12);
-  color: #4ade80;
-  border: 1px solid rgba(74, 222, 128, 0.3);
-}
-
-.ref-status.pending {
-  background: rgba(251, 191, 36, 0.1);
-  color: #fbbf24;
-  border: 1px solid rgba(251, 191, 36, 0.25);
-}
-
-.ref-status.none {
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-/* Add these to ReferralPage.css */
-
-/* ── Inactive referrals warning banner ── */
-.ref-inactive-banner {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  background: rgba(251, 191, 36, 0.08);
-  border: 1px solid rgba(251, 191, 36, 0.25);
-  border-radius: 16px;
-  padding: 16px 18px;
-  color: #fbbf24;
-}
-
-.ref-inactive-banner svg { flex-shrink: 0; margin-top: 2px; }
-
-.ref-inactive-banner strong {
-  display: block;
-  font-size: 0.88rem;
-  font-weight: 700;
-  margin-bottom: 4px;
-  color: #fbbf24;
-  font-family: 'DM Sans', sans-serif;
-}
-
-.ref-inactive-banner p {
-  font-size: 0.78rem;
-  color: rgba(251, 191, 36, 0.7);
-  margin: 0;
-  line-height: 1.5;
-  font-family: 'DM Sans', sans-serif;
-}
 /* ── How it works ── */
 .ref-how-it-works {
   background: rgba(10,28,14,.88);
-  border: 1px solid rgba(74,222,128,.12);
-  border-radius: 18px;
+  border: 1px solid rgba(74,222,128,.1);
+  border-radius: 20px;
   padding: 18px 20px;
-  margin-bottom: 4px;
 }
 
 .ref-how-title {
@@ -455,14 +108,14 @@
 
 .ref-how-steps {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: flex-start;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
 .ref-how-step {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   flex: 1;
   min-width: 100px;
@@ -481,27 +134,133 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  margin-top: 1px;
 }
 
 .ref-how-text {
   font-size: 11px;
   color: rgba(255,255,255,.5);
-  line-height: 1.45;
+  line-height: 1.5;
 }
 
 .ref-how-arrow {
   color: rgba(74,222,128,.4);
-  font-size: 16px;
+  font-size: 14px;
   flex-shrink: 0;
+  margin-top: 4px;
 }
 
-/* ── Earnings potential card ── */
+/* ══════════════════════════════════════════════════
+   ALERT BANNER — the part you want styled properly
+══════════════════════════════════════════════════ */
+.ref-alert-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: linear-gradient(135deg,
+    rgba(251,191,36,.08) 0%,
+    rgba(248,113,113,.06) 100%
+  );
+  border: 1px solid rgba(251,191,36,.28);
+  border-left: 3px solid #fbbf24;
+  border-radius: 16px;
+  padding: 16px 18px;
+  animation: bannerIn .4s ease;
+}
+
+@keyframes bannerIn {
+  from { opacity:0; transform:translateY(-6px); }
+  to   { opacity:1; transform:none; }
+}
+
+.ref-alert-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(251,191,36,.12);
+  border: 1px solid rgba(251,191,36,.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+
+.ref-alert-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.ref-alert-title {
+  font-size: .88rem;
+  font-weight: 700;
+  color: #fbbf24;
+  margin-bottom: 5px;
+  line-height: 1.4;
+}
+
+.ref-alert-title strong {
+  color: #fff;
+}
+
+.ref-alert-desc {
+  font-size: .8rem;
+  color: rgba(255,255,255,.5);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.ref-alert-desc strong {
+  color: #4ade80;
+  font-weight: 700;
+}
+
+/* ── Stats ── */
+.referral-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.ref-stat-card {
+  background: rgba(10,28,14,.88);
+  border: 1px solid rgba(127,255,110,.1);
+  border-radius: 20px;
+  padding: 18px 14px;
+  text-align: center;
+  transition: .2s;
+}
+
+.ref-stat-card:hover {
+  border-color: rgba(74,222,128,.28);
+  transform: translateY(-3px);
+}
+
+.ref-stat-card svg { color: #4ade80; margin-bottom: 8px; }
+.ref-stat-card.active {
+  border-color: rgba(74,222,128,.3);
+  background: rgba(74,222,128,.06);
+}
+
+.ref-stat-card h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 4px;
+}
+
+.ref-stat-card p {
+  font-size: .76rem;
+  color: rgba(255,255,255,.4);
+  margin: 0;
+}
+
+/* ── Earnings card ── */
 .ref-earnings-card {
   background: rgba(10,28,14,.88);
-  border: 1px solid rgba(74,222,128,.2);
-  border-radius: 18px;
+  border: 1px solid rgba(74,222,128,.18);
+  border-radius: 20px;
   padding: 18px 20px;
-  margin-bottom: 4px;
 }
 
 .ref-earnings-header {
@@ -512,6 +271,8 @@
   font-weight: 700;
   color: #fff;
   margin-bottom: 5px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .ref-earnings-sub {
@@ -544,22 +305,12 @@
   color: rgba(255,255,255,.3);
 }
 
-/* ── Milestone reward size bump ── */
-.milestone h4 {
-  font-size: .9rem;
-}
-
-.milestone p {
-  font-size: .8rem;
-  margin-top: 3px;
-}
 /* ── Withdrawal requirement card ── */
 .ref-withdrawal-card {
   background: rgba(10,28,14,.92);
   border: 1px solid rgba(251,191,36,.22);
   border-radius: 20px;
   padding: 20px;
-  margin-bottom: 4px;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -582,10 +333,7 @@
   color: #fff;
 }
 
-.ref-wr-icon {
-  font-size: 1.1rem;
-  line-height: 1;
-}
+.ref-wr-icon { font-size: 1.1rem; line-height: 1; }
 
 .ref-wr-badge {
   font-size: 10px;
@@ -667,64 +415,299 @@
   color: rgba(74,222,128,.7);
   font-weight: 600;
 }
-/* ══════════════════════════════════════════════════════════
-   RESPONSIVE
-   ══════════════════════════════════════════════════════════ */
 
-@media (max-width: 600px) {
-  .referral-page { padding: 22px 16px 50px; gap: 14px; }
-
-  .referral-hero { padding: 28px 18px; }
-
-  .hero-icon { width: 64px; height: 64px; font-size: 1.6rem; margin-bottom: 14px; }
-
-  .invite-card,
-  .milestone-card,
-  .referral-list {
-    padding: 18px;
-  }
+/* ── Progress card ── */
+.ref-progress-card {
+  background: rgba(10,28,14,.88);
+  border: 1px solid rgba(74,222,128,.18);
+  border-radius: 18px;
+  padding: 18px 20px;
 }
 
-@media (max-width: 480px) {
-  .referral-stats { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .ref-stat-card { padding: 14px 6px; }
-  .ref-stat-card svg { width: 18px; height: 18px; }
-
-  .referral-code-box {
-    padding: 10px 14px;
-    gap: 8px;
-  }
-
-  .invite-link { flex-direction: column; }
-  .invite-link input { width: 100%; }
-  .invite-link button { width: 100%; }
+.ref-progress-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: .88rem;
+  color: rgba(255,255,255,.5);
+  margin-bottom: 12px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
+.ref-progress-bar-wrap {
+  height: 6px;
+  background: rgba(255,255,255,.07);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.ref-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+  border-radius: 3px;
+  transition: width .6s ease;
+}
+
+.ref-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: rgba(255,255,255,.3);
+}
+
+/* ── Invite card ── */
+.invite-card {
+  background: rgba(10,28,14,.88);
+  border: 1px solid rgba(127,255,110,.1);
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.invite-card h3 {
+  color: #fff;
+  font-size: .9rem;
+  font-weight: 700;
+  margin: 0 0 14px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.invite-link {
+  display: flex;
+  gap: 10px;
+}
+
+.invite-link input {
+  flex: 1;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: rgba(255,255,255,.45);
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.invite-link button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  color: #041107;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: .84rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: .18s;
+  white-space: nowrap;
+}
+.invite-link button:hover { filter: brightness(1.08); }
+
+/* ── Milestones ── */
+.milestone-card {
+  background: rgba(10,28,14,.88);
+  border: 1px solid rgba(127,255,110,.1);
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.milestone-card h3 {
+  color: #fff;
+  font-size: .9rem;
+  font-weight: 700;
+  margin: 0 0 6px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.milestone {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+  gap: 12px;
+}
+
+.milestone:last-child { border-bottom: none; }
+.milestone.done { opacity: .65; }
+
+.milestone h4 {
+  color: #fff;
+  font-size: .9rem;
+  font-weight: 600;
+  margin: 0 0 3px;
+}
+
+.milestone p {
+  font-size: .78rem;
+  color: rgba(255,255,255,.4);
+  margin: 0;
+}
+
+.completed {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(74,222,128,.12);
+  border: 1px solid rgba(74,222,128,.3);
+  color: #4ade80;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.progress {
+  background: rgba(251,191,36,.1);
+  border: 1px solid rgba(251,191,36,.25);
+  color: #fbbf24;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+/* ── Referral list ── */
+.referral-list {
+  background: rgba(10,28,14,.88);
+  border: 1px solid rgba(127,255,110,.1);
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.referral-list h3 {
+  color: #fff;
+  font-size: .9rem;
+  font-weight: 700;
+  margin: 0 0 16px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.ref-list-summary {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.ref-list-sum-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 100px;
+}
+
+.ref-list-sum-item.active {
+  background: rgba(74,222,128,.1);
+  border: 1px solid rgba(74,222,128,.25);
+  color: #4ade80;
+}
+
+.ref-list-sum-item.pending {
+  background: rgba(248,113,113,.08);
+  border: 1px solid rgba(248,113,113,.22);
+  color: #f87171;
+}
+
+.referral-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+
+.referral-user:last-child { border-bottom: none; }
+
+.ref-user-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 800;
+  flex-shrink: 0;
+  border: 1px solid;
+}
+
+.ref-user-avatar.active {
+  background: rgba(74,222,128,.12);
+  border-color: rgba(74,222,128,.3);
+  color: #4ade80;
+}
+
+.ref-user-avatar.pending {
+  background: rgba(251,191,36,.1);
+  border-color: rgba(251,191,36,.25);
+  color: #fbbf24;
+}
+
+.ref-user-avatar.inactive {
+  background: rgba(248,113,113,.08);
+  border-color: rgba(248,113,113,.2);
+  color: #f87171;
+}
+
+.referral-user h4 {
+  color: #fff;
+  font-size: .88rem;
+  font-weight: 600;
+  margin: 0 0 2px;
+}
+
+.referral-user p {
+  font-size: .75rem;
+  color: rgba(255,255,255,.35);
+  margin: 0;
+}
+
+.ref-status {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 100px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ref-status.approved {
+  background: rgba(74,222,128,.12);
+  border: 1px solid rgba(74,222,128,.3);
+  color: #4ade80;
+}
+
+.ref-status.pending {
+  background: rgba(251,191,36,.1);
+  border: 1px solid rgba(251,191,36,.25);
+  color: #fbbf24;
+}
+
+.ref-status.none {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  color: rgba(255,255,255,.35);
+}
+
+/* ── Responsive ── */
 @media (max-width: 400px) {
-  .referral-stats { grid-template-columns: 1fr; }
-  .referral-page  { padding: 20px 14px 60px; }
-
-  .ref-stat-card {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    text-align: left;
-    padding: 14px 16px;
-  }
-
-  .ref-stat-card svg { margin-bottom: 0; flex-shrink: 0; }
-  .ref-stat-card h2 { margin-bottom: 0; }
-  .ref-stat-card p { margin: 0; }
-}
-
-@media (max-width: 340px) {
-  .referral-hero h1 { font-size: 1.25rem; }
-  .referral-code-box span { font-size: 0.95rem; }
-}
-
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .hero-icon { animation: none; }
-  .ref-stat-card { transition: none; }
-  .ref-progress-bar { transition: none; }
+  .referral-page  { padding: 18px 14px 80px; }
+  .referral-stats { grid-template-columns: 1fr 1fr; }
+  .ref-how-steps  { flex-direction: column; }
+  .ref-how-arrow  { display: none; }
 }

@@ -191,7 +191,7 @@ export default function ReferralPage() {
     }
   };
 
-  const referralLink = `${window.location.origin}/signup?ref=${referralCode}`;
+  const referralLink = `${window.location.origin}/?ref=${referralCode}`;
 
   const copyCode = async () => {
     await navigator.clipboard.writeText(referralCode).catch(() => {});
@@ -282,16 +282,22 @@ export default function ReferralPage() {
       </div>
 
       {/* ── Alert: unsubscribed referrals ── */}
-      {pendingReferrals > 0 && (
-        <div className="ref-alert-banner">
-          <AlertCircle size={15} style={{ flexShrink:0 }} />
-          <div>
-            <strong>{pendingReferrals} of your {totalReferrals} referral{totalReferrals !== 1 ? "s" : ""} {pendingReferrals === 1 ? "hasn't" : "haven't"} subscribed yet.</strong>
-            {" "}Only <strong style={{ color:"#4ade80" }}>subscribed users</strong> count toward your milestones.
-            Remind them to subscribe to unlock your bonus!
-          </div>
-        </div>
-      )}
+{pendingReferrals > 0 && (
+  <div className="ref-alert-banner">
+    <div className="ref-alert-icon">⚠️</div>
+    <div className="ref-alert-body">
+      <div className="ref-alert-title">
+        <strong>{pendingReferrals}</strong> of your{" "}
+        <strong>{totalReferrals}</strong> referral{totalReferrals !== 1 ? "s" : ""}{" "}
+        {pendingReferrals === 1 ? "hasn't" : "haven't"} subscribed yet
+      </div>
+      <p className="ref-alert-desc">
+        Only <strong>subscribed users</strong> count toward your milestones and
+        withdrawal requirements. Remind them to subscribe to unlock your bonus!
+      </p>
+    </div>
+  </div>
+)}
 
       {/* ── Stats ── */}
       <div className="referral-stats">

@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./Auth.css";
 import { supabase } from "../../libs/supabase";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 function CubeSVG() {
   return (
@@ -93,41 +93,77 @@ function getPwdStrength(pwd) {
 }
 
 // ── Retry helper ──────────────────────────────────────────────────────────────
-async function writeReferredByCode(userId, code, maxAttempts = 10) {
+async function writeReferredByCodeWithRetry(userId, code, maxAttempts = 15) {
+  console.log(`[Referral] Starting write loop for ${userId} with code ${code}`);
+
   for (let i = 0; i < maxAttempts; i++) {
-    await new Promise(res => setTimeout(res, 600 * (i + 1)));
+    // Wait before each attempt — longer each time
+    const waitMs = 500 + (i * 400);
+    await new Promise(res => setTimeout(res, waitMs));
 
-    const { data: existing } = await supabase
-      .from("profiles")
-      .select("id, referred_by_code")
-      .eq("id", userId)
-      .maybeSingle();
+    try {
+      // Check if profile row exists yet
+      const { data: existing, error: readErr } = await supabase
+        .from("profiles")
+        .select("id, referred_by_code")
+        .eq("id", userId)
+        .maybeSingle();
 
-    if (!existing) continue;
-    if (existing.referred_by_code) return true;
+      if (readErr) {
+        console.warn(`[Referral] Read error attempt ${i+1}:`, readErr.message);
+        continue;
+      }
 
-    const { error } = await supabase
-      .from("profiles")
-      .update({ referred_by_code: code })
-      .eq("id", userId);
+      if (!existing) {
+        console.log(`[Referral] Profile row not ready yet, attempt ${i+1}/${maxAttempts}`);
+        continue;
+      }
 
-    if (error) continue;
+      // Already has referred_by_code set
+      if (existing.referred_by_code) {
+        console.log(`[Referral] referred_by_code already set: ${existing.referred_by_code}`);
+        return true;
+      }
 
-    const { data: verify } = await supabase
-      .from("profiles")
-      .select("referred_by_code")
-      .eq("id", userId)
-      .maybeSingle();
+      // Write the code
+      const { error: writeErr } = await supabase
+        .from("profiles")
+        .update({ referred_by_code: code })
+        .eq("id", userId);
 
-    if (verify?.referred_by_code === code) return true;
+      if (writeErr) {
+        console.warn(`[Referral] Write error attempt ${i+1}:`, writeErr.message);
+        continue;
+      }
+
+      // Verify it was written
+      const { data: verify } = await supabase
+        .from("profiles")
+        .select("referred_by_code")
+        .eq("id", userId)
+        .maybeSingle();
+
+      if (verify?.referred_by_code === code) {
+        console.log(`✅ [Referral] referred_by_code written successfully on attempt ${i+1}`);
+        return true;
+      }
+
+      console.warn(`[Referral] Verify failed attempt ${i+1}, got:`, verify?.referred_by_code);
+
+    } catch (err) {
+      console.error(`[Referral] Unexpected error attempt ${i+1}:`, err);
+    }
   }
+
+  console.error(`❌ [Referral] Failed to write referred_by_code after ${maxAttempts} attempts`);
   return false;
 }
 
 export default function Auth() {
-  const [tab,      setTab]      = useState("login");
+   const [tab, setTab] = useState("signup");
   const [loading,  setLoading]  = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [signupData, setSignupData] = useState({
@@ -206,90 +242,123 @@ export default function Auth() {
   };
 
   const handleSignup = async () => {
-    const { firstName, lastName, email, password, referralCode } = signupData;
+  const { firstName, lastName, email, password, referralCode } = signupData;
 
-    if (!firstName || !lastName || !email || !password) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-    if (password.length < 8) {
-      toast.error("Password must be at least 8 characters");
-      return;
-    }
-    if (getPwdStrength(password) < 2) {
-      toast.error("Password is too weak — add numbers or symbols");
-      return;
-    }
+  if (!firstName || !lastName || !email || !password) {
+    toast.error("Please fill in all required fields");
+    return;
+  }
+  if (password.length < 8) {
+    toast.error("Password must be at least 8 characters");
+    return;
+  }
+  if (getPwdStrength(password) < 2) {
+    toast.error("Password is too weak — add numbers or symbols");
+    return;
+  }
 
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const fullName        = `${firstName.trim()} ${lastName.trim()}`;
-      const trimmedReferral = referralCode.trim().toUpperCase() || null;
+    const fullName        = `${firstName.trim()} ${lastName.trim()}`;
+    const trimmedReferral = referralCode.trim().toUpperCase() || null;
 
-      let validReferral = null;
-      if (trimmedReferral) {
-        const { data: referrerProfile, error: refErr } = await supabase
-          .from("profiles")
-          .select("id, referral_code")
-          .eq("referral_code", trimmedReferral)
-          .maybeSingle();
+    // ── 1. Validate referral code ──────────────────────────────────────────
+    let referrerId = null;
+    if (trimmedReferral) {
+      const { data: referrerProfile, error: refErr } = await supabase
+        .from("profiles")
+        .select("id, referral_code, full_name")
+        .eq("referral_code", trimmedReferral)
+        .maybeSingle();
 
-        if (refErr) {
-          toast.error("Could not verify referral code — try again");
-          setLoading(false);
-          return;
-        }
-
-        if (!referrerProfile) {
-          toast.error("Invalid referral code — check and try again");
-          setLoading(false);
-          return;
-        }
-
-        validReferral = trimmedReferral;
-      }
-
-      const { data, error } = await supabase.auth.signUp({
-        email:    email.trim().toLowerCase(),
-        password,
-        options: { data: { full_name: fullName } },
-      });
-
-      if (error) { toast.error(error.message); return; }
-
-      const newUserId = data.user?.id;
-
-      if (validReferral && newUserId) {
-        writeReferredByCode(newUserId, validReferral);
-      }
-
-      if (!data.session) {
-        toast.success("Account created! Check your email to confirm, then log in.", { autoClose: 6000 });
-        setTab("login");
+      if (refErr) {
+        console.error("Referral lookup error:", refErr);
+        toast.error("Could not verify referral code — try again");
+        setLoading(false);
         return;
       }
 
-      await new Promise(res => setTimeout(res, 1500));
+      if (!referrerProfile) {
+        toast.error("Invalid referral code. Please check and try again.");
+        setLoading(false);
+        return;
+      }
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", newUserId)
-        .maybeSingle();
-
-      localStorage.setItem("cubecoin_user",    JSON.stringify(data.user));
-      localStorage.setItem("cubecoin_profile", JSON.stringify(profile));
-      toast.success(`Welcome to CubeCoin, ${firstName}! 🎉`);
-      setTimeout(() => navigate("/subscription"), 1500);
-
-    } catch (err) {
-      console.error(err);
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
+      referrerId = referrerProfile.id;
+      console.log("✅ Valid referral code from:", referrerProfile.full_name, "id:", referrerId);
     }
-  };
+
+    // ── 2. Create account ──────────────────────────────────────────────────
+    const { data, error } = await supabase.auth.signUp({
+      email:    email.trim().toLowerCase(),
+      password,
+      options: {
+        data: {
+          full_name:     fullName,
+          // Store referred_by_code in user metadata as backup
+          referred_by_code: trimmedReferral || null,
+        },
+      },
+    });
+
+    if (error) {
+      toast.error(error.message);
+      setLoading(false);
+      return;
+    }
+
+    const newUserId = data.user?.id;
+    console.log("✅ User created:", newUserId);
+
+    // ── 3. Write referred_by_code to profile ───────────────────────────────
+    if (trimmedReferral && newUserId) {
+      // Start retry loop in background — don't block the UI
+      writeReferredByCodeWithRetry(newUserId, trimmedReferral);
+    }
+
+    // ── 4. Handle email confirmation flow ──────────────────────────────────
+    if (!data.session) {
+      toast.success(
+        "Account created! Check your email to verify, then log in.",
+        { autoClose: 6000 }
+      );
+      setTab("login");
+      setLoading(false);
+      return;
+    }
+
+    // ── 5. No email confirmation — direct login ────────────────────────────
+    await new Promise(res => setTimeout(res, 1500));
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", newUserId)
+      .maybeSingle();
+
+    localStorage.setItem("cubecoin_user",    JSON.stringify(data.user));
+    localStorage.setItem("cubecoin_profile", JSON.stringify(profile));
+
+    toast.success(`Welcome to CubeCoin, ${firstName}! 🎉`);
+    setTimeout(() => navigate("/subscription"), 1500);
+
+  } catch (err) {
+    console.error("Signup error:", err);
+    toast.error("Something went wrong. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+   // ── Read referral code from URL on mount ──────────────────────────────────
+  useEffect(() => {
+    const refFromUrl = searchParams.get("ref");
+    if (refFromUrl) {
+      // Pre-fill referral code and switch to signup tab
+      setSignupData(p => ({ ...p, referralCode: refFromUrl.trim().toUpperCase() }));
+      setTab("signup");
+    }
+  }, [searchParams]);
 
   return (
     <div className="auth-root">

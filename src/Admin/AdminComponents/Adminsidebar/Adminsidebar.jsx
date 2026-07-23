@@ -14,6 +14,7 @@ import {
   PackageSearch,
   Trophy,
   ArrowUpCircle,
+  ListTodo,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -82,6 +83,7 @@ export default function AdminSidebar() {
     { icon: <Trophy          size={20} />, name: "Rewards",       path: "/admin/reward"       },
     { icon: <PackageSearch   size={20} />, name: "Plans",         path: "/admin/plans"         },
     { icon: <Megaphone       size={20} />, name: "Announcements", path: "/admin/announcements" },
+    { icon: <ListTodo        size={20} />, name: "Daily Tasks",   path: "/admin/daily-tasks"   },
     { icon: <Settings        size={20} />, name: "Settings",      path: "/admin/settings"      },
     { icon: <ArrowUpCircle        size={20} />, name:"Plan Ugrade",      path: "/admin/upgrades"      },
     { icon: <ArrowUpCircle        size={20} />, name:"Withdrawal Settings",      path: "/admin/withdrawal-settings"      },

@@ -27,7 +27,9 @@ import AdminRewardPage from "./Admin/AdminPages/AdminRewardPage/AdminRewardPage"
 import CdashboardUpgrade from "./pages/CdashboardUpgrade/CdashboardUpgrade";
 import AdminUpgrades from "./Admin/AdminComponents/AdminUpgrades/AdminUpgrades";
 import AdminUpgradePage from "./Admin/AdminPages/AdminUpgradePage/AdminUpgradePage";
+import CdashboardDaily from "./pages/CdashboardDaily/CdashboardDaily";
 import AdminWithdrawalSettingsPage from "./Admin/AdminPages/AdminWithdrawalPage/AdminWithdrawalSettingsPage";
+import AdminDailyTasksPage from "./Admin/AdminPages/AdminDailyTasksPage/AdminDailyTasksPage";
 function App() {
 
   const [loading, setLoading] = useState(true);
@@ -61,6 +63,7 @@ function App() {
       <Route path="/profilesettings" element={<ProtectedRoute><Cdashboardprofile /></ProtectedRoute>} />
       <Route path="/spinwheel" element={<ProtectedRoute><CdashboardSpinWheel /></ProtectedRoute>} />
       <Route path="/upgrade" element={<ProtectedRoute><CdashboardUpgrade /></ProtectedRoute>} />
+      <Route path="/dailyTask" element={<ProtectedRoute><CdashboardDaily /></ProtectedRoute>} />
 
       {/* Admin Routes */}
       <Route path="/admin/dashboard" element={<ProtectedRoute><Admindashboard /></ProtectedRoute>} />
@@ -75,6 +78,7 @@ function App() {
       <Route path="/admin/reward" element={<ProtectedRoute><AdminRewardPage /></ProtectedRoute>} />
       <Route path="/admin/upgrades" element={<ProtectedRoute><AdminUpgradePage /></ProtectedRoute>} />
       <Route path="/admin/withdrawal-settings" element={<ProtectedRoute><AdminWithdrawalSettingsPage /></ProtectedRoute>} />
+      <Route path="/admin/daily-tasks" element={<ProtectedRoute><AdminDailyTasksPage /></ProtectedRoute>} />
     </Routes>
   );
 }

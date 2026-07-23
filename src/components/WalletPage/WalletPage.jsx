@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Layers, ArrowUp, Clock, TrendingUp,
   Users, Gift, ArrowRight, X, AlertCircle,
@@ -6,6 +6,8 @@ import {
 } from "lucide-react";
 import { supabase } from "../../libs/supabase";
 import { useNavigate } from "react-router-dom";
+import html2canvas from "html2canvas";
+import { Download, Share2, Copy as CopyIcon } from "lucide-react";
 import "./WalletPage.css";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -98,7 +100,21 @@ function nextAllowedDay(settings) {
   }
   return DAY_NAMES[allowed[0]] || "Sunday";
 }
+function statusMeta(status) {
+  switch (status) {
+    case "approved": return { label: "Successful", color: "#4ade80", bg: "rgba(74,222,128,.1)", border: "rgba(74,222,128,.3)", icon: "✓" };
+    case "rejected": return { label: "Rejected",   color: "#f87171", bg: "rgba(248,113,113,.1)", border: "rgba(248,113,113,.3)", icon: "✕" };
+    default:         return { label: "Pending",    color: "#fbbf24", bg: "rgba(251,191,36,.1)",  border: "rgba(251,191,36,.3)",  icon: "⏳" };
+  }
+}
 
+function fmtFullDate(iso) {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleString("en-NG", {
+    day: "numeric", month: "short", year: "numeric",
+    hour: "2-digit", minute: "2-digit",
+  });
+}
 // ── Toast hook ────────────────────────────────────────────────────────────────
 function useToasts() {
   const [toasts, setToasts] = useState([]);
@@ -761,7 +777,234 @@ function CashoutModal({ balance, userId, open, onClose, onSuccess, maxNaira, wit
     </div>
   );
 }
+function WithdrawalHistoryModal({ open, onClose, userId, onSelectReceipt }) {
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    if (!open || !userId) return;
+    setLoading(true);
+    supabase
+      .from("cashout_requests")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .then(({ data }) => {
+        setHistory(data || []);
+        setLoading(false);
+      });
+  }, [open, userId]);
+
+  return (
+    <div className={`modal-overlay ${open ? "open" : ""}`} onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal-sheet">
+        <div className="modal-handle" />
+        <div className="modal-header">
+          <span className="modal-title">Withdrawal History</span>
+          <button className="modal-close" onClick={onClose}><X size={15} /></button>
+        </div>
+        <div className="modal-body" style={{ paddingTop: 4 }}>
+          {loading ? (
+            <p style={{ color: "rgba(255,255,255,.4)", fontSize: 13, textAlign: "center", padding: "24px 0" }}>
+              Loading history…
+            </p>
+          ) : history.length === 0 ? (
+            <p style={{ color: "rgba(255,255,255,.4)", fontSize: 13, textAlign: "center", padding: "24px 0" }}>
+              No withdrawal requests yet.
+            </p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {history.map(h => {
+                const meta = statusMeta(h.status);
+                return (
+                  <button
+                    key={h.id}
+                    onClick={() => onSelectReceipt(h)}
+                    className="history-item"
+                  >
+                    <div className="history-item-icon" style={{ background: meta.bg, border: `1px solid ${meta.border}`, color: meta.color }}>
+                      {meta.icon}
+                    </div>
+                    <div className="history-item-info">
+                      <div className="history-item-top">
+                        <span className="history-item-amt">{Number(h.amount).toLocaleString()} CUBE</span>
+                        <span className="history-item-naira">{fmtNaira(h.naira_value)}</span>
+                      </div>
+                      <div className="history-item-bottom">
+                        <span>{fmtDate(h.created_at)}</span>
+                        <span className="history-item-badge" style={{ color: meta.color }}>{meta.label}</span>
+                      </div>
+                    </div>
+                    <ArrowRight size={14} style={{ color: "rgba(255,255,255,.25)", flexShrink: 0 }} />
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+function ReceiptModal({ open, onClose, data }) {
+  const receiptRef = useRef(null);
+  const [busy, setBusy] = useState(false);
+
+  if (!open || !data) return null;
+  const meta = statusMeta(data.status);
+
+  const captureReceipt = async () => {
+    const canvas = await html2canvas(receiptRef.current, {
+      backgroundColor: "#0a1c0e",
+      scale: 2,
+      useCORS: true,
+    });
+    return canvas;
+  };
+
+  const handleDownload = async () => {
+    setBusy(true);
+    try {
+      const canvas = await captureReceipt();
+      const link = document.createElement("a");
+      link.download = `CubeCoin-Receipt-${data.tx_ref}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    } catch (err) {
+      console.error("Receipt download error:", err);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleShare = async () => {
+    setBusy(true);
+    try {
+      const canvas = await captureReceipt();
+      canvas.toBlob(async (blob) => {
+        const file = new File([blob], `CubeCoin-Receipt-${data.tx_ref}.png`, { type: "image/png" });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: "CubeCoin Withdrawal Receipt",
+            text: `Withdrawal receipt — ${data.tx_ref}`,
+          });
+        } else {
+          // Fallback: just trigger download
+          const link = document.createElement("a");
+          link.download = `CubeCoin-Receipt-${data.tx_ref}.png`;
+          link.href = canvas.toDataURL("image/png");
+          link.click();
+        }
+        setBusy(false);
+      }, "image/png");
+    } catch (err) {
+      console.error("Receipt share error:", err);
+      setBusy(false);
+    }
+  };
+
+  const copyRef = () => {
+    navigator.clipboard?.writeText(data.tx_ref).catch(() => {});
+  };
+
+  return (
+    <div className="modal-overlay open" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal-sheet">
+        <div className="modal-handle" />
+        <div className="modal-header">
+          <span className="modal-title">Withdrawal Receipt</span>
+          <button className="modal-close" onClick={onClose}><X size={15} /></button>
+        </div>
+
+        <div className="modal-body" style={{ paddingTop: 6 }}>
+          {/* ── This is the exact area captured into the image ── */}
+          <div className="receipt-card" ref={receiptRef}>
+            <div className="receipt-brand">
+              <div className="receipt-brand-icon">⛏</div>
+              <div>
+                <div className="receipt-brand-name">CubeCoin</div>
+                <div className="receipt-brand-sub">Withdrawal Receipt</div>
+              </div>
+            </div>
+
+            <div className="receipt-status" style={{ background: meta.bg, border: `1px solid ${meta.border}` }}>
+              <span style={{ color: meta.color, fontWeight: 800 }}>{meta.icon} {meta.label}</span>
+            </div>
+
+            <div className="receipt-amount-block">
+              <div className="receipt-amount-cube">{Number(data.amount).toLocaleString()} <span>CUBE</span></div>
+              <div className="receipt-amount-naira">≈ {fmtNaira(data.naira_value)}</div>
+            </div>
+
+            <div className="receipt-divider" />
+
+            <div className="receipt-rows">
+              <div className="receipt-row">
+                <span>Reference</span>
+                <span className="mono">{data.tx_ref}</span>
+              </div>
+              <div className="receipt-row">
+                <span>Bank</span>
+                <span>{data.bank_name}</span>
+              </div>
+              <div className="receipt-row">
+                <span>Account Number</span>
+                <span className="mono">{data.account_number}</span>
+              </div>
+              <div className="receipt-row">
+                <span>Account Name</span>
+                <span>{data.account_name}</span>
+              </div>
+              <div className="receipt-row">
+                <span>Date Requested</span>
+                <span>{fmtFullDate(data.created_at)}</span>
+              </div>
+              {data.status === "approved" && (
+                <div className="receipt-row">
+                  <span>Date Processed</span>
+                  <span>{fmtFullDate(data.approved_at || data.updated_at)}</span>
+                </div>
+              )}
+              {data.status === "rejected" && data.rejection_reason && (
+                <div className="receipt-row">
+                  <span>Reason</span>
+                  <span style={{ color: "#f87171", textAlign: "right", maxWidth: 180 }}>{data.rejection_reason}</span>
+                </div>
+              )}
+              {data.refunded_at && (
+                <div className="receipt-row">
+                  <span>Refunded</span>
+                  <span style={{ color: "#4ade80" }}>{Number(data.refund_amount || 0).toLocaleString()} CUBE</span>
+                </div>
+              )}
+            </div>
+
+            <div className="receipt-divider" />
+
+            <div className="receipt-footer">
+              Generated {fmtFullDate(new Date().toISOString())} · CubeCoin
+            </div>
+          </div>
+          {/* ── End captured area ── */}
+
+          <div className="receipt-actions">
+            <button className="receipt-btn primary" onClick={handleDownload} disabled={busy}>
+              <Download size={16} /> {busy ? "Working…" : "Download"}
+            </button>
+            <button className="receipt-btn" onClick={handleShare} disabled={busy}>
+              <Share2 size={16} /> Share
+            </button>
+          </div>
+          <button className="receipt-copy-ref" onClick={copyRef}>
+            <CopyIcon size={13} /> Copy reference number
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 // ── Main WalletPage ───────────────────────────────────────────────────────────
 export default function WalletPage() {
   const { toasts, addToast } = useToasts();
@@ -782,6 +1025,8 @@ export default function WalletPage() {
   const [totalCashedOutNgn,  setTotalCashedOutNgn]  = useState(0);
   const [withdrawalSettings, setWithdrawalSettings] = useState(null);
   const [withdrawnThisWeek,  setWithdrawnThisWeek]  = useState(0);
+  const [historyOpen, setHistoryOpen] = useState(false);
+const [receiptData, setReceiptData] = useState(null);
 
   const balance = Number(profile?.cube_balance || 0);
 
@@ -1060,9 +1305,9 @@ export default function WalletPage() {
               {isLocked ? <Lock size={16} /> : <ArrowUp size={16} />}
               {!windowOpen ? "Closed" : limitReached ? "Limit Reached" : isGated ? "Locked" : "Cash Out"}
             </button>
-            <button className="hero-btn history-btn">
-              <Clock size={16} /> History
-            </button>
+            <button className="hero-btn history-btn" onClick={() => setHistoryOpen(true)}>
+  <Clock size={16} /> History
+</button>
           </div>
         </div>
 
@@ -1241,6 +1486,17 @@ export default function WalletPage() {
         withdrawnThisWeek={withdrawnThisWeek}
         planName={planRule?.planName || "your plan"}
       />
+      <WithdrawalHistoryModal
+  open={historyOpen}
+  onClose={() => setHistoryOpen(false)}
+  userId={user?.id}
+  onSelectReceipt={(item) => { setHistoryOpen(false); setReceiptData(item); }}
+/>
+<ReceiptModal
+  open={!!receiptData}
+  onClose={() => setReceiptData(null)}
+  data={receiptData}
+/>
 
       <ToastStack toasts={toasts} />
     </div>

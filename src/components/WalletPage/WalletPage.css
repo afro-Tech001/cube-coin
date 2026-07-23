@@ -1100,7 +1100,163 @@
   font-size: 10px;
   color: rgba(255,255,255,.3);
 }
+/* ── History list ── */
+.history-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 16px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: .18s;
+  font-family: 'DM Sans', sans-serif;
+  text-align: left;
+}
+.history-item:hover { background: rgba(255,255,255,.06); border-color: rgba(74,222,128,.25); }
 
+.history-item-icon {
+  width: 38px; height: 38px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.history-item-info { flex: 1; min-width: 0; }
+
+.history-item-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.history-item-amt { font-size: .88rem; font-weight: 700; color: #fff; }
+.history-item-naira { font-size: .8rem; color: rgba(255,255,255,.4); }
+
+.history-item-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-size: .72rem;
+  color: rgba(255,255,255,.35);
+}
+.history-item-badge { font-weight: 700; }
+
+/* ── Receipt card ── */
+.receipt-card {
+  background: #0a1c0e;
+  border: 1px solid rgba(74,222,128,.18);
+  border-radius: 20px;
+  padding: 26px 22px;
+}
+
+.receipt-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.receipt-brand-icon {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  background: rgba(74,222,128,.12);
+  border: 1px solid rgba(74,222,128,.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.receipt-brand-name { font-size: 1rem; font-weight: 800; color: #fff; }
+.receipt-brand-sub { font-size: .74rem; color: rgba(255,255,255,.4); }
+
+.receipt-status {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: .78rem;
+  margin-bottom: 20px;
+}
+
+.receipt-amount-block { text-align: center; margin-bottom: 20px; }
+.receipt-amount-cube {
+  font-size: 1.9rem;
+  font-weight: 900;
+  color: #4ade80;
+  letter-spacing: -1px;
+}
+.receipt-amount-cube span { font-size: 1rem; color: rgba(255,255,255,.4); font-weight: 700; }
+.receipt-amount-naira { font-size: .88rem; color: rgba(255,255,255,.5); margin-top: 4px; }
+
+.receipt-divider {
+  height: 1px;
+  background: repeating-linear-gradient(90deg, rgba(255,255,255,.12) 0 6px, transparent 6px 12px);
+  margin: 16px 0;
+}
+
+.receipt-rows { display: flex; flex-direction: column; gap: 10px; }
+.receipt-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  font-size: .82rem;
+}
+.receipt-row > span:first-child { color: rgba(255,255,255,.4); }
+.receipt-row > span:last-child { color: #fff; font-weight: 600; text-align: right; }
+.receipt-row .mono { font-family: monospace; letter-spacing: .02em; }
+
+.receipt-footer {
+  text-align: center;
+  font-size: .68rem;
+  color: rgba(255,255,255,.25);
+  margin-top: 4px;
+}
+
+.receipt-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.receipt-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 14px;
+  font-size: .88rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: .18s;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.05);
+  color: rgba(255,255,255,.7);
+}
+.receipt-btn:disabled { opacity: .6; cursor: not-allowed; }
+.receipt-btn.primary {
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  color: #041107;
+  border: none;
+}
+.receipt-btn.primary:hover:not(:disabled) { filter: brightness(1.08); }
+.receipt-btn:hover:not(:disabled):not(.primary) { background: rgba(255,255,255,.09); }
+
+.receipt-copy-ref {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,.35);
+  font-size: .76rem;
+  cursor: pointer;
+  padding: 6px;
+}
+.receipt-copy-ref:hover { color: rgba(255,255,255,.6); }
 /* ── Red cs-val for limit reached ── */
 .cs-val.red { color: #f87171; font-weight: 700; }
 /* ── Responsive ── */
