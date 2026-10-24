@@ -1,0 +1,223 @@
+/* ── Overlay — sits above everything, blocks all interaction ── */
+.pem-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 3, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  font-family: 'DM Sans', sans-serif;
+  animation: pemFadeIn .4s ease;
+}
+
+@keyframes pemFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Card ── */
+.pem-card {
+  background: #0a1c0e;
+  border: 1px solid rgba(248, 113, 113, 0.25);
+  border-radius: 28px;
+  padding: 36px 28px 32px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  animation: pemSlideUp .45s cubic-bezier(.34, 1.4, .64, 1);
+}
+
+@keyframes pemSlideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* ── Top glow ── */
+.pem-glow {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 120px;
+  background: rgba(248, 113, 113, 0.15);
+  filter: blur(40px);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* ── Icon ── */
+.pem-icon-wrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(248, 113, 113, 0.1);
+  border: 2px solid rgba(248, 113, 113, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 22px;
+  animation: pemPulse 2s ease-in-out infinite;
+}
+
+@keyframes pemPulse {
+  0%,100% { box-shadow: 0 0 0 0   rgba(248,113,113,.3); }
+  50%      { box-shadow: 0 0 0 14px rgba(248,113,113,0); }
+}
+
+.pem-icon { font-size: 2.4rem; }
+
+/* ── Text ── */
+.pem-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 10px;
+}
+
+.pem-subtitle {
+  font-size: .9rem;
+  color: rgba(255,255,255,.5);
+  line-height: 1.65;
+  margin: 0 0 22px;
+}
+
+/* ── Info box ── */
+.pem-info-box {
+  background: rgba(248, 113, 113, 0.06);
+  border: 1px solid rgba(248, 113, 113, 0.15);
+  border-radius: 16px;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pem-info-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: .82rem;
+  color: rgba(255,255,255,.55);
+  line-height: 1.4;
+}
+
+.pem-info-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* ── Plans hint ── */
+.pem-plans-hint {
+  background: rgba(74, 222, 128, 0.05);
+  border: 1px solid rgba(74, 222, 128, 0.15);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 22px;
+}
+
+.pem-plans-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255,255,255,.3);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 10px;
+}
+
+.pem-plans-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.pem-plan-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: rgba(74,222,128,.08);
+  border: 1px solid rgba(74,222,128,.2);
+  border-radius: 10px;
+  padding: 7px 14px;
+  flex: 1;
+}
+
+.pem-plan-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #4ade80;
+}
+
+.pem-plan-price {
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+}
+
+/* ── Buttons ── */
+.pem-resubscribe-btn {
+  width: 100%;
+  padding: 15px;
+  border-radius: 16px;
+  border: none;
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  color: #041107;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: filter .18s, transform .18s;
+  margin-bottom: 10px;
+  box-shadow: 0 8px 24px rgba(74,222,128,.25);
+}
+
+.pem-resubscribe-btn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+}
+
+.pem-signout-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.1);
+  background: transparent;
+  color: rgba(255,255,255,.35);
+  font-size: .88rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: .18s;
+  margin-bottom: 16px;
+}
+
+.pem-signout-btn:hover {
+  background: rgba(255,255,255,.05);
+  color: rgba(255,255,255,.6);
+}
+
+.pem-footer {
+  font-size: .75rem;
+  color: rgba(255,255,255,.25);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .pem-card {
+    padding: 30px 20px 28px;
+    border-radius: 24px;
+  }
+  .pem-title { font-size: 1.4rem; }
+}

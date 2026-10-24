@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../../../libs/supabase";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -39,6 +39,10 @@ const STATUS_META = {
   approved: { label: "Approved", bg: T.greenDim, bd: T.greenBd, color: T.green },
   rejected: { label: "Rejected", bg: T.redBg,    bd: T.redBd,   color: T.red   },
 };
+
+// Safe date formatter — used everywhere a subscription date is displayed so
+// null/undefined timestamps never throw.
+const fmtDate = (d) => (d ? new Date(d).toLocaleString() : "—");
 
 function Badge({ status }) {
   const m = STATUS_META[status] || STATUS_META.pending;
@@ -85,6 +89,8 @@ function StatCard({ label, value, accent }) {
 function DetailSheet({ sub, onClose, onApprove, onReject, loading }) {
   if (!sub) return null;
 
+  const expired = sub.expires_at && new Date(sub.expires_at) < new Date();
+
   const rows = [
     ["Subscription ID", sub.id],
     ["User ID",         sub.user_id],
@@ -95,8 +101,13 @@ function DetailSheet({ sub, onClose, onApprove, onReject, loading }) {
     ["Reference",       sub.tx_ref],
     ["Mining Rate",     sub.mining_rate || "Pending"],
     ["Plan Status",     sub.plan_status || "Pending"],
-    ["Submitted",       new Date(sub.created_at).toLocaleString()],
-    ["Approved At",     sub.approved_at ? new Date(sub.approved_at).toLocaleString() : "Not yet"],
+    ["Submitted",       fmtDate(sub.created_at)],
+    ["Approved At",     sub.approved_at ? fmtDate(sub.approved_at) : "Not yet"],
+    ["Activated",       sub.activated_at ? fmtDate(sub.activated_at) : "Not yet"],
+    ["Expires",         sub.expires_at ? (expired ? `⚠ Expired ${fmtDate(sub.expires_at)}` : fmtDate(sub.expires_at)) : "—"],
+    ["Days left",       sub.expires_at
+      ? (expired ? "Expired" : `${Math.ceil((new Date(sub.expires_at) - new Date()) / 86400000)} days`)
+      : "—"],
   ];
 
   return (
@@ -149,7 +160,9 @@ function DetailSheet({ sub, onClose, onApprove, onReject, loading }) {
               <span style={{ fontSize: 11, color: T.muted }}>{l}</span>
               <span style={{
                 fontSize: 13, fontWeight: 600,
-                color: l === "Amount" || l === "Plan" ? T.green : T.white,
+                color: l === "Amount" || l === "Plan" ? T.green
+                  : l === "Expires" && String(v).startsWith("⚠") ? T.red
+                  : T.white,
               }}>
                 {l === "Plan" ? <PlanPill name={v} /> : v}
               </span>
@@ -242,40 +255,60 @@ export default function AdminSubscription() {
       .from("subscriptions")
       .select("*")
       .order("created_at", { ascending: false });
-    if (error) toast.error(error.message);
-    else       setSubs(data || []);
+
+    if (error) {
+      toast.error(error.message);
+      setSubs([]);
+    } else {
+      setSubs(data || []);
+    }
+
     setLoading(false);
   };
 
-  // Grab the logged-in admin's UUID so we can store it in approved_by
   const [adminId, setAdminId] = useState(null);
 
   useEffect(() => {
-    fetchSubs();
-    supabase.auth.getUser().then(({ data }) => {
+    let isMounted = true;
+
+    const loadData = async () => {
+      await fetchSubs();
+
+      const { data } = await supabase.auth.getUser();
+      if (!isMounted) return;
+
       setAdminId(data?.user?.id ?? null);
-    });
+    };
+
+    void loadData();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  // ── Core fix: updateStatus ────────────────────────────────────────────────
   const updateStatus = async (id, status) => {
+    const sub = subs.find((item) => item.id === id);
+    if (!sub) {
+      toast.error("Subscription not found");
+      return;
+    }
+
     setActionLoad(true);
 
     try {
-      const sub = subs.find(s => s.id === id);
-      if (!sub) { toast.error("Subscription not found"); return; }
-
       const now = new Date().toISOString();
+      const expiresAt = new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toISOString();
 
-      // ── Step 1: Update subscriptions table ──────────────────────────────
       const { error: subErr } = await supabase
         .from("subscriptions")
         .update({
           payment_status: status,
-          plan_status:    status === "approved" ? "active" : "rejected",
-          approved_at:    status === "approved" ? now      : null,
-          approved_by:    status === "approved" ? adminId  : null,  // UUID, not a string
-          activated_at:   status === "approved" ? now      : null,
+          plan_status: status === "approved" ? "active" : "rejected",
+          approved_at: status === "approved" ? now : null,
+          approved_by: status === "approved" ? adminId : null,
+          activated_at: status === "approved" ? now : null,
+          expires_at: status === "approved" ? expiresAt : null,
         })
         .eq("id", id);
 
@@ -284,22 +317,16 @@ export default function AdminSubscription() {
         throw new Error("Failed to update subscription: " + subErr.message);
       }
 
-      // ── Step 2: Update profiles table via user_id ────────────────────────
-      // THE FIX: use a service-role-level bypass by calling an RPC, or use
-      // the admin client. Since we don't have that, we use the profiles.id
-      // which equals auth.users.id = sub.user_id directly.
       const profilePayload = status === "approved"
         ? {
             subscription_status: "approved",
-            plan_name:           sub.plan_name,
-            plan_status:         "active",
+            plan_name: sub.plan_name,
+            plan_status: "active",
           }
         : {
             subscription_status: "rejected",
-            plan_status:         "rejected",
+            plan_status: "rejected",
           };
-
-      console.log("[Step 2] Updating profile:", sub.user_id, profilePayload);
 
       const { data: updatedProfiles, error: profErr } = await supabase
         .from("profiles")
@@ -309,28 +336,22 @@ export default function AdminSubscription() {
 
       if (profErr) {
         console.error("[Step 2] profiles update failed:", profErr);
-        // Still show partial success so admin knows sub was updated
-        toast.warning(`Subscription ${status}, but profile update failed: ${profErr.message}. Run the SQL fix below.`);
-        fetchSubs();
+        toast.warning(`Subscription ${status}, but profile update failed: ${profErr.message}`);
+        await fetchSubs();
         setSelected(null);
         return;
       }
 
       if (!updatedProfiles || updatedProfiles.length === 0) {
-        // RLS is silently blocking the write — most common cause
         console.error("[Step 2] 0 rows updated — RLS is blocking profile update");
         toast.warning(
-          `Subscription marked ${status}, but profile table was NOT updated (RLS blocked it). ` +
-          `Run this SQL in Supabase: CREATE POLICY "Admin update profiles" ON public.profiles FOR UPDATE TO authenticated USING (true) WITH CHECK (true);`
+          `Subscription marked ${status}, but profile table was NOT updated (RLS blocked it).`
         );
-        fetchSubs();
+        await fetchSubs();
         setSelected(null);
         return;
       }
 
-      console.log("[Step 2] Profile updated:", updatedProfiles[0]);
-
-      // ── Step 3: If approving, also grant subscription_cubes if not yet granted ──
       if (status === "approved" && sub.subscription_cubes) {
         const { data: prof } = await supabase
           .from("profiles")
@@ -344,14 +365,12 @@ export default function AdminSubscription() {
             .from("profiles")
             .update({ cube_balance: newBalance, cubes_granted: true })
             .eq("id", sub.user_id);
-          console.log(`[Step 3] Granted ${sub.subscription_cubes} CUBE to user`);
         }
       }
 
       toast.success(`✅ Subscription ${status} — profile updated automatically`);
-      fetchSubs();
+      await fetchSubs();
       setSelected(null);
-
     } catch (err) {
       console.error("[updateStatus] Unexpected error:", err);
       toast.error(err.message);

@@ -160,10 +160,10 @@ async function writeReferredByCodeWithRetry(userId, code, maxAttempts = 15) {
 }
 
 export default function Auth() {
-   const [tab, setTab] = useState("signup");
+  const [searchParams] = useSearchParams();
+  const [tab, setTab] = useState(() => searchParams.get("tab") === "login" ? "login" : "signup");
   const [loading,  setLoading]  = useState(false);
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
 
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [signupData, setSignupData] = useState({
@@ -189,57 +189,93 @@ export default function Auth() {
   };
 
   const handleLogin = async () => {
-    if (!loginData.email || !loginData.password) {
-      toast.error("Please fill in all fields");
+  if (!loginData.email || !loginData.password) {
+    toast.error("Please fill in all fields");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email:    loginData.email.trim().toLowerCase(),
+      password: loginData.password,
+    });
+
+    if (error) { toast.error(error.message); return; }
+
+    localStorage.setItem("cubecoin_user", JSON.stringify(data.user));
+
+    // ── Admin check first — admins NEVER get expiry check ──────────────────
+    const { data: adminData } = await supabase
+      .from("admins")
+      .select("role, email")
+      .eq("email", data.user.email)
+      .maybeSingle();
+
+    if (adminData) {
+      toast.success(`Welcome Admin 🚀 (${adminData.role})`);
+      localStorage.setItem("cubecoin_admin", JSON.stringify(adminData));
+      setTimeout(() => navigate("/admin/dashboard"), 1500);
+      return; // ← admins stop here, no expiry check
+    }
+
+    // ── Regular user — fetch profile ────────────────────────────────────────
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", data.user.id)
+      .maybeSingle();
+
+    localStorage.setItem("cubecoin_profile", JSON.stringify(profile));
+
+    // ── Check subscription expiry ───────────────────────────────────────────
+    const { data: sub } = await supabase
+      .from("subscriptions")
+      .select("plan_name, expires_at, payment_status")
+      .eq("user_id", data.user.id)
+      .eq("payment_status", "approved")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (sub?.expires_at && new Date(sub.expires_at) < new Date()) {
+      // Plan expired — mark profile and show expiry modal
+      await supabase
+        .from("profiles")
+        .update({ subscription_status: "expired" })
+        .eq("id", data.user.id);
+
+      // Store expiry info for the modal
+      localStorage.setItem("cubecoin_expired", JSON.stringify({
+        planName:  sub.plan_name,
+        expiredAt: sub.expires_at,
+      }));
+
+      toast.warn("Your plan has expired. Please resubscribe to continue.", { autoClose: 4000 });
+      setTimeout(() => navigate("/plan-expired"), 1500);
       return;
     }
-    try {
-      setLoading(true);
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email:    loginData.email.trim().toLowerCase(),
-        password: loginData.password,
-      });
-      if (error) { toast.error(error.message); return; }
 
-      localStorage.setItem("cubecoin_user", JSON.stringify(data.user));
+    // ── All good — route based on subscription status ───────────────────────
+    toast.success(`Welcome back, ${profile?.full_name || data.user.email} 🚀`);
 
-      const { data: adminData } = await supabase
-        .from("admins")
-        .select("*")
-        .eq("email", data.user.email)
-        .maybeSingle();
-
-      if (adminData) {
-        toast.success(`Welcome Admin 🚀 (${adminData.role})`);
-        localStorage.setItem("cubecoin_admin", JSON.stringify(adminData));
-        setTimeout(() => navigate("/admin/dashboard"), 1500);
-        return;
-      }
-
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", data.user.id)
-        .maybeSingle();
-
-      localStorage.setItem("cubecoin_profile", JSON.stringify(profile));
-      toast.success(`Welcome back, ${profile?.full_name || data.user.email} 🚀`);
-
-      const subStatus = profile?.subscription_status;
-      if (subStatus === "approved") {
-        setTimeout(() => navigate("/dashboard"), 1500);
-      } else if (subStatus === "pending") {
-        setTimeout(() => navigate("/subscription-status"), 1500);
-      } else {
-        setTimeout(() => navigate("/subscription"), 1500);
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Login failed. Please try again.");
-    } finally {
-      setLoading(false);
+    const subStatus = profile?.subscription_status;
+    if (subStatus === "approved") {
+      setTimeout(() => navigate("/dashboard"), 1500);
+    } else if (subStatus === "pending") {
+      setTimeout(() => navigate("/subscription-status"), 1500);
+    } else {
+      setTimeout(() => navigate("/subscription"), 1500);
     }
-  };
+
+  } catch (err) {
+    console.error(err);
+    toast.error("Login failed. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleSignup = async () => {
   const { firstName, lastName, email, password, referralCode } = signupData;
