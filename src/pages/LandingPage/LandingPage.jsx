@@ -226,10 +226,6 @@ function LandingPage() {
             </article>
           ))}
         </div>
-        <div className="landing-risk-note" id="risk-note">
-          <ShieldAlert size={21} />
-          <p><strong>Important:</strong> Plan entry amounts are not guaranteed returns. Earnings, token rewards, and revenue are uncertain and may be zero. Results depend on demand, eligibility, network or project rules, performance, operating costs, and third-party terms. Consider these factors and your ability to bear losses before participating.</p>
-        </div>
       </section>
 
       <section className="landing-how landing-section" id="how-it-works">
