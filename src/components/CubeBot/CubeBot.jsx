@@ -41,7 +41,7 @@ const KB = [
   },
   {
     keys: ["exchange","naira","ngn","100 cube","worth","value"],
-    reply: "💱 **CUBE Exchange Rate:**\n\n**100 CUBE = ₦5.00** (1 CUBE = ₦0.05)\n\nExamples:\n• 1,000 CUBE = ₦50\n• 10,000 CUBE = ₦500\n• 100,000 CUBE = ₦5,000",
+    reply: "💱 **CUBE Exchange Rate:**\n\n**100 StockBlock = $5** (1 CUBE = ₦0.05)\n\nExamples:\n• 1,000 CUBE = ₦50\n• 10,000 CUBE = ₦500\n• 100,000 CUBE = ₦5,000",
     chips: ["How to cash out?","How to earn more CUBE?"],
   },
  {
@@ -56,7 +56,7 @@ const KB = [
   },
   {
     keys: ["pause","resume","stop","session","paused"],
-    reply: "⏸ **Pausing Mining:**\n\n• **Pause** — stops timer, no CUBE earned while paused\n• **Resume** — continues from where you left off\n• **Claim** — adds all earned CUBE to your wallet\n\nOnly active mining time counts toward earnings.",
+    reply: "⏸ **Pausing Mining:**\n\n• **Pause** — stops timer, no stockblock points earned while paused\n• **Resume** — continues from where you left off\n• **Claim** — adds all earned CUBE to your wallet\n\nOnly active mining time counts toward earnings.",
     chips: ["How to claim?","Mining rates"],
   },
   {
@@ -76,24 +76,24 @@ const KB = [
   },
   {
     keys: ["best plan","recommend","which plan","suggest"],
-    reply: "🌟 **Best Plan for You:**\n\n• **Starting out?** → Starter (₦10,600)\n• **Best value?** → ⭐ Silver (₦22,500) — most popular!\n• **Maximum earnings?** → 💎 Diamond (₦50,000)\n\nSilver is the sweet spot — 0.40 CUBE/hr + 200K activation bonus!",
+    reply: "🌟 **Best Plan for You:**\n\n• **Starting out?** → Starter ($100)\n• **Best value?** → ⭐ Silver (₦22,500) — most popular!\n• **Maximum earnings?** → 💎 Diamond (₦50,000)\n\nSilver is the sweet spot — 0.40 CUBE/hr + 200K activation bonus!",
     chips: ["How to subscribe?","Mining rates"],
   },
   {
-    keys: ["activation bonus","subscription cube","50k","100k","200k","300k"],
+    keys: ["activation bonus","subscription","$100","$200","$300","$400"],
     reply: "🎁 **Activation Bonuses:**\n\nWhen your plan is approved you get:\n\n⬡ Starter → **50,000 CUBE**\n🥉 Bronze → **100,000 CUBE**\n🥈 Silver → **200,000 CUBE**\n🥇 Gold → **250,000 CUBE**\n💎 Diamond → **300,000 CUBE**\n\nCredited to your wallet automatically on approval!",
     chips: ["Mining rates","How to cash out?"],
   },
   {
-    keys: ["balance","cube balance","how much","total"],
-    reply: "💰 **Your CUBE Balance:**\n\nCheck your balance on:\n• **Dashboard** → Hero card (live balance)\n• **Wallet page** → Full history breakdown\n• **Mining page** → Live claimable amount\n\nGrows through mining, referrals, streaks, and bonuses!",
+    keys: ["balance","stockblock balance","how much","total"],
+    reply: "💰 **Your Stockblock Balance:**\n\nCheck your balance on:\n• **Dashboard** → Hero card (live balance)\n• **Wallet page** → Full history breakdown\n• **Mining page** → Live claimable amount\n\nGrows through mining, referrals, streaks, and bonuses!",
     chips: ["How to withdraw?","How to mine?"],
   },
 ];
 
 const FALLBACKS = [
   "I'm not sure about that! 🤔 Try asking about mining, subscriptions, withdrawals, or referrals.",
-  "Hmm, I don't have that info yet. I can help with CubeCoin mining, plans, wallet, and referrals!",
+  "Hmm, I don't have that info yet. I can help with AI Powered mining, plans, wallet, and referrals!",
   "That's outside my knowledge for now! 💡 Ask me about mining rates, plans, or cashouts.",
 ];
 
@@ -268,7 +268,7 @@ export default function CubeBot() {
       const name = profile?.full_name?.split(" ")[0] || "there";
       setTimeout(() => {
         botReply(
-          `Hey ${name}! 👋 I'm **CubeBot** — your CubeCoin assistant.\n\nHow can I help you today?`,
+          `Hey ${name}! 👋 I'm **StockBot** — your Stockblock AI assistant.\n\nHow can I help you today?`,
           ["How do I mine?","Subscription plans","How to withdraw?","Referral program","Daily spin wheel"]
         );
       }, 500);

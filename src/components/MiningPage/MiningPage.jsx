@@ -228,7 +228,7 @@ export default function MiningPage() {
           .single();
         if (updated) {
           prof = updated;
-          showToast(`🎉 ${subData.subscription_cubes.toLocaleString()} CUBE credited to your wallet!`);
+          showToast(`🎉 ${subData.subscription_cubes.toLocaleString()} Blocks credited to your wallet!`);
         }
       }
 
@@ -466,7 +466,7 @@ export default function MiningPage() {
 
       const { data: liveProfile, error: fetchErr } = await supabase
         .from("profiles")
-        .select("cube_balance, total_mined, streak")
+        .select("block_balance, total_mined, streak")
         .eq("id", user.id)
         .single();
 
@@ -493,7 +493,7 @@ export default function MiningPage() {
 
       const { data: confirmed, error: confirmErr } = await supabase
         .from("profiles")
-        .select("cube_balance, total_mined, streak")
+        .select("block_balance, total_mined, streak")
         .eq("id", user.id)
         .single();
 
@@ -532,7 +532,7 @@ export default function MiningPage() {
       setSwinging("idle");
       swingRef.current = false;
       setShowClaim(false);
-      showToast(`🎉 ${earned.toFixed(4)} CUBE added to your wallet!`);
+      showToast(`🎉 ${earned.toFixed(4)} BLOCKS added to your wallet!`);
 
     } catch (err) {
       console.error("[Claim] Unexpected error:", err);
@@ -595,7 +595,7 @@ export default function MiningPage() {
               <CrackLines visible={showCracks} />
               <CubeLogoSVG hit={cubeHit} />
               <div className="earn-num">{claimable.toFixed(4)}</div>
-              <div className="earn-sub">CUBE</div>
+              <div className="earn-sub">BLOCK</div>
             </div>
             <svg className="chips-svg" viewBox="-110 -110 220 220">
               {chips.map(c => (
@@ -617,8 +617,8 @@ export default function MiningPage() {
 <p className="sub">
   {isPaused     ? "Resume to continue earning"
    : isMining   ? fmt(timeLeft)
-   : claimable > 0 ? "Claim your earned CUBE"
-   : `Mine ${tier.dailyCube?.toLocaleString() || ""} CUBE/day · ₦${tier.dailyNaira?.toLocaleString() || ""} value`}
+   : claimable > 0 ? "Claim your earned BLOCKS"
+   : `Mine ${tier.dailyCube?.toLocaleString() || ""} BLOCK/day · ₦${tier.dailyNaira?.toLocaleString() || ""} value`}
 </p>
 
         <div className="btn-row">
@@ -641,7 +641,7 @@ export default function MiningPage() {
           )}
           {!isMining && !isPaused && hasActiveSession && claimable > 0 && (
             <button className="claim-btn" onClick={() => setShowClaim(true)}>
-              Claim {claimable.toFixed(4)} CUBE
+              Claim {claimable.toFixed(4)} BLOCKS
             </button>
           )}
         </div>
@@ -667,7 +667,7 @@ export default function MiningPage() {
         <div className="stat-card">
           <div className="stat-icon">⚡</div>
           <h3>{sub?.mining_rate}</h3>
-          <p>CUBE / hour</p>
+          <p>BLOCKS / hour</p>
         </div>
       </div>
 
@@ -689,9 +689,9 @@ export default function MiningPage() {
           <div className="modal">
             <div className="modal-icon">🎉</div>
             <h3>Claim your reward</h3>
-            <p className="modal-sub">Add your mined CUBE tokens to your wallet balance.</p>
+            <p className="modal-sub">Add your mined BLOCK tokens to your wallet balance.</p>
             <div className="modal-amt">{claimable.toFixed(4)}</div>
-            <div className="modal-amt-sub">CUBE tokens</div>
+            <div className="modal-amt-sub">BLOCK tokens</div>
             <button className="modal-confirm" onClick={confirmClaim} disabled={claiming || claimable <= 0}>
               {claiming ? "Processing…" : "Claim & add to wallet"}
             </button>
