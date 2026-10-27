@@ -14,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import "./LandingPage.css";
+import cubeCoinLogo from "../../assets/cube-coin-logo.png";
 
 const plans = [
   {
@@ -79,21 +80,9 @@ const plans = [
 ];
 
 const steps = [
-  {
-    number: "01",
-    title: "Choose a way to contribute",
-    copy: "Compare plan requirements, resources, and risks before deciding which AI opportunity fits you.",
-  },
-  {
-    number: "02",
-    title: "Set up with Stockblock AI",
-    copy: "Get support connecting eligible hardware, services, data tools, or an AI agent to its project or network.",
-  },
-  {
-    number: "03",
-    title: "Deliver useful work",
-    copy: "Networks and customers determine eligibility, workload demand, scoring, and compensation.",
-  },
+  ["Create your account", "Sign up in a few steps and set up your Cube Coin profile."],
+  ["Explore the platform", "Choose from mining sessions, tasks, streaks, and referrals."],
+  ["Track your progress", "Check your activity and available rewards from your dashboard."],
 ];
 
 function LandingPage() {
@@ -104,9 +93,9 @@ function LandingPage() {
     <main className="landing">
       <header className="landing-header">
         <div className="landing-nav-wrap">
-          <Link className="landing-brand" to="/" aria-label="Stockblock AI home" onClick={closeMenu}>
-            <span className="landing-brand-mark" aria-hidden="true">S</span>
-            <span>STOCKBLOCK <span>AI</span></span>
+          <Link className="landing-brand" to="/" aria-label="Cube Coin home" onClick={closeMenu}>
+            <img src={cubeCoinLogo} alt="" />
+            <span>cube<span>coin</span></span>
           </Link>
 
           <button
@@ -135,11 +124,11 @@ function LandingPage() {
         <div className="landing-hero-grid" aria-hidden="true" />
         <div className="landing-hero-inner">
           <div className="landing-hero-copy">
-            <div className="landing-eyebrow"><span /> AI WORK, MADE ACCESSIBLE</div>
-            <h1>Turn AI work into <span>opportunity.</span></h1>
+            <div className="landing-eyebrow"><span /> YOUR NEXT MOVE STARTS HERE</div>
+            <h1>Make your time<br />count with <span>Cube Coin.</span></h1>
             <p className="landing-hero-description">
-              Stockblock AI connects computing power, AI services, and specialized work
-              with decentralized networks and real business needs.
+              A fresh way to explore digital rewards. Mine, complete daily tasks,
+              and keep your progress moving—all from one simple place.
             </p>
             <div className="landing-hero-actions">
               <a className="landing-button landing-button-primary" href="#plans">
@@ -200,8 +189,8 @@ function LandingPage() {
       <section className="landing-plans landing-section" id="plans">
         <div className="landing-section-heading">
           <div>
-            <div className="landing-eyebrow"><span /> AVAILABLE PLANS FOR INVESTORS</div>
-            <h2>Find your AI<br /><span>workstream.</span></h2>
+            <div className="landing-eyebrow"><span /> THE CUBE COIN EXPERIENCE</div>
+            <h2>Small actions.<br /><span>Real momentum.</span></h2>
           </div>
           <p>Each plan supports a different kind of AI contribution. Review the requirements and potential costs—not just the entry amount.</p>
         </div>
@@ -230,9 +219,9 @@ function LandingPage() {
 
       <section className="landing-how landing-section" id="how-it-works">
         <div className="landing-how-intro">
-          <div className="landing-eyebrow"><span /> HOW STOCKBLOCK AI WORKS</div>
-          <h2>From resources<br />to <span>real work.</span></h2>
-          <p>Stockblock AI helps coordinate the setup and delivery. The network, project, or customer sets the rules for whether work qualifies and how it is compensated.</p>
+          <div className="landing-eyebrow"><span /> GET STARTED IN THREE STEPS</div>
+          <h2>Simple from<br />the <span>first click.</span></h2>
+          <p>No complicated setup. Just a straightforward place to explore Cube Coin and follow your activity.</p>
           <Link className="landing-button landing-button-outline" to="/login?tab=signup">
             Explore participation <ArrowRight size={17} />
           </Link>
@@ -251,22 +240,22 @@ function LandingPage() {
       <section className="landing-cta-band">
         <div className="landing-cta-mark" aria-hidden="true"><Sparkles size={25} /></div>
         <div>
-          <div className="landing-eyebrow"><span /> EXPLORE STOCKBLOCK AI</div>
-          <h2>Choose your next step.</h2>
-          <p>Review the plan details and decide whether the requirements fit you.</p>
+          <div className="landing-eyebrow"><span /> YOUR CUBE COIN JOURNEY</div>
+          <h2>Ready to make a move?</h2>
+          <p>Start exploring the Cube Coin experience today.</p>
         </div>
         <Link className="landing-button landing-button-primary" to="/login?tab=signup">
-          Get started <ArrowRight size={18} />
+          Join Cube Coin <ArrowRight size={18} />
         </Link>
       </section>
 
       <footer className="landing-footer">
-        <Link className="landing-brand landing-footer-brand" to="/" aria-label="Stockblock AI home">
-          <span className="landing-brand-mark" aria-hidden="true">S</span>
-          <span>STOCKBLOCK <span>AI</span></span>
+        <Link className="landing-brand landing-footer-brand" to="/" aria-label="Cube Coin home">
+          <img src={cubeCoinLogo} alt="" />
+          <span>cube<span>coin</span></span>
         </Link>
-        <p>Participation involves risk. Earnings and rewards are not guaranteed.</p>
-        <span className="landing-copyright">© {new Date().getFullYear()} Stockblock AI</span>
+        <p>Explore at your own pace. Digital rewards and token values are not guaranteed.</p>
+        <span className="landing-copyright">© {new Date().getFullYear()} Cube Coin</span>
       </footer>
     </main>
   );

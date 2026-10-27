@@ -98,12 +98,12 @@ export default function Loader() {
 
         {/* ── Wordmark ── */}
         <div className="loader-wordmark">
-          <span className="loader-wm-cube">CUBE</span>
-          <span className="loader-wm-coin">COIN</span>
+          <span className="loader-wm-cube">STOCKBLOCK</span>
+          <span className="loader-wm-coin">AI</span>
         </div>
 
         {/* ── Tagline ── */}
-        <p className="loader-tagline">Powering the Future of Digital Mining</p>
+        <p className="loader-tagline">Powering the Future of AI Digital Mining</p>
 
         {/* ── Loading bar ── */}
         <div className="loading-bar-wrap">

@@ -406,8 +406,8 @@ export default function Auth() {
         <div className="logo-area">
           <div className="cube-logo"><CubeSVG /></div>
           <div className="logo-wordmark">
-            <span className="logo-cube-text">CUBE</span>
-            <span className="logo-coin-text">COIN</span>
+            <span className="logo-cube-text">STOCKBLOCK</span>
+            <span className="logo-coin-text">AI</span>
           </div>
         </div>
 
