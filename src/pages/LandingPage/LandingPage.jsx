@@ -75,7 +75,7 @@ const plans = [
       Businesses pay for access or for the work delivered.",
     earning: "Stockblock AI generates profits for investors from monthly subscriptions, usage fees, or service contracts.",
     detail:
-      "Joint or group plan. Revenue depends on customer demand, delivery, operating costs, and contract terms; it is not assured.",
+      "Joint or group plan. Revenue depends on customer demand, delivery, operating costs, and contract terms; profit is assured but might vary.",
   },
 ];
 
