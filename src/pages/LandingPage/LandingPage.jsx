@@ -35,10 +35,10 @@ const plans = [
     icon: Network,
     title: "Participate in Bittensor AI subnets",
     description:
-      "Subnet miners provide AI services such as model inference, data processing, answers, or predictions. Subnets evaluate the work and may distribute rewards in TAO.",
+      "Subnet miners provide AI services such as model inference, data processing, answers, or predictions. Subnets evaluate the work and distributes rewards in TAO.",
     earning: "Potential TAO rewards for useful, well-scored subnet contributions.",
     detail:
-      "Subnet rules, hardware, technical skills, and tokens required for registration vary. Stockblock AI can help coordinate setup and operations; rewards are not guaranteed.",
+      "Subnet rules, hardware, technical skills, and tokens required for registration vary. Stockblock AI helps to coordinate setup and operations; rewards are not guaranteed.",
   },
   {
     name: "Standard",
@@ -62,17 +62,18 @@ const plans = [
       "Support projects that need data processing, model evaluation, testing, or other specialized technical contributions.",
     earning: "Project-specific direct payments or token-based rewards.",
     detail:
-      "Eligibility and compensation are set by each project. This route may need less GPU capacity, but can require tools, integrations, and specialized work.",
+      "Eligibility and compensation are set by each project. This route will need less GPU capacity, but can require tools, integrations, and specialized work.",
   },
   {
     name: "Enterprise",
     price: "$10,000",
     number: "05",
     icon: Bot,
-    title: "Build AI agents for recurring revenue",
+    title: "Build AI agents that generate recurring revenue",
     description:
-      "Develop AI-powered systems for useful business work, such as customer support, lead generation, report preparation, or content creation.",
-    earning: "Possible income from subscriptions, usage fees, or service contracts.",
+      "Stockblock AI helps you build an AI-powered system that performs useful work automatically, such as customer support, lead generation, report preparation, or business content creation. \
+      Businesses pay for access or for the work delivered.",
+    earning: "Stockblock AI generates profits for investors from monthly subscriptions, usage fees, or service contracts.",
     detail:
       "Joint or group plan. Revenue depends on customer demand, delivery, operating costs, and contract terms; it is not assured.",
   },
