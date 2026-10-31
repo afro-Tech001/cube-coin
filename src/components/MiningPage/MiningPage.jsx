@@ -578,7 +578,7 @@ export default function MiningPage() {
       {/* ── Hero ── */}
       <div className="mining-hero">
         <div className="plan-badge">
-          {sub?.plan_name} plan · {sub?.mining_rate} CUBE/hr
+          {sub?.plan_name} plan · {sub?.mining_rate} STOCK/hr
         </div>
 
         <div className="scene-wrap">

@@ -247,7 +247,7 @@ export default function Auth() {
         .eq("id", data.user.id);
 
       // Store expiry info for the modal
-      localStorage.setItem("cubecoin_expired", JSON.stringify({
+      localStorage.setItem("Block_expired", JSON.stringify({
         planName:  sub.plan_name,
         expiredAt: sub.expires_at,
       }));
@@ -376,7 +376,7 @@ export default function Auth() {
     localStorage.setItem("cubecoin_user",    JSON.stringify(data.user));
     localStorage.setItem("cubecoin_profile", JSON.stringify(profile));
 
-    toast.success(`Welcome to CubeCoin, ${firstName}! 🎉`);
+    toast.success(`Welcome to StockBlock AI, ${firstName}! 🎉`);
     setTimeout(() => navigate("/subscription"), 1500);
 
   } catch (err) {

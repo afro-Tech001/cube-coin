@@ -14,7 +14,7 @@ export default function WelcomeCard() {
           </h1>
 
           <span className="cube-unit">
-            CUBE
+            STOCKBLOCK AI
           </span>
         </div>
 
@@ -30,7 +30,7 @@ export default function WelcomeCard() {
 
       <div className="earning-rate">
 
-        +4.5 CUBE / Hour
+        +4.5 STOCKS / Hour
 
       </div>
 

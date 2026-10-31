@@ -211,13 +211,13 @@ function PrizeCard({ prize, onClose }) {
 
         <div className="prize-detail">
           {prize.type === "cube" && (
-            <p><span style={{ color: "#4ade80", fontWeight: 800 }}>{prize.cubeAwarded.toLocaleString()} CUBE</span> added to your wallet</p>
+            <p><span style={{ color: "#4ade80", fontWeight: 800 }}>{prize.cubeAwarded.toLocaleString()} STOCK points</span> added to your wallet</p>
           )}
           {prize.type === "airtime" && (
             <>
               <p><span style={{ color: "#fbbf24", fontWeight: 800 }}>{prize.label}</span> will be processed within 24 hours</p>
               <p style={{ marginTop: 6, color: "rgba(255,255,255,0.45)", fontSize: 12 }}>
-                + <span style={{ color: "#4ade80" }}>{prize.cubeAwarded} CUBE</span> bonus credited to your wallet
+                + <span style={{ color: "#4ade80" }}>{prize.cubeAwarded} STOCK point</span> bonus credited to your wallet
               </p>
             </>
           )}
@@ -225,7 +225,7 @@ function PrizeCard({ prize, onClose }) {
             <>
               <p><span style={{ color: "#60a5fa", fontWeight: 800 }}>{prize.label}</span> will be processed within 24 hours</p>
               <p style={{ marginTop: 6, color: "rgba(255,255,255,0.45)", fontSize: 12 }}>
-                + <span style={{ color: "#4ade80" }}>{prize.cubeAwarded} CUBE</span> bonus credited to your wallet
+                + <span style={{ color: "#4ade80" }}>{prize.cubeAwarded} STOCK point</span> bonus credited to your wallet
               </p>
             </>
           )}
@@ -251,7 +251,7 @@ function HistoryRow({ item }) {
         <div className="history-date">{new Date(item.spun_at).toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" })}</div>
       </div>
       <div className="history-cubes">
-        +{item.cube_awarded.toLocaleString()} CUBE
+        +{item.cube_awarded.toLocaleString()} STOCKBLOCK AI
       </div>
     </div>
   );
@@ -488,7 +488,7 @@ export default function SpinWheelPage() {
         <div className="spin-bal-item">
           <span className="spin-bal-label">Your balance</span>
           <span className="spin-bal-val">
-            {Number(profile?.cube_balance || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })} CUBE
+            {Number(profile?.cube_balance || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })} STOCK
           </span>
         </div>
         <div className="spin-bal-divider" />

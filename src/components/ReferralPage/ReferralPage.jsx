@@ -244,7 +244,7 @@ export default function ReferralPage() {
         <div className="hero-icon"><Users size={42} /></div>
         <h1>Invite & Earn</h1>
         <p>
-          Earn <strong style={{ color:"#4ade80" }}>5,000 CUBE</strong> for every{" "}
+          Earn <strong style={{ color:"#4ade80" }}>5,000 Points</strong> for every{" "}
           <strong style={{ color:"#4ade80" }}>5 friends who subscribe</strong> — not just sign up!
         </p>
         <div className="referral-code-box">
@@ -276,7 +276,7 @@ export default function ReferralPage() {
           <div className="ref-how-arrow">→</div>
           <div className="ref-how-step">
             <div className="ref-how-num">4</div>
-            <div className="ref-how-text">You earn 5,000 CUBE per 5 subscribers!</div>
+            <div className="ref-how-text">You earn 5,000 points per 5 subscribers!</div>
           </div>
         </div>
       </div>
@@ -314,7 +314,7 @@ export default function ReferralPage() {
         <div className="ref-stat-card">
           <Gift size={22} />
           <h2 style={{ color:"#4ade80" }}>{fmtCubes(totalEarned)}</h2>
-          <p>CUBE Earned</p>
+          <p>STOCK points Earned</p>
         </div>
       </div>
 
@@ -323,11 +323,11 @@ export default function ReferralPage() {
         <div className="ref-earnings-header">
           <span>💰 Total earnings potential</span>
           <span style={{ color:"#4ade80", fontWeight:800 }}>
-            {fmtCubes(totalPotential)} CUBE
+            {fmtCubes(totalPotential)} STOCK
           </span>
         </div>
         <div className="ref-earnings-sub">
-          Bring in 50 subscribed users → earn {fmtCubes(totalPotential)} CUBE total
+          Bring in 50 subscribed users → earn {fmtCubes(totalPotential)} STOCK points total
         </div>
         <div className="ref-earnings-progress">
           <div style={{ width:`${Math.min(100,(totalEarned/totalPotential)*100)}%` }} />
@@ -395,7 +395,7 @@ export default function ReferralPage() {
         <div className="ref-progress-card">
           <div className="ref-progress-header">
             <span>Next: <strong style={{color:"#4ade80"}}>{nextMilestone.target} subscribed users</strong></span>
-            <span style={{color:"#4ade80",fontWeight:800}}>+{fmtCubes(nextMilestone.reward)} CUBE</span>
+            <span style={{color:"#4ade80",fontWeight:800}}>+{fmtCubes(nextMilestone.reward)} STOCK</span>
           </div>
           <div className="ref-progress-bar-wrap">
             <div className="ref-progress-bar" style={{ width:`${progPct}%` }} />

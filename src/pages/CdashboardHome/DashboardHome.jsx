@@ -53,7 +53,7 @@ export default function DashboardHome() {
 
 const fmtNaira = (cube) => {
   const naira = Number(cube || 0) * CUBE_TO_NGN;
-  return naira.toLocaleString("en-NG", { maximumFractionDigits: 0 });
+  return naira.toLocaleString("en-US", { maximumFractionDigits: 0 });
 };
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3200); };
   const [userId, setUserId] = useState(null);
@@ -231,7 +231,7 @@ setTransactions(txs.slice(0, 5));
       setActiveSession(null);
       clearInterval(timerRef.current);
       setShowClaim(false);
-      showToast(`🎉 ${earned.toFixed(4)} CUBE added to wallet!`);
+      showToast(`🎉 ${earned.toFixed(4)} STOCK POINTS added to wallet!`);
       // Refresh transactions
       const { data: freshTxs } = await supabase
         .from("wallet_transactions")
@@ -281,20 +281,20 @@ setTransactions(txs.slice(0, 5));
 <div className="hero-card">
   <p className="hero-label">Total Earned</p>
   <h1 className="hero-balance">{Number(userData?.cube_balance || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}</h1>
-  <span className="hero-unit">CUBE</span>
-  <p className="hero-naira">≈ ₦{fmtNaira(userData?.cube_balance)}</p>
+  <span className="hero-unit">STOCKBLOCK</span>
+  <p className="hero-naira">≈ ${fmtNaira(userData?.cube_balance)}</p>
 
   <div className="mining-active">
     <span className={`active-dot ${isMiningActive ? "pulse" : ""}`} />
     {isMiningActive ? "Mining Active" : isMiningPaused ? "Mining Paused" : "Mining Idle"}
   </div>
 
-  <p className="mining-rate">{subscription?.mining_rate || 0} CUBE / Hour</p>
+  <p className="mining-rate">{subscription?.mining_rate || 0} STOCKS / Hour</p>
   {/* Live claimable */}
   {hasActiveSession && claimable > 0 && (
     <p className="claimable-hint">
-      ⛏ <strong style={{ color: "#4ade80" }}>{claimable.toFixed(4)} CUBE</strong>
-      {" "}<span className="claimable-naira">(≈ ₦{fmtNaira(claimable)})</span> ready to claim
+      ⛏ <strong style={{ color: "#4ade80" }}>{claimable.toFixed(4)} STOCKBLOCK</strong>
+      {" "}<span className="claimable-naira">(≈ ${fmtNaira(claimable)})</span> ready to claim
     </p>
   )}
 
@@ -376,7 +376,7 @@ setTransactions(txs.slice(0, 5));
                 </div>
               </div>
               <span className="reward-amount" style={{ color: Number(tx.amount) >= 0 ? "#4ade80" : "#f87171" }}>
-                {prefix}{amt.toFixed(2)} CUBE
+                {prefix}{amt.toFixed(2)} STOCKS
               </span>
             </div>
           );
@@ -408,9 +408,9 @@ setTransactions(txs.slice(0, 5));
             <button className="dash-modal-close" onClick={() => setShowClaim(false)}><X size={16} /></button>
             <div className="dash-modal-icon">🎉</div>
             <h3>Claim your reward</h3>
-            <p>Add your mined CUBE to your wallet balance.</p>
+            <p>Add your mined STOCKBLOCK POINTS to your wallet balance.</p>
             <div className="dash-modal-amt">{claimable.toFixed(4)}</div>
-            <div className="dash-modal-unit">CUBE tokens</div>
+            <div className="dash-modal-unit">STOCKBLOCK tokens</div>
             {activeSession?.is_paused && (
               <div className="dash-modal-notice">⏸ Session is paused — you can still claim what you've earned</div>
             )}

@@ -34,7 +34,7 @@ export function PageLoader({ message = "Loading…", submessage = null }) {
           </div>
         </div>
         <div className="ld-page-info">
-          <div className="ld-page-brand"><span>CUBE</span> COIN</div>
+          <div className="ld-page-brand"><span>STOCKBLOCK</span> AI</div>
           <div className="ld-page-msg">{message}</div>
           {submessage && (
             <div style={{ fontSize: 11, color: "var(--ld-muted2)", marginBottom: 6 }}>

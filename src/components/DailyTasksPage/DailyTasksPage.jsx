@@ -6,9 +6,9 @@ import { CheckCircle, Upload, Clock, AlertCircle, ExternalLink, RefreshCw } from
 // ── Constants ─────────────────────────────────────────────────────────────────
 const CUBE_REWARD = 60000;
 const WHATSAPP_TEXT  = encodeURIComponent(
-  "🚀 I'm mining CUBE on CubeCoin and earning real Naira daily! " +
-  "Join me and start earning — 100 CUBE = ₦5 💰\n\n" +
-  "👉 Sign up: https://cube-coin.com"
+  "🚀 I'm mining CUBECoin and AI on StockBlock AI and earning real dollars daily! " +
+  "Join me and start earning" +
+  "👉 Sign up: https://cube-coin.com" // CHANGING OF DOMAIN NAME
 );
 const WHATSAPP_URL = `https://api.whatsapp.com/send?text=${WHATSAPP_TEXT}`;
 
@@ -184,7 +184,7 @@ const allSharesConfirmed = sharedStatus && sharedGroups && sharedFriends;
       {/* ── Header ── */}
       <div className="dt-header">
         <div className="dt-eyebrow"><span className="dt-eyebrow-dot"/>Daily Task</div>
-        <h1 className="dt-title">Share StockBlcck AI<br/><span>Earn {CUBE_REWARD} CUBE</span></h1>
+        <h1 className="dt-title">Share StockBlcck AI<br/><span>Earn {CUBE_REWARD} REWARD POINTS</span></h1>
           <p className="dt-sub">
           Post to your WhatsApp status, share to <strong>5 groups</strong>, and share to{" "}
           <strong>5 friends</strong>. Upload one screenshot as proof, and earn{" "}
@@ -202,7 +202,7 @@ const allSharesConfirmed = sharedStatus && sharedGroups && sharedFriends;
         <div className="dt-reward-div"/>
         <div className="dt-reward-item">
           <span className="dt-reward-label">Value</span>
-          <span className="dt-reward-val">₦{(CUBE_REWARD * 0.05).toLocaleString()}</span>
+          <span className="dt-reward-val">${(CUBE_REWARD * 0.05).toLocaleString()}</span>
         </div>
         <div className="dt-reward-div"/>
         <div className="dt-reward-item">
@@ -365,7 +365,7 @@ const allSharesConfirmed = sharedStatus && sharedGroups && sharedFriends;
               <div className="dt-proof-guide">
                 <div className="dt-proof-guide-title">📋 What your screenshot must show:</div>
                 <ul className="dt-proof-list">
-                  <li>✓ Your WhatsApp Status with the CubeCoin post</li>
+                  <li>✓ Your WhatsApp Status with the StockBlock AI post</li>
                   <li>✓ Evidence of sharing to at least 5 groups</li>
                   <li>✓ Evidence of sharing to at least 5 friends</li>
                   <li>✓ Today's date visible on the message</li>
@@ -438,8 +438,10 @@ const allSharesConfirmed = sharedStatus && sharedGroups && sharedFriends;
             </a>
           )}
 
+          
+          {/* MADE A CHANGE TO THE DAILY CALCULATION.. FROM 0.05 TO 0.7 */}
           <div className="dt-done-date">
-            Submitted on {fmtDate(todayTask.submitted_at)} · Come back tomorrow for another +{CUBE_REWARD.toLocaleString()} CUBE (₦{(CUBE_REWARD * 0.05).toLocaleString()})
+            Submitted on {fmtDate(todayTask.submitted_at)} · Come back tomorrow for another +{CUBE_REWARD.toLocaleString()} STOCK (${(CUBE_REWARD * 0.7).toLocaleString()})
           </div>
 
           {todayTask.status === "rejected" && (
@@ -498,7 +500,7 @@ const allSharesConfirmed = sharedStatus && sharedGroups && sharedFriends;
             { n:"4", icon:"🤝", text:"Share it to 5 friends individually" },
             { n:"5", icon:"📸", text:"Take a screenshot proving all 3 shares" },
             { n:"6", icon:"⬆",  text:"Upload the screenshot here as proof" },
-            { n:"7", icon:"⬡",  text:`Admin reviews and credits ${CUBE_REWARD} CUBE to your wallet` },
+            { n:"7", icon:"⬡",  text:`Admin reviews and credits ${CUBE_REWARD} REWARD POINTS to your wallet` },
           ].map(s => (
             <div key={s.n} className="dt-how-step">
               <div className="dt-how-num">{s.icon}</div>

@@ -6,27 +6,27 @@ import "./CubeBot.css";
 const KB = [
   {
     keys: ["hello","hi","hey","start","help","what can","who are you"],
-    reply: "Hey there! 👋 I'm **CubeBot**, your CubeCoin mining assistant. I can help you with:\n\n• How mining works\n• Subscription plans\n• Withdrawals & wallet\n• Referrals & bonuses\n• Streak rewards\n\nWhat would you like to know?",
+    reply: "Hey there! 👋 I'm **StockBlock AI Bot**, your AI mining assistant. I can help you with:\n\n• How mining works\n• Subscription plans\n• Withdrawals & wallet\n• Referrals & bonuses\n• Streak rewards\n\nWhat would you like to know?",
     chips: ["How do I mine?","Subscription plans","How to withdraw?","Referral program"],
   },
   {
-    keys: ["mine","mining","how to mine","start mining","pickaxe","earn cube"],
+    keys: ["mine","mining","how to mine","start mining","pickaxe","earn blocks or AI mining rewards"],
     reply: "⛏ **How Mining Works:**\n\n1. Go to the **Mining page** from your dashboard\n2. Tap **Start Mining** — your session begins\n3. Mining runs based on your plan's rate (e.g. 0.40 CUBE/hr)\n4. You can **Pause** and **Resume** anytime\n5. When done, tap **Claim** to add earned CUBE to your wallet\n\nYour CUBE accumulates in real time — the longer you mine, the more you earn! 🚀",
     chips: ["What are the rates?","Can I pause mining?","How to claim?"],
   },
 {
-  keys: ["rate","cube per hour","mining rate","how fast","daily","earn per day","naira daily"],
-  reply: "📊 **Mining Rates & Daily Earnings:**\n\n🟢 Basic → **30,000 CUBE/day** (₦1,500 value)\n⬡ Starter → **60,000 CUBE/day** (₦3,000 value)\n🥉 Bronze → **90,000 CUBE/day** (₦4,500 value)\n🥈 Silver → **120,000 CUBE/day** (₦6,000 value)\n🥇 Gold → **150,000 CUBE/day** (₦7,500 value)\n💎 Diamond → **196,000 CUBE/day** (₦9,800 value)\n\n📌 Exchange rate: 1 CUBE = ₦0.05 (100 CUBE = ₦5)\nAll sessions run 24 hours — claim daily to keep earning!",
+  keys: ["rate","blocks per hour","mining rate","how fast","daily","earn per day","naira daily"],
+  reply: "📊 **Mining Rates & Daily Earnings:**\n\n🟢 Basic → **30,000 CUBE/day** ($100 value)\n⬡ Starter → **60,000 CUBE/day** (₦3,000 value)\n🥉 Bronze → **90,000 CUBE/day** (₦4,500 value)\n🥈 Silver → **120,000 CUBE/day** (₦6,000 value)\n🥇 Gold → **150,000 CUBE/day** (₦7,500 value)\n💎 Diamond → **196,000 CUBE/day** (₦9,800 value)\n\n📌 Exchange rate: 1 CUBE = ₦0.05 (100 CUBE = ₦5)\nAll sessions run 24 hours — claim daily to keep earning!",
   chips: ["What does Silver cost?","How to cash out?","Upgrade my plan"],
 },
 {
   keys: ["plan","subscription","starter","bronze","silver","gold","diamond","basic","cost","price","upgrade"],
-  reply: "💳 **Subscription Plans:**\n\n🆕 **Basic** — ₦5,600 → 20,000 CUBE bonus\n⬡ **Starter** — ₦10,600 → 50,000 CUBE bonus\n🥉 **Bronze** — ₦16,200 → 100,000 CUBE bonus\n🥈 **Silver** — ₦22,500 → 200,000 CUBE bonus ⭐\n🥇 **Gold** — ₦30,350 → 250,000 CUBE bonus\n💎 **Diamond** — ₦50,000 → 300,000 CUBE bonus\n\nEach plan is a **one-time payment** with a big CUBE bonus on activation!",
+  reply: "💳 **Subscription Plans:**\n\n🆕 **Basic** — $300 → 20,000 CUBE bonus\n⬡ 🥉**Bronze** — $500 → 50,000 CUBE bonus\n 🥈**Silver** — $1000 → 100,000 CUBE bonus\n 🥇 **Gold** — $10,000 → 250,000 CUBE bonus\n💎 **Diamond** —UPCOMING \nEach plan is a **one-time payment** with a big STOCK bonus on activation!",
   chips: ["How to subscribe?","How do I pay?","Mining rates","What's the best plan?"],
 },
   {
     keys: ["pay","payment","bank","transfer","how to pay","receipt","moniepoint"],
-    reply: "🏦 **How to Pay:**\n\n1. Choose your plan on the Subscription page\n2. Transfer to:\n   • **Bank:** Moniepoint  Nigeria\n   • **Name:** Mara's Treat\n   • **Account:** 7077456282\n3. Upload your payment **receipt**\n4. Admin verifies within **1–3 hours**\n\n⚠️ Use your phone/email as narration so we can identify you.",
+    reply: "🏦 **How to Pay:**\n\n1. Choose your plan on the Subscription page\n2. Transfer to:\n   • **Bank:** Bank transfers are currently not available because of region costs, we accept crypto payments and other payment methods listed\n   • **Name:** Bitcoin, Ethereum, trx, BNB etc\n   • **Address:**Request for payment address\n3. Upload your payment **receipt**\n4. Admin verifies within **1–3 hours**\n\n⚠️ Use your phone/email as narration so we can identify you.",
     chips: ["How long does activation take?","Subscription plans"],
   },
   {
@@ -36,14 +36,14 @@ const KB = [
   },
   {
     keys: ["withdraw","cashout","cash out","withdrawal","naira","convert","wallet"],
-    reply: "💸 **How to Cash Out:**\n\n1. Go to your **Wallet** page\n2. Tap **Cash Out**\n3. Enter CUBE amount (min. **100 CUBE**)\n4. Enter your bank details\n5. Submit — processed within **1–24 hours**\n\n💱 Rate: **100 CUBE = ₦5.00**",
+    reply: "💸 **How to Cash Out:**\n\n1. Go to your **Wallet** page\n2. Tap **Cash Out**\n3. Enter STOCK OR AI REWARD amount (min. **100 STOCKS/REWARDS**)\n4. Enter your bank details\n5. Submit — processed within **1–24 hours**\n\n💱 Rate: **100 STOCKBLOCK AI POINTS = $0.70**",
     chips: ["Minimum withdrawal?","What's the exchange rate?"],
   },
-  {
-    keys: ["exchange","naira","ngn","100 cube","worth","value"],
-    reply: "💱 **CUBE Exchange Rate:**\n\n**100 StockBlock = $5** (1 CUBE = ₦0.05)\n\nExamples:\n• 1,000 CUBE = ₦50\n• 10,000 CUBE = ₦500\n• 100,000 CUBE = ₦5,000",
-    chips: ["How to cash out?","How to earn more CUBE?"],
-  },
+  // {
+  //   keys: ["exchange","Dollar","$","100 stock","worth","value"],
+  //   reply: "💱 **CUBE Exchange Rate:**\n\n**100 StockBlock = $0.70** (1 CUBE = ₦0.05)\n\nExamples:\n• 1,000 CUBE = ₦50\n• 10,000 CUBE = ₦500\n• 100,000 CUBE = ₦5,000",
+  //   chips: ["How to cash out?","How to earn more CUBE?"],
+  // },
  {
   keys: ["referral","refer","invite","code","friend","bonus","earn"],
   reply: "👥 **Referral Program:**\n\nEvery friend who subscribes earns you **30,000 CUBE**!\n\n🎯 **Milestone Rewards (subscribed users only):**\n• 5 subscribers → **150,000 CUBE**\n• 10 subscribers → **300,000 CUBE**\n• 25 subscribers → **750,000 CUBE**\n• 50 subscribers → **1,500,000 CUBE**\n\n⚠️ Your friend must **subscribe to a plan** — sign-ups alone don't count.\n\nBonuses are auto-credited the moment a milestone is reached! 🚀",
@@ -65,9 +65,9 @@ const KB = [
     chips: ["How to start mining?","What's my balance?"],
   },
   {
-    keys: ["spin","wheel","daily spin","prize","airtime","data","task"],
-    reply: "🎡 **Daily Spin Wheel:**\n\nVisit the **Daily Spin** page once per day! Prizes:\n\n• ⬡ CUBE (25, 50, 75, 100, 200, 500)\n• 📱 Airtime (₦100, ₦200)\n• 📶 Data (1GB, 5GB, 10GB, 20GB)\n\nCUBE prizes are added instantly. For airtime/data — contact support to redeem!",
-    chips: ["How to get more CUBE?","Contact support"],
+    keys: ["spin","wheel","daily spin","prize","data","task"],
+    reply: "🎡 **Daily Spin Wheel:**\n\nVisit the **Daily Spin** page once per day! Prizes:\n\n• ⬡ StockBlock Points (25, 50, 75, 100, 200, 500)\n• 📱 Airtime (₦100, ₦200)\n• 📶 Data (1GB, 5GB, 10GB, 20GB)\n\nCUBE prizes are added instantly. For airtime/data — contact support to redeem!",
+    chips: ["How to get more StockBlock Points","Contact support"],
   },
   {
     keys: ["support","contact","problem","issue","not working","error"],
@@ -76,12 +76,12 @@ const KB = [
   },
   {
     keys: ["best plan","recommend","which plan","suggest"],
-    reply: "🌟 **Best Plan for You:**\n\n• **Starting out?** → Starter ($100)\n• **Best value?** → ⭐ Silver (₦22,500) — most popular!\n• **Maximum earnings?** → 💎 Diamond (₦50,000)\n\nSilver is the sweet spot — 0.40 CUBE/hr + 200K activation bonus!",
+    reply: "🌟 **Best Plan for You:**\n\n• **Starting out?** → Starter ($100)\n• **Best value?** → ⭐ Silver ($1,000) — most popular!\n• **Maximum earnings?** → 💎 Diamond UPCOMING \n\nSilver is the sweet spot — 0.40 StockBlock/hr + 200K activation bonus!",
     chips: ["How to subscribe?","Mining rates"],
   },
   {
-    keys: ["activation bonus","subscription","$100","$200","$300","$400"],
-    reply: "🎁 **Activation Bonuses:**\n\nWhen your plan is approved you get:\n\n⬡ Starter → **50,000 CUBE**\n🥉 Bronze → **100,000 CUBE**\n🥈 Silver → **200,000 CUBE**\n🥇 Gold → **250,000 CUBE**\n💎 Diamond → **300,000 CUBE**\n\nCredited to your wallet automatically on approval!",
+    keys: ["activation bonus","subscription","$100","$300","$500","$1,000","$10,000"],
+    reply: "🎁 **Activation Bonuses:**\n\nWhen your plan is approved you get:\n\n⬡ Starter → **50,000 REWARD POINTS**\n🥉 Bronze → **100,000 REWARD POINTS**\n🥈 Silver → **200,000 REWARD POINTS**\n🥇 Gold → **250,000 REWARD POINTS**\n💎 Diamond → **UPCOMING**\n\nCredited to your wallet automatically on approval!",
     chips: ["Mining rates","How to cash out?"],
   },
   {
@@ -304,7 +304,7 @@ export default function CubeBot() {
             <RobotIcon size={20} />
           </div>
           <div className="cubebot-info">
-            <div className="cubebot-name">CubeBot</div>
+            <div className="cubebot-name">AI Bot</div>
             <div className="cubebot-status">
               <span className="cubebot-dot" />
               Online · Always here to help

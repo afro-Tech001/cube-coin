@@ -111,8 +111,8 @@ export default function Sidebar() {
             <CubeLogoSVG />
             <div className="sb-logo-text">
               <span>
-                <span className="sb-logo-cube">CUBE</span>
-                <span className="sb-logo-coin"> COIN</span>
+                <span className="sb-logo-cube">STOCKBLOCK</span>
+                <span className="sb-logo-coin"> AI</span>
               </span>
             </div>
           </div>
@@ -169,7 +169,7 @@ export default function Sidebar() {
             </div>
 
             <h3>Logout?</h3>
-            <p>Are you sure you want to logout from your Cube Coin account?</p>
+            <p>Are you sure you want to logout from your StockBlock account?</p>
 
             <div className="logout-actions">
               <button

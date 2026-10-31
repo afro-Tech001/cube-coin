@@ -62,7 +62,7 @@ export default function PlanExpiredModal({ planName, expiredAt }) {
           </div>
           <div className="pem-info-row">
             <span className="pem-info-icon">💰</span>
-            <span>Your CUBE balance is safe and waiting for you</span>
+            <span>Your balance is safe and waiting for you</span>
           </div>
           <div className="pem-info-row">
             <span className="pem-info-icon">🔄</span>

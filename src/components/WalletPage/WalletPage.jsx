@@ -14,10 +14,10 @@ import "./WalletPage.css";
 const CUBE_TO_NGN = 0.05;
 const MIN_CASHOUT = 100;
 
-const BANKS = [
-  "First Bank Nigeria","GTBank","Access Bank","Zenith Bank",
-  "UBA","Fidelity Bank","Opay","Kuda Bank","Palmpay","Other",
-];
+// const BANKS = [
+//   "First Bank Nigeria","GTBank","Access Bank","Zenith Bank",
+//   "UBA","Fidelity Bank","Opay","Kuda Bank","Palmpay","Other",
+// ];
 
 const DAY_NAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 

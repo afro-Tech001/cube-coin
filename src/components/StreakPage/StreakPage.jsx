@@ -3,10 +3,10 @@ import { supabase } from "../../libs/supabase";
 import "./StreakPage.css";
 
 const MILESTONES = [
-  { days: 7,   reward: "100 CUBE",       bonus: "+10%", bonusPct: 10,  icon: "🌱" },
-  { days: 14,  reward: "250 CUBE",       bonus: "+20%", bonusPct: 20,  icon: "🔥" },
-  { days: 16,  reward: "250 CUBE",       bonus: "+25%", bonusPct: 25,  icon: "⚡" },
-  { days: 30,  reward: "1,000 CUBE",     bonus: "+40%", bonusPct: 40,  icon: "💎" },
+  { days: 7,   reward: "100 STOCK POINTS",       bonus: "+10%", bonusPct: 10,  icon: "🌱" },
+  { days: 14,  reward: "250 STOCK POINTS",       bonus: "+20%", bonusPct: 20,  icon: "🔥" },
+  { days: 16,  reward: "250 STOCK POINTS",       bonus: "+25%", bonusPct: 25,  icon: "⚡" },
+  { days: 30,  reward: "1,000 STOCK POINTS",     bonus: "+40%", bonusPct: 40,  icon: "💎" },
   { days: 60,  reward: "VIP Badge",      bonus: "+60%", bonusPct: 60,  icon: "👑" },
   { days: 100, reward: "Legendary Miner",bonus: "+100%",bonusPct: 100, icon: "🏆" },
 ];
@@ -196,7 +196,7 @@ export default function StreakPage() {
         <div className="streak-stat-card">
           <div className="streak-stat-ico">💎</div>
           <h2>{bonusEarned || "—"}</h2>
-          <p>Bonus CUBE</p>
+          <p>Bonus STOCK POINTS</p>
         </div>
         <div className="streak-stat-card">
           <div className="streak-stat-ico">⚡</div>

@@ -126,8 +126,8 @@ function StepHeader({ step }) {
       <div className="ps-logo-row">
         <CubeLogoSVG />
         <span className="ps-logo-name">
-          <span className="ps-logo-cube">CUBE</span>
-          <span className="ps-logo-coin"> COIN</span>
+          <span className="ps-logo-cube">STOCKBLOCK</span>
+          <span className="ps-logo-coin">AI</span>
         </span>
       </div>
 
@@ -216,7 +216,7 @@ function Step1({ sub, onNext, onSkip }) {
         <div className="ps-plan-summary-full" style={{ borderTop:"1px solid rgba(74,222,128,0.12)", paddingTop:12 }}>
           <div className="ps-mining-rate-label">Your Mining Rate</div>
           <div className="ps-mining-rate-big">
-            {Number(sub.mining_rate).toFixed(2)} CUBE/hr
+            {Number(sub.mining_rate).toFixed(2)} STOCKS/hr
           </div>
         </div>
       </div>
@@ -342,6 +342,8 @@ const handleCopy = async () => {
               <option value="SG">Singapore</option>
               <option value="US">United States</option>
               <option value="UK">United Kingdom</option>
+              <option value="IN">Indonesia</option>
+          
               <option value="OTHER">Other</option>
             </select>
           </div>
@@ -352,7 +354,7 @@ const handleCopy = async () => {
           <input
             type="tel"
             value={phone}
-            placeholder="+234 800 000 0000"
+            placeholder="+1 800 000 0000"
             className={errors.phone ? "error" : ""}
             onChange={(e) => { setPhone(e.target.value); setErrors((p) => ({ ...p, phone: false })); }}
           />
@@ -454,19 +456,19 @@ function Step3({ sub, profileName, onEnter, cardRef }) {
       <div className="ps-welcome-sub">
         Your <strong style={{ color:"#e8ffe6" }}>{sub.plan_name}</strong> rig is spinning up.
         Every hour you're active,{" "}
-        <strong style={{ color:"#4ade80" }}>{Number(sub.mining_rate).toFixed(2)} CUBE</strong> lands in your wallet.
+        <strong style={{ color:"#4ade80" }}>{Number(sub.mining_rate).toFixed(2)} STOCK points</strong> lands in your wallet.
       </div>
 
       <div className="ps-welcome-stats">
         <div className="ps-ws-card">
           <div className="ps-ws-label">Mining Rate</div>
           <div className="ps-ws-val">{Number(sub.mining_rate).toFixed(2)}/hr</div>
-          <div className="ps-ws-sub">CUBE earned</div>
+          <div className="ps-ws-sub">STOCKS earned</div>
         </div>
         <div className="ps-ws-card">
           <div className="ps-ws-label">Daily Est.</div>
           <div className="ps-ws-val">{dailyEst}</div>
-          <div className="ps-ws-sub">CUBE / day</div>
+          <div className="ps-ws-sub">STOCK / day</div>
         </div>
         <div className="ps-ws-card">
           <div className="ps-ws-label">Your Plan</div>

@@ -134,7 +134,7 @@ function PrizeModal({ prize, onClose }) {
                 {" "}will be processed within 24 hours
               </p>
               <p style={{ marginTop: 6, color: "rgba(255,255,255,.4)", fontSize: 12 }}>
-                + <span style={{ color: "#4ade80" }}>{prize.cubeAwarded} CUBE</span> bonus credited
+                + <span style={{ color: "#4ade80" }}>{prize.cubeAwarded} STOCK</span> bonuses credited
               </p>
             </>
           )}
@@ -169,9 +169,9 @@ const REFERRAL_MILESTONES = [
   { target: 50, reward: 1000 },
 ];
 const MINE_MILESTONES = [
-  { amount: 1000,  reward: 75,  label: "Mine 1K CUBE"  },
-  { amount: 5000,  reward: 200, label: "Mine 5K CUBE"  },
-  { amount: 10000, reward: 500, label: "Mine 10K CUBE" },
+  { amount: 1000,  reward: 75,  label: "Mine 1K STOCKS"  },
+  { amount: 5000,  reward: 200, label: "Mine 5K STOCKS"  },
+  { amount: 10000, reward: 500, label: "Mine 10K STOCKS" },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -463,7 +463,7 @@ export default function RewardsPage() {
       {/* Header */}
       <div className="rewards-header">
         <h1>🎁 Rewards Center</h1>
-        <p>Complete activities and earn more CUBE rewards.</p>
+        <p>Complete activities and earn more STOCKS.</p>
       </div>
 
       {/* Total reward card */}
@@ -471,7 +471,7 @@ export default function RewardsPage() {
         <div className="total-reward-inner">
           <div>
             <p>Total rewards earned</p>
-            <h2>{totalRewards.toLocaleString(undefined, { maximumFractionDigits: 2 })} CUBE</h2>
+            <h2>{totalRewards.toLocaleString(undefined, { maximumFractionDigits: 2 })} STOCK</h2>
           </div>
           <div className="total-reward-stats">
             <div className="trs-item">
@@ -599,7 +599,7 @@ export default function RewardsPage() {
             <div className={`reward-card${!nextStreak ? " dimmed" : ""}`}>
               <div className="reward-icon"><Flame size={18} /></div>
               <h3>{m.label}</h3>
-              <span>+{m.reward} CUBE</span>
+              <span>+{m.reward} STOCKBLOCK</span>
               <p className="reward-desc">
                 {nextStreak ? "Milestone reached!" : `${streak}/${m.days} days — keep going!`}
               </p>
@@ -630,7 +630,7 @@ export default function RewardsPage() {
                 : "Referral Master"
             }
           </h3>
-          <span>+{nextReferralMilestone?.reward || nextLockedReferral?.reward || 1000} CUBE</span>
+          <span>+{nextReferralMilestone?.reward || nextLockedReferral?.reward || 1000} STOCKS</span>
           <p className="reward-desc">
             {nextReferralMilestone
               ? `${referralCount} referrals — ready!`
@@ -652,7 +652,7 @@ export default function RewardsPage() {
         <div className={`reward-card${!nextMineMilestone ? " dimmed" : ""}`}>
           <div className="reward-icon"><Trophy size={18} /></div>
           <h3>{nextMineMilestone?.label || nextLockedMine?.label || "Mine 10K CUBE"}</h3>
-          <span>+{nextMineMilestone?.reward || nextLockedMine?.reward || 500} CUBE</span>
+          <span>+{nextMineMilestone?.reward || nextLockedMine?.reward || 500} STOCKS</span>
           <p className="reward-desc">
             {nextMineMilestone
               ? "Achievement unlocked!"
@@ -692,7 +692,7 @@ export default function RewardsPage() {
                 <span>{tx.title}</span>
                 <div className="history-date">{fmtDate(tx.created_at)}</div>
               </div>
-              <strong>+{Math.abs(Number(tx.amount)).toFixed(2)} CUBE</strong>
+              <strong>+{Math.abs(Number(tx.amount)).toFixed(2)} STOCKS</strong>
             </div>
           ))
         )}

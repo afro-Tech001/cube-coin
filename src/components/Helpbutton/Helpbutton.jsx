@@ -15,8 +15,8 @@ const FAQS = [
         a: "Mining sessions expire after your plan's session duration. Simply visit the Mine page and start a new session. Make sure your subscription is active.",
       },
       {
-        q: "How fast do I earn CUBE?",
-        a: "Rates depend on your plan — Starter earns 0.08 CUBE/hr up to Diamond at 1.40 CUBE/hr. The longer you mine without interruption, the more your streak bonus adds up.",
+        q: "How fast will I earn?",
+        a: "Rates depend on your plan",
       },
       {
         q: "What is a mining streak?",
@@ -29,12 +29,12 @@ const FAQS = [
     icon: "💰",
     items: [
       {
-        q: "How do I cash out my CUBE?",
+        q: "How do I cash out my my rewards?",
         a: "Go to the Wallet page, enter your bank details, select the amount, and submit. Admin reviews and pays out within 1–24 hours.",
       },
       {
-        q: "What is the CUBE to Naira rate?",
-        a: "100 CUBE = ₦5. So 1,000 CUBE = ₦50, and 10,000 CUBE = ₦500.",
+        q: "What is the CUBE to dollar rate?",
+        a: "1 CUBECOIN = $0.005. So 1,000 CUBE = $5, and 10,000 CUBE = $50.",
       },
       {
         q: "Why is my cashout still pending?",
@@ -42,7 +42,7 @@ const FAQS = [
       },
       {
         q: "Is there a minimum cashout?",
-        a: "Yes — the minimum cashout is 1,000 CUBE (₦50). Make sure your balance covers the amount before requesting.",
+        a: "Yes — the minimum cashout is 1,000,000 CUBE ($5,000). Make sure your balance covers the amount before requesting.",
       },
     ],
   },
@@ -52,15 +52,15 @@ const FAQS = [
     items: [
       {
         q: "How do I subscribe to a plan?",
-        a: "Go to the Subscription page, pick a plan, and follow the 3-step process — view plan details, make the bank transfer, then upload your payment receipt.",
+        a: "Go to the Subscription page, pick a plan, and follow the 3-step process — view plan details, make the bank transfer OR USE MAKE CRYPTO PAYMENTS, then upload your payment receipt.",
       },
       {
         q: "My subscription shows Pending — what next?",
         a: "Admin manually verifies receipts. Approval usually takes 1–3 hours. You'll be redirected automatically once approved.",
       },
       {
-        q: "Do I get CUBE when I subscribe?",
-        a: "Yes! Each plan awards bonus CUBE on activation: Starter gets 50K, Bronze 100K, Silver 200K, Gold 400K, Diamond 1M CUBE.",
+        q: "Do I get PROFITS when I subscribe?",
+        a: "Yes! Each plan awards bonuses on activation: Starter gets 50K, Bronze 100K, Silver 200K, Gold 400K, Diamond 1M CUBE(NOT YET AVAILABLE).",
       },
       {
         q: "Can I upgrade my plan?",
@@ -74,7 +74,7 @@ const FAQS = [
     items: [
       {
         q: "How do I earn from referrals?",
-        a: "Share your unique referral code. You earn 50 CUBE when someone signs up using your code, plus milestone bonuses at 5, 10, 25, and 50 referrals.",
+        a: "Share your unique referral code. You earn 500 POINTS when someone signs up using your code, plus milestone bonuses at 5, 10, 25, and 50 referrals.",
       },
       {
         q: "Where do I find my referral code?",
@@ -82,7 +82,7 @@ const FAQS = [
       },
       {
         q: "How does the daily spin work?",
-        a: "You get one free spin every day on the Rewards page. Prizes include CUBE, airtime, and data. Airtime/data prizes are fulfilled by the admin within 24 hours.",
+        a: "You get one free spin every day on the Rewards page. Prizes include StockBlock Points, and data. Airtime/data prizes are fulfilled by the admin within 24 hours.",
       },
       {
         q: "My referral isn't showing — why?",
@@ -92,6 +92,7 @@ const FAQS = [
   },
 ];
 
+//ADD WHATSAPP CONTACT FOR SUPPORT
 const CONTACT_OPTIONS = [
   { icon: "📧", label: "Email support", value: "support@cubecoin.ng", href: "mailto:support@cubecoin.ng" },
   { icon: "💬", label: "WhatsApp", value: "Chat with us", href: "https://wa.me/2348000000000" },
@@ -186,7 +187,7 @@ export default function Helpbutton() {
             <div className="hb-modal-title-row">
               <div className="hb-modal-cube-icon" aria-hidden="true">⬡</div>
               <div>
-                <div className="hb-modal-title">CubeCoin Help Center</div>
+                <div className="hb-modal-title">StockBlock AI Help Center</div>
                 <div className="hb-modal-sub">How can we help you?</div>
               </div>
               <button className="hb-close-btn" onClick={() => setOpen(false)} aria-label="Close help">
@@ -316,8 +317,8 @@ export default function Helpbutton() {
               <div className="hb-contact">
                 <div className="hb-contact-header">
                   <div className="hb-contact-avatar">⬡</div>
-                  <div className="hb-contact-title">Reach the CubeCoin team</div>
-                  <div className="hb-contact-sub">We typically respond within a few hours</div>
+                  <div className="hb-contact-title">Reach the company team</div>
+                  <div className="hb-contact-sub">We typically respond within a few Minutes</div>
                 </div>
 
                 <div className="hb-contact-options">
@@ -347,7 +348,7 @@ export default function Helpbutton() {
 
           {/* Footer */}
           <div className="hb-modal-footer">
-            <span>CubeCoin Support</span>
+            <span>StockBlock AI Support</span>
             <button className="hb-footer-contact" onClick={() => { setActiveTab("contact"); setSearch(""); }}>
               Contact us →
             </button>

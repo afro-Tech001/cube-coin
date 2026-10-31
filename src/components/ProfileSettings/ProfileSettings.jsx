@@ -73,7 +73,7 @@ export default function ProfileSettings() {
         <div className="profile-stat-card">
           <Wallet size={22} />
           <h2>{Number(profile?.cube_balance || 0).toFixed(2)}</h2>
-          <p>CUBE Earned</p>
+          <p>Points Earned</p>
         </div>
         <div className="profile-stat-card">
           <Users size={22} />

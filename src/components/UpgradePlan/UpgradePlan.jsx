@@ -17,11 +17,13 @@ const PLAN_ICONS = {
   Silver: "🥈", Gold: "🥇", Diamond: "💎",
 };
 
-const BANK = {
-  bankName:      "Moniepoint Nigeria",
-  accountName:   "Mara's Treat",
-  accountNumber: "7077456282",
-};
+//WE WILL USE CRYPTO
+
+// const BANK = {
+//   bankName:      "Moniepoint Nigeria",
+//   accountName:   "Mara's Treat",
+//   accountNumber: "7077456282",
+// };
 
 function fmtCubes(n) {
   if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + "M";
@@ -204,7 +206,7 @@ export default function UpgradePlan() {
         .eq("id", user.id);
 
       setSuccess(true);
-      showToast("Upgrade submitted! Admin will verify within 1–3 hours ✅");
+      showToast("Upgrade submitted! the team will verify it within 1–3 hours ✅");
 
     } catch (err) {
       console.error(err);
@@ -302,12 +304,12 @@ export default function UpgradePlan() {
               <div className="up-plan-right">
                 {isCurrentPlan ? (
                   <div className="up-plan-price-wrap">
-                    <div className="up-plan-full-price">₦{plan.price.toLocaleString()}</div>
+                    <div className="up-plan-full-price">${plan.price.toLocaleString()}</div>
                     <button className="up-btn-current" disabled>Active</button>
                   </div>
                 ) : isLower ? (
                   <div className="up-plan-price-wrap">
-                    <div className="up-plan-full-price dim">₦{plan.price.toLocaleString()}</div>
+                    <div className="up-plan-full-price dim">${plan.price.toLocaleString()}</div>
                     <button className="up-btn-lower" disabled>Lower tier</button>
                   </div>
                 ) : (
@@ -315,11 +317,11 @@ export default function UpgradePlan() {
                     {currentPlanObj ? (
                       <>
                         <div className="up-upgrade-cost-label">You pay</div>
-                        <div className="up-upgrade-cost-val">₦{cost.toLocaleString()}</div>
-                        <div className="up-full-price-hint">Full: ₦{plan.price.toLocaleString()}</div>
+                        <div className="up-upgrade-cost-val">${cost.toLocaleString()}</div>
+                        <div className="up-full-price-hint">Full: ${plan.price.toLocaleString()}</div>
                       </>
                     ) : (
-                      <div className="up-upgrade-cost-val">₦{plan.price.toLocaleString()}</div>
+                      <div className="up-upgrade-cost-val">${plan.price.toLocaleString()}</div>
                     )}
                     <button
                       className={`up-btn-upgrade ${plan.featured ? "featured" : ""}`}
@@ -365,7 +367,7 @@ export default function UpgradePlan() {
                 <p>
                   Your upgrade to <strong style={{ color:"#4ade80" }}>{selected.name}</strong> plan
                   is being verified. You'll receive{" "}
-                  <strong style={{ color:"#4ade80" }}>{fmtCubes(selected.subscriptionCubes)} CUBE</strong>{" "}
+                  <strong style={{ color:"#4ade80" }}>{fmtCubes(selected.subscriptionCubes)} STOCK POINTS</strong>{" "}
                   once approved.
                 </p>
                 <div className="up-success-ref">
@@ -415,11 +417,11 @@ export default function UpgradePlan() {
                     <>
                       <div className="up-cost-row">
                         <span>New plan price</span>
-                        <span>₦{selected.price.toLocaleString()}</span>
+                        <span>${selected.price.toLocaleString()}</span>
                       </div>
                       <div className="up-cost-row">
                         <span>Current plan credit</span>
-                        <span style={{ color:"#f87171" }}>− ₦{currentPlanObj.price.toLocaleString()}</span>
+                        <span style={{ color:"#f87171" }}>− ${currentPlanObj.price.toLocaleString()}</span>
                       </div>
                       <div className="up-cost-row total">
                         <span>You pay</span>
@@ -430,7 +432,7 @@ export default function UpgradePlan() {
                   {!currentPlanObj && (
                     <div className="up-cost-row total">
                       <span>You pay</span>
-                      <span style={{ color:"#4ade80" }}>₦{selected.price.toLocaleString()}</span>
+                      <span style={{ color:"#4ade80" }}>${selected.price.toLocaleString()}</span>
                     </div>
                   )}
                 </div>
@@ -439,7 +441,7 @@ export default function UpgradePlan() {
                 <div className="up-cube-badge">
                   <span style={{ fontSize:20 }}>⬡</span>
                   <div>
-                    <div className="up-cube-val">{fmtCubes(selected.subscriptionCubes)} CUBE</div>
+                    <div className="up-cube-val">{fmtCubes(selected.subscriptionCubes)} STOCKS</div>
                     <div className="up-cube-sub">credited to your wallet on activation</div>
                   </div>
                 </div>
@@ -459,7 +461,7 @@ export default function UpgradePlan() {
 
                 <div className="up-amount-highlight">
                   <p>Transfer exactly this amount</p>
-                  <h2>₦{cost.toLocaleString()}</h2>
+                  <h2>${cost.toLocaleString()}</h2>
                 </div>
 
                 <div className="up-bank-card">
