@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react";
+import { useState, useEffect} from "react";
 import { Route, Routes } from "react-router-dom";
 import Auth from "./components/Auth/Auth";
 import SubscriptionPage from "./components/Subscriptionpage/Subscriptionpage";
@@ -30,22 +30,10 @@ import AdminUpgradePage from "./Admin/AdminPages/AdminUpgradePage/AdminUpgradePa
 import CdashboardDaily from "./pages/CdashboardDaily/CdashboardDaily";
 import AdminWithdrawalSettingsPage from "./Admin/AdminPages/AdminWithdrawalPage/AdminWithdrawalSettingsPage";
 import AdminDailyTasksPage from "./Admin/AdminPages/AdminDailyTasksPage/AdminDailyTasksPage";
-import { supabase } from "./libs/supabase";
-import { usePlanExpiry } from "./hooks/usePlanExpiry";
-import PlanExpiredPage from "./components/PlanExpiredModal/PlanExpiredPage";
 import LandingPage from "./pages/LandingPage/LandingPage";
 function App() {
 
   const [loading, setLoading] = useState(true);
-   const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user: u } }) => {
-      setUser(u);
-    });
-  }, []);
-
-  const { expired, expiredAt, planName, checked } = usePlanExpiry(user);
 
   useEffect(() => {
 
@@ -69,19 +57,16 @@ function App() {
       <Route path="/subscription" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
       <Route path="/subscription-status" element={<ProtectedRoute><SubscriptionStatus /></ProtectedRoute>} />
       <Route path="/profile-setup" element={<ProtectedRoute><ProfileSetup /></ProtectedRoute>} />
-      <Route path="/dashboard" element={<ProtectedRoute><CdashboardHome /></ProtectedRoute>} />
-      <Route path="/mining" element={<ProtectedRoute><Cdashboardmining /></ProtectedRoute>} />
-      <Route path="/rewards" element={<ProtectedRoute><Cdashboardreward /></ProtectedRoute>} />
-      <Route path="/referrals" element={<ProtectedRoute><Cdashboardreferral /></ProtectedRoute>} />
-      <Route path="/streaks" element={<ProtectedRoute><CdashboardStreak /></ProtectedRoute>} />
-      <Route path="/wallet" element={<ProtectedRoute><Cdashboardwallet /></ProtectedRoute>} />
-      <Route path="/profilesettings" element={<ProtectedRoute><Cdashboardprofile /></ProtectedRoute>} />
-      <Route path="/spinwheel" element={<ProtectedRoute><CdashboardSpinWheel /></ProtectedRoute>} />
-      <Route path="/upgrade" element={<ProtectedRoute><CdashboardUpgrade /></ProtectedRoute>} />
-      <Route path="/dailyTask" element={<ProtectedRoute><CdashboardDaily /></ProtectedRoute>} />
-      {checked && expired && (
-        <Route path="*" element={<PlanExpiredPage planName={planName} expiredAt={expiredAt} />} />
-      )}
+      <Route path="/dashboard" element={<ProtectedRoute requireSubscription><CdashboardHome /></ProtectedRoute>} />
+      <Route path="/mining" element={<ProtectedRoute requireSubscription><Cdashboardmining /></ProtectedRoute>} />
+      <Route path="/rewards" element={<ProtectedRoute requireSubscription><Cdashboardreward /></ProtectedRoute>} />
+      <Route path="/referrals" element={<ProtectedRoute requireSubscription><Cdashboardreferral /></ProtectedRoute>} />
+      <Route path="/streaks" element={<ProtectedRoute requireSubscription><CdashboardStreak /></ProtectedRoute>} />
+      <Route path="/wallet" element={<ProtectedRoute requireSubscription><Cdashboardwallet /></ProtectedRoute>} />
+      <Route path="/profilesettings" element={<ProtectedRoute requireSubscription><Cdashboardprofile /></ProtectedRoute>} />
+      <Route path="/spinwheel" element={<ProtectedRoute requireSubscription><CdashboardSpinWheel /></ProtectedRoute>} />
+      <Route path="/upgrade" element={<ProtectedRoute requireSubscription><CdashboardUpgrade /></ProtectedRoute>} />
+      <Route path="/dailyTask" element={<ProtectedRoute requireSubscription><CdashboardDaily /></ProtectedRoute>} />
 
 
       {/* Admin Routes */}

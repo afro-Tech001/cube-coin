@@ -1,0 +1,55 @@
+.subscription-gate-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(3, 10, 6, 0.82);
+  backdrop-filter: blur(8px);
+}
+
+.subscription-gate-modal {
+  width: min(100%, 440px);
+  padding: 32px;
+  border: 1px solid rgba(74, 222, 128, 0.25);
+  border-radius: 22px;
+  background: #0a1c0e;
+  color: #fff;
+  text-align: center;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+  font-family: "DM Sans", sans-serif;
+}
+
+.subscription-gate-icon {
+  margin-bottom: 16px;
+  font-size: 2rem;
+}
+
+.subscription-gate-modal h2 {
+  margin: 0 0 12px;
+  font-size: 1.4rem;
+}
+
+.subscription-gate-modal p {
+  margin: 0 0 24px;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.subscription-gate-button {
+  width: 100%;
+  padding: 14px 18px;
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  color: #041107;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.subscription-gate-button:hover {
+  filter: brightness(1.08);
+}
