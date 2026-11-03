@@ -112,11 +112,6 @@ const fmtNum = (n) =>
 
 // 10000 -> "$10,000.00"
 const fmtUSD = (n) => "$" + fmtNum(n);
-// Transaction hashes have different shapes per network, so validate before saving
-// const HASH_PATTERNS = {
-//   TRC20: /^[0-9a-fA-F]{64}$/,        // 64 hex characters
-//   BEP20: /^0x[0-9a-fA-F]{64}$/,      // 0x + 64 hex characters
-// };
 
 // ── Helper: format large cube numbers ─────────────────────────────────────────
 function fmtCubes(n) {

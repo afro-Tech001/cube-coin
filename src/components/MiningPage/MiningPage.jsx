@@ -109,51 +109,83 @@ function CrackLines({ visible }) {
   );
 }
 
+// // ── Plan tiers ────────────────────────────────────────────────────────────────
+// // Keys MUST match the exact mining_rate decimal values stored in subscriptions
+// // sessionSecs: how long one mining session runs
+// // swingEvery:  lower = faster pickaxe animation (more hits per second)
+// // ─────────────────────────────────────────────────────────────────────────────
+// const PLAN_TIERS = {
+//   1250.00:  { sessionSecs: 24 * 3600, swingEvery: 10, label: "Basic",   dailyCube: 30000,  dailyNaira: 1500 },
+//   2500.00:  { sessionSecs: 24 * 3600, swingEvery: 9,  label: "Starter", dailyCube: 60000,  dailyNaira: 3000 },
+//   3750.00:  { sessionSecs: 24 * 3600, swingEvery: 7,  label: "Bronze",  dailyCube: 90000,  dailyNaira: 4500 },
+//   5000.00:  { sessionSecs: 24 * 3600, swingEvery: 5,  label: "Silver",  dailyCube: 120000, dailyNaira: 6000 },
+//   6250.00:  { sessionSecs: 24 * 3600, swingEvery: 4,  label: "Gold",    dailyCube: 150000, dailyNaira: 7500 },
+//   8166.67:  { sessionSecs: 24 * 3600, swingEvery: 3,  label: "Diamond", dailyCube: 196000, dailyNaira: 9800 },
+// };
+
+// const getTier = (rate) => {
+//   if (!rate) return PLAN_TIERS[1250.00];
+//   const r = Number(rate);
+//   if (PLAN_TIERS[r]) return PLAN_TIERS[r];
+//   // Fuzzy match within 5 tolerance for floating point
+//   const keys    = Object.keys(PLAN_TIERS).map(Number);
+//   const closest = keys.reduce((prev, curr) =>
+//     Math.abs(curr - r) < Math.abs(prev - r) ? curr : prev
+//   );
+//   if (Math.abs(closest - r) < 5) return PLAN_TIERS[closest];
+//   console.warn("[MiningPage] Unknown mining rate:", r, "— defaulting to Basic");
+//   return PLAN_TIERS[1250.00];
+// };
+
+// // ── Helpers ───────────────────────────────────────────────────────────────────
+// const calcEarned = (startedAt, rate, totalPausedSecs = 0, currentlyPausedSince = null) => {
+//   let elapsedMs = Date.now() - new Date(startedAt).getTime();
+//   let pausedMs  = (totalPausedSecs || 0) * 1000;
+//   if (currentlyPausedSince) {
+//     pausedMs += Date.now() - new Date(currentlyPausedSince).getTime();
+//   }
+//   const activeMs = Math.max(0, elapsedMs - pausedMs);
+//   const hrs = activeMs / 3600000;
+//   return Math.max(0, hrs * Number(rate));
+// };
+
+// const fmt = (t) => {
+//   const h = Math.floor(t / 3600);
+//   const m = Math.floor((t % 3600) / 60);
+//   const s = t % 60;
+//   return `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+// };
+
 // ── Plan tiers ────────────────────────────────────────────────────────────────
-// Keys MUST match the exact mining_rate decimal values stored in subscriptions
+// Keyed by plan_name (must match the name saved in subscriptions.plan_name).
 // sessionSecs: how long one mining session runs
-// swingEvery:  lower = faster pickaxe animation (more hits per second)
-// ─────────────────────────────────────────────────────────────────────────────
+// swingEvery:  animation frames between pickaxe swings (~60 frames = 1 second).
+//              Lower = faster swinging. Keep it above ~40, because one swing takes
+//              about 0.67s and a new swing can't start until the last one ends.
+const DAY = 24 * 3600;
+
 const PLAN_TIERS = {
-  1250.00:  { sessionSecs: 24 * 3600, swingEvery: 10, label: "Basic",   dailyCube: 30000,  dailyNaira: 1500 },
-  2500.00:  { sessionSecs: 24 * 3600, swingEvery: 9,  label: "Starter", dailyCube: 60000,  dailyNaira: 3000 },
-  3750.00:  { sessionSecs: 24 * 3600, swingEvery: 7,  label: "Bronze",  dailyCube: 90000,  dailyNaira: 4500 },
-  5000.00:  { sessionSecs: 24 * 3600, swingEvery: 5,  label: "Silver",  dailyCube: 120000, dailyNaira: 6000 },
-  6250.00:  { sessionSecs: 24 * 3600, swingEvery: 4,  label: "Gold",    dailyCube: 150000, dailyNaira: 7500 },
-  8166.67:  { sessionSecs: 24 * 3600, swingEvery: 3,  label: "Diamond", dailyCube: 196000, dailyNaira: 9800 },
+  Basic:      { sessionSecs: DAY, swingEvery: 120, label: "Basic" },
+  Essential:  { sessionSecs: DAY, swingEvery: 100, label: "Essential" },
+  Standard:   { sessionSecs: DAY, swingEvery: 80,  label: "Standard" },
+  Premium:    { sessionSecs: DAY, swingEvery: 60,  label: "Premium" },
+  Enterprise: { sessionSecs: DAY, swingEvery: 45,  label: "Enterprise" },
+
+  // Legacy names, so users who bought an old plan still get a sensible animation
+  // Starter:    { sessionSecs: DAY, swingEvery: 100, label: "Starter" },
+  // Bronze:     { sessionSecs: DAY, swingEvery: 80,  label: "Bronze" },
+  // Silver:     { sessionSecs: DAY, swingEvery: 60,  label: "Silver" },
+  // Gold:       { sessionSecs: DAY, swingEvery: 50,  label: "Gold" },
+  // Diamond:    { sessionSecs: DAY, swingEvery: 45,  label: "Diamond" },
 };
 
-const getTier = (rate) => {
-  if (!rate) return PLAN_TIERS[1250.00];
-  const r = Number(rate);
-  if (PLAN_TIERS[r]) return PLAN_TIERS[r];
-  // Fuzzy match within 5 tolerance for floating point
-  const keys    = Object.keys(PLAN_TIERS).map(Number);
-  const closest = keys.reduce((prev, curr) =>
-    Math.abs(curr - r) < Math.abs(prev - r) ? curr : prev
-  );
-  if (Math.abs(closest - r) < 5) return PLAN_TIERS[closest];
-  console.warn("[MiningPage] Unknown mining rate:", r, "— defaulting to Basic");
-  return PLAN_TIERS[1250.00];
-};
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-const calcEarned = (startedAt, rate, totalPausedSecs = 0, currentlyPausedSince = null) => {
-  let elapsedMs = Date.now() - new Date(startedAt).getTime();
-  let pausedMs  = (totalPausedSecs || 0) * 1000;
-  if (currentlyPausedSince) {
-    pausedMs += Date.now() - new Date(currentlyPausedSince).getTime();
+const getTier = (planName) => {
+  const tier = PLAN_TIERS[String(planName || "").trim()];
+  if (!tier) {
+    console.warn("[MiningPage] Unknown plan name:", planName, "— defaulting to Basic");
+    return PLAN_TIERS.Basic;
   }
-  const activeMs = Math.max(0, elapsedMs - pausedMs);
-  const hrs = activeMs / 3600000;
-  return Math.max(0, hrs * Number(rate));
-};
-
-const fmt = (t) => {
-  const h = Math.floor(t / 3600);
-  const m = Math.floor((t % 3600) / 60);
-  const s = t % 60;
-  return `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  return tier;
 };
 
 // ── Main component ────────────────────────────────────────────────────────────
@@ -187,7 +219,8 @@ export default function MiningPage() {
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3200); };
 
   // tier is derived AFTER sub loads — safe because loading gate prevents early render
-  const tier = sub ? getTier(sub.mining_rate) : getTier(0.40);
+  // const tier = sub ? getTier(sub.mining_rate) : getTier(0.40);
+  const tier = sub ? getTier(sub.plan_name) : PLAN_TIERS.Basic;
 
   // ── Initial load ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -234,7 +267,8 @@ export default function MiningPage() {
 
       setProfile({ ...prof, referral_code: prof?.referral_code || "" });
 
-      const tierInfo = getTier(subData.mining_rate);
+      // const tierInfo = getTier(subData.mining_rate);
+      const tierInfo = getTier(subData.plan_name);
       console.log("[MiningPage] tier resolved:", tierInfo);
 
       const { data: active, error: sessErr } = await supabase
@@ -614,12 +648,21 @@ export default function MiningPage() {
            : "Ready to mine"}
         </h2>
         {/* Update this line in your mining hero section */}
-<p className="sub">
+{/* <p className="sub">
   {isPaused     ? "Resume to continue earning"
    : isMining   ? fmt(timeLeft)
    : claimable > 0 ? "Claim your earned BLOCKS"
    : `Mine ${tier.dailyCube?.toLocaleString() || ""} BLOCK/day · ₦${tier.dailyNaira?.toLocaleString() || ""} value`}
+</p> */}
+        
+        {/* NEW CODE */}
+        <p className="sub">
+  {isPaused       ? "Resume to continue earning"
+   : isMining     ? fmt(timeLeft)
+   : claimable > 0 ? "Claim your earned BLOCKS"
+   : `Mine ${(Number(sub?.mining_rate || 0) * 24).toLocaleString("en-US", { maximumFractionDigits: 2 })} BLOCK per day`}
 </p>
+        {/* END */}
 
         <div className="btn-row">
           {!hasActiveSession && (
