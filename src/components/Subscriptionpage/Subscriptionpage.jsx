@@ -52,7 +52,7 @@ const PLANS = [
     ],
   },
   {
-    id: 3, name: "Premium", price: 1000,
+    id: 3, name: "Premium", price: 1000, // 1,000
     rate: "109.53 CUBE/hr", rateVal: 109.53,
     subscriptionCubes: 200000,
     dailyEarning: 2628.81,
@@ -155,7 +155,7 @@ function PlanCard({ plan, onSelect }) {
       {plan.current && <div className="sub-current-badge">Current</div>}
 
       <div className="sub-plan-name">{plan.name}</div>
-      <div className="sub-plan-price">${plan.price.toFixed(2)} <span>/once</span></div>
+      <div className="sub-plan-price">${plan.price.toFixed(2).toLocaleString()} <span>/once</span></div>
       <div className="sub-plan-rate">{plan.rate}</div>
 
       {/* ── Cube award highlight ── */}
