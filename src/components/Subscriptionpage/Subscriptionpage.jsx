@@ -220,70 +220,135 @@ function Step1({ plan, onNext }) {
 }
 
 // ── Step 2 ────────────────────────────────────────────────────────────────────
-function Step2({ plan, txRef, onNext }) {
-  const [copied, setCopied] = useState(false);
+// function Step2({ plan, txRef, onNext }) {
+//   const [copied, setCopied] = useState(false);
 
-  const copyAccNumber = () => {
-    navigator.clipboard?.writeText(BANK.accountNumber).catch(() => {});
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+//   const copyAccNumber = () => {
+//     navigator.clipboard?.writeText(BANK.accountNumber).catch(() => {});
+//     setCopied(true);
+//     setTimeout(() => setCopied(false), 2000);
+//   };
+
+//   return (
+//     <>
+//       <div className="sub-plan-label">{plan.name} plan</div>
+//       <div className="sub-sheet-price">${plan.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span>one-time</span></div>
+//       <StepDots current={2} />
+
+//       <div className="sub-amount-highlight">
+//         <p>Transfer exactly this amount</p>
+//         <h2>${plan.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+//       </div>
+
+//       {/* Compact cube reminder */}
+//       <div className="sub-cube-reminder">
+//         <span className="sub-cube-reminder-icon">⬡</span>
+//         You'll receive <strong>{fmtCubes(plan.subscriptionCubes)} CUBE</strong> once payment is verified
+//       </div>
+
+//       <div className="sub-section-title">Bank transfer details</div>
+//       <div className="sub-bank-card">
+//         {[
+//           ["Bank name",      BANK.bankName],
+//           ["Account name",   BANK.accountName],
+//           ["Account number", BANK.accountNumber],
+//           ["Sort code",      BANK.sortCode],
+//         ].map(([label, val]) => (
+//           <div key={label} className="sub-bank-row">
+//             <span className="sub-bank-label">{label}</span>
+//             <span className="sub-bank-val">
+//               {val}
+//               {label === "Account number" && (
+//                 <button className="sub-copy-mini" onClick={copyAccNumber}>
+//                   {copied ? "Copied!" : "Copy"}
+//                 </button>
+//               )}
+//             </span>
+//           </div>
+//         ))}
+//       </div>
+
+//       <div className="sub-notice">
+//         ⚠ Use your phone number or email as the transfer narration so we can identify your payment.
+//       </div>
+
+//       <div className="sub-ref-field">
+//         <label>Payment reference (auto-generated)</label>
+//         <input type="text" value={txRef} readOnly style={{ color: "#4ade80", letterSpacing: 1 }} />
+//       </div>
+
+//       <button className="sub-confirm-btn" onClick={onNext}>
+//         I have made this transfer ✓
+//       </button>
+//     </>
+//   );
+// }
+
+// ── Step 2: send the crypto payment ───────────────────────────────────────────
+function Step2({ plan, onNext }) {
+  const [copied, setCopied] = useState(null); // "address" | "amount" | null
+
+  const copy = (text, key) => {
+    navigator.clipboard?.writeText(text).catch(() => {});
+    setCopied(key);
+    setTimeout(() => setCopied(null), 2000);
   };
+
+  // Prices are in USD and USDT is pegged 1:1, so the amount to send equals the price
+  const amount = plan.price.toFixed(2);
 
   return (
     <>
       <div className="sub-plan-label">{plan.name} plan</div>
-      <div className="sub-sheet-price">${plan.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span>one-time</span></div>
+      <div className="sub-sheet-price">{fmtUSD(plan.price)} <span>one-time</span></div>
       <StepDots current={2} />
 
       <div className="sub-amount-highlight">
-        <p>Transfer exactly this amount</p>
-        <h2>${plan.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+        <p>Send exactly this amount</p>
+        <h2>{fmtNum(plan.price)} {PAYMENT.token}</h2>
+        <button className="sub-copy-mini" onClick={() => copy(amount, "amount")}>
+          {copied === "amount" ? "Copied!" : "Copy amount"}
+        </button>
       </div>
 
-      {/* Compact cube reminder */}
       <div className="sub-cube-reminder">
         <span className="sub-cube-reminder-icon">⬡</span>
         You'll receive <strong>{fmtCubes(plan.subscriptionCubes)} CUBE</strong> once payment is verified
       </div>
 
-      <div className="sub-section-title">Bank transfer details</div>
+      <div className="sub-section-title">Payment details</div>
       <div className="sub-bank-card">
-        {[
-          ["Bank name",      BANK.bankName],
-          ["Account name",   BANK.accountName],
-          ["Account number", BANK.accountNumber],
-          ["Sort code",      BANK.sortCode],
-        ].map(([label, val]) => (
-          <div key={label} className="sub-bank-row">
-            <span className="sub-bank-label">{label}</span>
-            <span className="sub-bank-val">
-              {val}
-              {label === "Account number" && (
-                <button className="sub-copy-mini" onClick={copyAccNumber}>
-                  {copied ? "Copied!" : "Copy"}
-                </button>
-              )}
-            </span>
-          </div>
-        ))}
+        <div className="sub-bank-row">
+          <span className="sub-bank-label">Token</span>
+          <span className="sub-bank-val">{PAYMENT.token}</span>
+        </div>
+        <div className="sub-bank-row">
+          <span className="sub-bank-label">Network</span>
+          <span className="sub-bank-val">{PAYMENT.networkName}</span>
+        </div>
+        <div className="sub-bank-row">
+          <span className="sub-bank-label">Wallet address</span>
+          <span className="sub-bank-val" style={{ wordBreak: "break-all" }}>
+            {PAYMENT.address}
+            <button className="sub-copy-mini" onClick={() => copy(PAYMENT.address, "address")}>
+              {copied === "address" ? "Copied!" : "Copy"}
+            </button>
+          </span>
+        </div>
       </div>
 
       <div className="sub-notice">
-        ⚠ Use your phone number or email as the transfer narration so we can identify your payment.
-      </div>
-
-      <div className="sub-ref-field">
-        <label>Payment reference (auto-generated)</label>
-        <input type="text" value={txRef} readOnly style={{ color: "#4ade80", letterSpacing: 1 }} />
+        ⚠ Send only <strong>{PAYMENT.token}</strong> on the <strong>{PAYMENT.networkName}</strong> network.
+        Any other token or network means the funds are lost permanently.
+        If you pay from an exchange, add its withdrawal fee on top so the full amount arrives.
       </div>
 
       <button className="sub-confirm-btn" onClick={onNext}>
-        I have made this transfer ✓
+        I have sent the payment ✓
       </button>
     </>
   );
 }
-
 // ── Step 3 ────────────────────────────────────────────────────────────────────
 function Step3({ plan, txRef, onSubmit }) {
   const [name,    setName]    = useState("");
