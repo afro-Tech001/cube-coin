@@ -463,7 +463,7 @@ export default function RewardsPage() {
       {/* Header */}
       <div className="rewards-header">
         <h1>🎁 Rewards Center</h1>
-        <p>Complete activities and earn more STOCKS.</p>
+        <p>Complete activities and earn more CUBE.</p>
       </div>
 
       {/* Total reward card */}
@@ -471,7 +471,7 @@ export default function RewardsPage() {
         <div className="total-reward-inner">
           <div>
             <p>Total rewards earned</p>
-            <h2>{totalRewards.toLocaleString(undefined, { maximumFractionDigits: 2 })} STOCK</h2>
+            <h2>{totalRewards.toLocaleString(undefined, { maximumFractionDigits: 2 })} CUBE</h2>
           </div>
           <div className="total-reward-stats">
             <div className="trs-item">
@@ -511,7 +511,7 @@ export default function RewardsPage() {
               <>
                 <div className="rw-spin-heading">Spin &amp; win daily!</div>
                 <p className="rw-spin-desc">
-                  One free spin every day. Win CUBE, airtime, or data instantly.
+                  One free spin every day. Win CUBE.
                 </p>
 
                 <div className="rw-prizes-mini">
@@ -599,7 +599,7 @@ export default function RewardsPage() {
             <div className={`reward-card${!nextStreak ? " dimmed" : ""}`}>
               <div className="reward-icon"><Flame size={18} /></div>
               <h3>{m.label}</h3>
-              <span>+{m.reward} STOCKBLOCK</span>
+              <span>+{m.reward} CUBE</span>
               <p className="reward-desc">
                 {nextStreak ? "Milestone reached!" : `${streak}/${m.days} days — keep going!`}
               </p>
@@ -630,7 +630,7 @@ export default function RewardsPage() {
                 : "Referral Master"
             }
           </h3>
-          <span>+{nextReferralMilestone?.reward || nextLockedReferral?.reward || 1000} STOCKS</span>
+          <span>+{nextReferralMilestone?.reward || nextLockedReferral?.reward || 1000} CUBE</span>
           <p className="reward-desc">
             {nextReferralMilestone
               ? `${referralCount} referrals — ready!`
@@ -652,7 +652,7 @@ export default function RewardsPage() {
         <div className={`reward-card${!nextMineMilestone ? " dimmed" : ""}`}>
           <div className="reward-icon"><Trophy size={18} /></div>
           <h3>{nextMineMilestone?.label || nextLockedMine?.label || "Mine 10K CUBE"}</h3>
-          <span>+{nextMineMilestone?.reward || nextLockedMine?.reward || 500} STOCKS</span>
+          <span>+{nextMineMilestone?.reward || nextLockedMine?.reward || 500} CUBE</span>
           <p className="reward-desc">
             {nextMineMilestone
               ? "Achievement unlocked!"
@@ -692,7 +692,7 @@ export default function RewardsPage() {
                 <span>{tx.title}</span>
                 <div className="history-date">{fmtDate(tx.created_at)}</div>
               </div>
-              <strong>+{Math.abs(Number(tx.amount)).toFixed(2)} STOCKS</strong>
+              <strong>+{Math.abs(Number(tx.amount)).toFixed(2)} CUBE</strong>
             </div>
           ))
         )}
