@@ -104,7 +104,7 @@ const PAYMENT = {
   token: "USDT",
   network: "TRC20",
   networkName: "Tron (TRC20)",
-  address: "YOUR_WALLET_ADDRESS_HERE",
+  address: "TDJgB8tSKeaJNhHmvxqxL8MVd127Cy53U5",
 };
 // 10000 -> "10,000.00" (locale is pinned so every user sees the same format)
 const fmtNum = (n) =>
