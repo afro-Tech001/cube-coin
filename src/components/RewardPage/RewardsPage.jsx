@@ -8,17 +8,17 @@ import { supabase } from "../../libs/supabase";
 // ─────────────────────────────────────────────────────────────────────────────
 const PRIZES = [
   { label: "250 CUBE",     type: "cube",    cubeAwarded: 250,  color: "#22c55e", weight: 18, icon: "⬡" },
-  { label: "₦500 Airtime", type: "airtime", cubeAwarded: 200,  color: "#f59e0b", weight: 8,  icon: "📞" },
+  // { label: "₦500 Airtime", type: "airtime", cubeAwarded: 200,  color: "#f59e0b", weight: 8,  icon: "📞" },
   { label: "500 CUBE",     type: "cube",    cubeAwarded: 500,  color: "#4ade80", weight: 14, icon: "⬡" },
-  { label: "1GB Data",     type: "data",    cubeAwarded: 300,  color: "#60a5fa", weight: 10, icon: "📶" },
+  // { label: "1GB Data",     type: "data",    cubeAwarded: 300,  color: "#60a5fa", weight: 10, icon: "📶" },
   { label: "100 CUBE",     type: "cube",    cubeAwarded: 100,  color: "#86efac", weight: 18, icon: "⬡" },
-  { label: "₦200 Airtime", type: "airtime", cubeAwarded: 80,   color: "#fbbf24", weight: 8,  icon: "📞" },
+  // { label: "₦200 Airtime", type: "airtime", cubeAwarded: 80,   color: "#fbbf24", weight: 8,  icon: "📞" },
   { label: "1000 CUBE",    type: "cube",    cubeAwarded: 1000, color: "#7fff6e", weight: 6,  icon: "⬡" },
-  { label: "5GB Data",     type: "data",    cubeAwarded: 800,  color: "#38bdf8", weight: 6,  icon: "📶" },
+  // { label: "5GB Data",     type: "data",    cubeAwarded: 800,  color: "#38bdf8", weight: 6,  icon: "📶" },
   { label: "50 CUBE",      type: "cube",    cubeAwarded: 50,   color: "#bbf7d0", weight: 12, icon: "⬡" },
-  { label: "10GB Data",    type: "data",    cubeAwarded: 1500, color: "#7dd3fc", weight: 4,  icon: "📶" },
+  // { label: "10GB Data",    type: "data",    cubeAwarded: 1500, color: "#7dd3fc", weight: 4,  icon: "📶" },
   { label: "2000 CUBE",    type: "cube",    cubeAwarded: 2000, color: "#4ade80", weight: 3,  icon: "⬡" },
-  { label: "20GB Data",    type: "data",    cubeAwarded: 3000, color: "#0ea5e9", weight: 3,  icon: "📶" },
+  // { label: "20GB Data",    type: "data",    cubeAwarded: 3000, color: "#0ea5e9", weight: 3,  icon: "📶" },
 ];
 
 const TOTAL_WEIGHT = PRIZES.reduce((s, p) => s + p.weight, 0);
