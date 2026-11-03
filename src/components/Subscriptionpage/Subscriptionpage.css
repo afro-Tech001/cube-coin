@@ -577,6 +577,8 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   white-space: nowrap;
+  width: 100%;
+  overflow: hidden;
 }
 
 /* ── Large variant — used prominently on Step 1 ── */
