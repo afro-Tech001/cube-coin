@@ -188,7 +188,7 @@ function Step1({ plan, onNext }) {
   return (
     <>
       <div className="sub-plan-label">{plan.name} plan</div>
-      <div className="sub-sheet-price">₦{plan.price.toLocaleString()} <span>one-time</span></div>
+      <div className="sub-sheet-price">${plan.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span>one-time</span></div>
       <StepDots current={1} />
 
       {/* Cube award — prominent on step 1 */}
@@ -226,12 +226,12 @@ function Step2({ plan, txRef, onNext }) {
   return (
     <>
       <div className="sub-plan-label">{plan.name} plan</div>
-      <div className="sub-sheet-price">₦{plan.price.toLocaleString()} <span>one-time</span></div>
+      <div className="sub-sheet-price">${plan.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span>one-time</span></div>
       <StepDots current={2} />
 
       <div className="sub-amount-highlight">
         <p>Transfer exactly this amount</p>
-        <h2>₦{plan.price.toLocaleString()}</h2>
+        <h2>${plan.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
       </div>
 
       {/* Compact cube reminder */}
@@ -305,7 +305,7 @@ function Step3({ plan, txRef, onSubmit }) {
       <div className="sub-bank-card" style={{ marginBottom: 14 }}>
         {[
           ["Plan",             plan.name],
-          ["Amount",           `₦${plan.price.toLocaleString()}`],
+          ["Amount",           `$${plan.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
           ["Reference",        txRef],
           ["Mining rate",      plan.rate],
           ["Subscription CUBE", `${fmtCubes(plan.subscriptionCubes)} CUBE`],
@@ -383,7 +383,7 @@ function SuccessScreen({ plan, txRef, userName, onClose }) {
       <p>
         Thank you, <strong style={{ color: "#fff" }}>{userName}</strong>.
         Your <strong style={{ color: "#4ade80" }}>{plan.name}</strong> plan is being activated.
-        We'll verify your transfer of <strong style={{ color: "#fff" }}>₦{plan.price.toLocaleString()}</strong> and notify you within 1–3 hours.
+        We'll verify your transfer of <strong style={{ color: "#fff" }}>${plan.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> and notify you within 1–3 hours.
       </p>
 
       {/* Cube award reminder on success */}
