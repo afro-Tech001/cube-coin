@@ -15,7 +15,7 @@ const PLANS = [
     dailyEarning: 30000,
     dailyNaira: 1500,
     features: [
-      "30,000 CUBE daily (₦1,500 value)",
+      "30,000 CUBE daily ($100 value)",
       "Entry-level mining",
       "Daily rewards",
       "Mobile access",
