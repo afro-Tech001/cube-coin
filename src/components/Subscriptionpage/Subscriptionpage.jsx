@@ -9,7 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const PLANS = [
   {
-    id: 0, name: "Basic", price: $100,
+    id: 0, name: "Basic", price: 100,
     rate: "1,250 CUBE/hr", rateVal: 1250.00,
     subscriptionCubes: 20000,
     dailyEarning: 30000,
