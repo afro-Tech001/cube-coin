@@ -25,12 +25,12 @@ const PLANS = [
   },
   {
     id: 1, name: "Essential", price: 300,
-    rate: "6.90 CUBE/hr", rateVal: 6.90,
+    rate: "17.80 CUBE/hr", rateVal: 17.80,
     subscriptionCubes: 50000,
-    dailyEarning: 165.00,
+    dailyEarning: 429.00,
     dailyNaira: 34.7,
     features: [
-      "165 CUBE daily ($34.7 value)",
+      "429 CUBE daily ($13.50)",
       "Basic mining speed",
       "Daily rewards",
       "Mobile access",
@@ -38,13 +38,13 @@ const PLANS = [
     ],
   },
   {
-    id: 2, name: "Standard", price: 16200,
-    rate: "3,750 CUBE/hr", rateVal: 3750.00,
+    id: 2, name: "Standard", price: 500,
+    rate: "28.48 CUBE/hr", rateVal: 28.48,
     subscriptionCubes: 100000,
-    dailyEarning: 90000,
-    dailyNaira: 4500,
+    dailyEarning: 1636.8,
+    dailyNaira: 21.60,
     features: [
-      "90,000 CUBE daily (₦4,500 value)",
+      "683.49 CUBE daily ($21.60)",
       "2.5× mining speed",
       "Priority queue",
       "Email support",
@@ -52,13 +52,13 @@ const PLANS = [
     ],
   },
   {
-    id: 3, name: "Premium", price: 22500,
-    rate: "5,000 CUBE/hr", rateVal: 5000.00,
+    id: 3, name: "Premium", price: 1000,
+    rate: "109.53 CUBE/hr", rateVal: 109.53,
     subscriptionCubes: 200000,
-    dailyEarning: 120000,
+    dailyEarning: 2628.81,
     dailyNaira: 6000,
     features: [
-      "120,000 CUBE daily (₦6,000 value)",
+      "2,628.81 CUBE daily ($83.3)",
       "5× mining speed",
       "Daily + bonus rewards",
       "Referral boost +5%",
@@ -68,13 +68,13 @@ const PLANS = [
     featured: true, badge: "Most popular",
   },
   {
-    id: 4, name: "Enterprise", price: 30350,
-    rate: "6,250 CUBE/hr", rateVal: 6250.00,
+    id: 4, name: "Enterprise", price: 10000,
+    rate: " 1,314.41 CUBE/hr", rateVal: 109.53,
     subscriptionCubes: 250000,
-    dailyEarning: 150000,
-    dailyNaira: 7500,
+    dailyEarning: 31545.74,
+    dailyNaira: 1000,
     features: [
-      "150,000 CUBE daily (₦7,500 value)",
+      "31,545.74 CUBE daily ($1,000)",
       "9× mining speed",
       "Double daily rewards",
       "Referral boost +10%",
@@ -82,22 +82,22 @@ const PLANS = [
       "Custom avatar",
     ],
   },
-  {
-    id: 5, name: "Diamond", price: 50000,
-    rate: "8,166 CUBE/hr", rateVal: 8166.67,
-    subscriptionCubes: 300000,
-    dailyEarning: 196000,
-    dailyNaira: 9800,
-    features: [
-      "196,000 CUBE daily (₦9,800 value)",
-      "17.5× mining speed",
-      "Triple daily rewards",
-      "Referral boost +20%",
-      "Dedicated manager",
-      "Priority withdrawals",
-      "Lifetime perks",
-    ],
-  },
+  // {
+  //   id: 5, name: "Diamond", price: 10000,
+  //   rate: "8,166 CUBE/hr", rateVal: 8166.67,
+  //   subscriptionCubes: 300000,
+  //   dailyEarning: 196000,
+  //   dailyNaira: 9800,
+  //   features: [
+  //     "196,000 CUBE daily (₦9,800 value)",
+  //     "17.5× mining speed",
+  //     "Triple daily rewards",
+  //     "Referral boost +20%",
+  //     "Dedicated manager",
+  //     "Priority withdrawals",
+  //     "Lifetime perks",
+  //   ],
+  // },
 ];
 
 const BANK = {
@@ -121,7 +121,7 @@ function CubeAwardBadge({ cubes, size = "normal" }) {
       <span className="sub-cube-award-icon">⬡</span>
       <div className="sub-cube-award-text">
         <span className="sub-cube-award-val">{fmtCubes(cubes)}</span>
-        <span className="sub-cube-award-label">CUBE on activation</span>
+        <span className="sub-cube-award-label">Block AI Points on Activation</span>
       </div>
     </div>
   );
