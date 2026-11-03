@@ -225,7 +225,28 @@ function DetailSheet({ sub, onClose, onApprove, onReject, loading }) {
           </div>
         )}
 
-        {sub.payment_status !== "pending" && (
+        {sub.payment_status === "approved" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={{
+              background: T.greenDim, border: `1px solid ${T.greenBd}`,
+              borderRadius: 12, padding: "12px 16px",
+              fontSize: 13, color: T.muted, textAlign: "center",
+            }}>
+              This subscription is approved. Sync its status to the user profile if needed.
+            </div>
+            <button disabled={loading} onClick={() => onApprove(sub.id)}
+              style={{
+                width: "100%", padding: 14, borderRadius: 14, border: "none",
+                background: T.accent, color: T.accentDark, fontSize: "0.95rem",
+                fontWeight: 800, cursor: loading ? "not-allowed" : "pointer",
+                fontFamily: T.font, opacity: loading ? 0.6 : 1,
+              }}>
+              {loading ? "Processing..." : "Sync profile"}
+            </button>
+          </div>
+        )}
+
+        {sub.payment_status !== "pending" && sub.payment_status !== "approved" && (
           <div style={{
             background: T.greenDim, border: `1px solid ${T.greenBd}`,
             borderRadius: 12, padding: "12px 16px",
@@ -298,7 +319,7 @@ export default function AdminSubscription() {
 
     try {
       const now = new Date().toISOString();
-      const expiresAt = new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toISOString();
+      const expiresAt = new Date(new Date(now).getTime() + 21 * 24 * 60 * 60 * 1000).toISOString();
 
       const { error: subErr } = await supabase
         .from("subscriptions")
@@ -321,18 +342,16 @@ export default function AdminSubscription() {
         ? {
             subscription_status: "approved",
             plan_name: sub.plan_name,
-            plan_status: "active",
           }
         : {
             subscription_status: "rejected",
-            plan_status: "rejected",
           };
 
       const { data: updatedProfiles, error: profErr } = await supabase
         .from("profiles")
         .update(profilePayload)
         .eq("id", sub.user_id)
-        .select("id, subscription_status, plan_name, plan_status");
+        .select("id, subscription_status, plan_name");
 
       if (profErr) {
         console.error("[Step 2] profiles update failed:", profErr);
