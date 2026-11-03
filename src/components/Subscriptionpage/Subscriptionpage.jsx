@@ -24,13 +24,13 @@ const PLANS = [
     badge: "New · Best entry",
   },
   {
-    id: 1, name: "Essential", price: 10600,
-    rate: "2,500 CUBE/hr", rateVal: 2500.00,
+    id: 1, name: "Essential", price: 300,
+    rate: "6.90 CUBE/hr", rateVal: 6.90,
     subscriptionCubes: 50000,
-    dailyEarning: 60000,
-    dailyNaira: 3000,
+    dailyEarning: 165.00,
+    dailyNaira: 34.7,
     features: [
-      "60,000 CUBE daily (3000 value)",
+      "165 CUBE daily ($34.7 value)",
       "Basic mining speed",
       "Daily rewards",
       "Mobile access",
