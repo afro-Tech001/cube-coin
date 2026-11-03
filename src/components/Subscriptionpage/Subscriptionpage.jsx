@@ -69,7 +69,7 @@ const PLANS = [
   },
   {
     id: 4, name: "Enterprise", price: 10000,
-    rate: " 1,314.41 CUBE/hr", rateVal: 109.53,
+    rate: " 1,314.41 CUBE/hr", rateVal: 1314.41,
     subscriptionCubes: 250000,
     dailyEarning: 31545.74,
     dailyNaira: 1000,

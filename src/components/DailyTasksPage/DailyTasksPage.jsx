@@ -4,9 +4,9 @@ import { supabase } from "../../libs/supabase";
 import { CheckCircle, Upload, Clock, AlertCircle, ExternalLink, RefreshCw } from "lucide-react";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-const CUBE_REWARD = 60000;
+const CUBE_REWARD = 100;
 const WHATSAPP_TEXT  = encodeURIComponent(
-  "🚀 I'm mining CUBECoin and AI on StockBlock AI and earning real dollars daily! " +
+  "🚀 I'm mining AI on StockBlock AI and earning real CUBE-COIN daily! CONVERTIBLE TO DOLLARS " +
   "Join me and start earning" +
   "👉 Sign up: https://cube-coin.com" // CHANGING OF DOMAIN NAME
 );
@@ -158,7 +158,7 @@ const allSharesConfirmed = sharedStatus && sharedGroups && sharedFriends;
       setSharedFriends(false);
       setScreenshot(null);
       setPreview(null);
-      showToast(`Task submitted! ${CUBE_REWARD} BLOCK will be credited after review ✓`);
+      showToast(`Task submitted! ${CUBE_REWARD}  will be credited after review ✓`);
     } catch (err) {
       console.error(err);
       setError(err.message || "Something went wrong");
@@ -189,7 +189,7 @@ const allSharesConfirmed = sharedStatus && sharedGroups && sharedFriends;
           Post to your WhatsApp status, share to <strong>5 groups</strong>, and share to{" "}
           <strong>5 friends</strong>. Upload one screenshot as proof, and earn{" "}
           <strong>{CUBE_REWARD.toLocaleString()} StockBlock</strong>{" "}
-          <span style={{ color: "rgba(255,255,255,.5)" }}>(≈ ₦{(CUBE_REWARD * 0.05).toLocaleString()})</span> once reviewed.
+          <span style={{ color: "rgba(255,255,255,.5)" }}>(≈ ${ (CUBE_REWARD * 0.0317).toLocaleString() })</span> once reviewed.
         </p>
       </div>
 
@@ -197,17 +197,17 @@ const allSharesConfirmed = sharedStatus && sharedGroups && sharedFriends;
       <div className="dt-reward-strip">
         <div className="dt-reward-item">
           <span className="dt-reward-label">Daily reward</span>
-          <span className="dt-reward-val">⬡ {CUBE_REWARD.toLocaleString()} BLOCK</span>
+          <span className="dt-reward-val">⬡ {CUBE_REWARD.toLocaleString()} CUBE</span>
         </div>
         <div className="dt-reward-div"/>
         <div className="dt-reward-item">
           <span className="dt-reward-label">Value</span>
-          <span className="dt-reward-val">${(CUBE_REWARD * 0.05).toLocaleString()}</span>
+          <span className="dt-reward-val">${(CUBE_REWARD * 0.0317).toLocaleString()}</span>
         </div>
         <div className="dt-reward-div"/>
         <div className="dt-reward-item">
           <span className="dt-reward-label">Monthly</span>
-          <span className="dt-reward-val">~{(CUBE_REWARD * 30).toLocaleString()} BLOCK</span>
+          <span className="dt-reward-val">~{(CUBE_REWARD * 30).toLocaleString()} CUBE</span>
         </div>
       </div>
 

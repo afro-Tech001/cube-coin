@@ -255,7 +255,7 @@ function Step2({ sub, onSave, onSkip }) {
   const [name,     setName]     = useState(sub.full_name || "");
   const [username, setUsername] = useState("");
   const [phone,    setPhone]    = useState("");
-  const [country,  setCountry]  = useState("NG");
+  const [country,  setCountry]  = useState("US");
   const [bio,      setBio]      = useState("");
   const [errors,   setErrors]   = useState({});
   const [saving,   setSaving]   = useState(false);
