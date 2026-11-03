@@ -100,11 +100,17 @@ const PLANS = [
   // },
 ];
 
-const BANK = {
-  bankName: "Moniepoint Nigeria",
-  accountName: "Mara's Treat",
-  accountNumber: "7077456282",
-  sortCode: "011",
+const PAYMENT = {
+  token: "USDT",
+  network: "TRC20",
+  networkName: "Tron (TRC20)",
+  address: "YOUR_WALLET_ADDRESS_HERE",
+};
+
+// Transaction hashes have different shapes per network, so validate before saving
+const HASH_PATTERNS = {
+  TRC20: /^[0-9a-fA-F]{64}$/,        // 64 hex characters
+  BEP20: /^0x[0-9a-fA-F]{64}$/,      // 0x + 64 hex characters
 };
 
 // ── Helper: format large cube numbers ─────────────────────────────────────────
