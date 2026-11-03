@@ -187,7 +187,24 @@ const getTier = (planName) => {
   }
   return tier;
 };
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const calcEarned = (startedAt, rate, totalPausedSecs = 0, currentlyPausedSince = null) => {
+  let elapsedMs = Date.now() - new Date(startedAt).getTime();
+  let pausedMs  = (totalPausedSecs || 0) * 1000;
+  if (currentlyPausedSince) {
+    pausedMs += Date.now() - new Date(currentlyPausedSince).getTime();
+  }
+  const activeMs = Math.max(0, elapsedMs - pausedMs);
+  const hrs = activeMs / 3600000;
+  return Math.max(0, hrs * Number(rate));
+};
 
+const fmt = (t) => {
+  const h = Math.floor(t / 3600);
+  const m = Math.floor((t % 3600) / 60);
+  const s = t % 60;
+  return `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+};
 // ── Main component ────────────────────────────────────────────────────────────
 export default function MiningPage() {
   const navigate = useNavigate();
