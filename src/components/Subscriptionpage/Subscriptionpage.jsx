@@ -9,7 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const PLANS = [
   {
-    id: 0, name: "Basic", price: 5600,
+    id: 0, name: "Basic", price: $100,
     rate: "1,250 CUBE/hr", rateVal: 1250.00,
     subscriptionCubes: 20000,
     dailyEarning: 30000,
@@ -30,7 +30,7 @@ const PLANS = [
     dailyEarning: 60000,
     dailyNaira: 3000,
     features: [
-      "60,000 CUBE daily (₦3,000 value)",
+      "60,000 CUBE daily (3000 value)",
       "Basic mining speed",
       "Daily rewards",
       "Mobile access",
