@@ -106,7 +106,12 @@ const PAYMENT = {
   networkName: "Tron (TRC20)",
   address: "YOUR_WALLET_ADDRESS_HERE",
 };
+// 10000 -> "10,000.00" (locale is pinned so every user sees the same format)
+const fmtNum = (n) =>
+  n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+// 10000 -> "$10,000.00"
+const fmtUSD = (n) => "$" + fmtNum(n);
 // Transaction hashes have different shapes per network, so validate before saving
 // const HASH_PATTERNS = {
 //   TRC20: /^[0-9a-fA-F]{64}$/,        // 64 hex characters
