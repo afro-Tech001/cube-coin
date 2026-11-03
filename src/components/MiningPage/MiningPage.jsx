@@ -172,11 +172,11 @@ const PLAN_TIERS = {
   Enterprise: { sessionSecs: DAY, swingEvery: 45,  label: "Enterprise" },
 
   // Legacy names, so users who bought an old plan still get a sensible animation
-  // Starter:    { sessionSecs: DAY, swingEvery: 100, label: "Starter" },
-  // Bronze:     { sessionSecs: DAY, swingEvery: 80,  label: "Bronze" },
-  // Silver:     { sessionSecs: DAY, swingEvery: 60,  label: "Silver" },
-  // Gold:       { sessionSecs: DAY, swingEvery: 50,  label: "Gold" },
-  // Diamond:    { sessionSecs: DAY, swingEvery: 45,  label: "Diamond" },
+  Starter:    { sessionSecs: DAY, swingEvery: 100, label: "Starter" },
+  Bronze:     { sessionSecs: DAY, swingEvery: 80,  label: "Bronze" },
+  Silver:     { sessionSecs: DAY, swingEvery: 60,  label: "Silver" },
+  Gold:       { sessionSecs: DAY, swingEvery: 50,  label: "Gold" },
+  Diamond:    { sessionSecs: DAY, swingEvery: 45,  label: "Diamond" },
 };
 
 const getTier = (planName) => {
