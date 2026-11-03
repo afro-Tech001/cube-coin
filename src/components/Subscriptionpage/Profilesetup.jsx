@@ -8,15 +8,34 @@ import "./Profilesetup.css"
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
+// const PLAN_PILL_CLASS = {
+//   Silver: "silver", Gold: "gold", Bronze: "bronze",
+//   Diamond: "diamond", Starter: "starter",
+// };
+
 const PLAN_PILL_CLASS = {
-  Silver: "silver", Gold: "gold", Bronze: "bronze",
-  Diamond: "diamond", Starter: "starter",
+  // Current plans, reusing the colors your CSS already has
+  Basic:      "starter",
+  Essential:  "bronze",
+  Standard:   "silver",
+  Premium:    "gold",
+  Enterprise: "diamond",
+
+  // Older plan names, kept in case someone still has one
+  Starter: "starter", Bronze: "bronze", Silver: "silver",
+  Gold: "gold", Diamond: "diamond",
 };
 
-function formatNaira(n) {
-  return "₦" + Number(n).toLocaleString();
-}
+// function formatNaira(n) {
+//   return "₦" + Number(n).toLocaleString();
+// }
 
+function formatUSD(n) {
+  return "$" + Number(n).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
 // ─────────────────────────────────────────────────────────────────────────────
 // Mini CubeCoin logo SVG (header)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -185,7 +204,7 @@ function Step1({ sub, onNext, onSkip }) {
         {/* Amount */}
         <div>
           <div className="ps-ps-label">Amount Paid</div>
-          <div className="ps-ps-val amber">{formatNaira(sub.amount)}</div>
+          <div className="ps-ps-val amber">{formatUSD(sub.amount)}</div>
         </div>
 
         {/* Tx ref */}
@@ -216,7 +235,7 @@ function Step1({ sub, onNext, onSkip }) {
         <div className="ps-plan-summary-full" style={{ borderTop:"1px solid rgba(74,222,128,0.12)", paddingTop:12 }}>
           <div className="ps-mining-rate-label">Your Mining Rate</div>
           <div className="ps-mining-rate-big">
-            {Number(sub.mining_rate).toFixed(2)} STOCKS/hr
+            {Number(sub.mining_rate).toFixed(2)} CUBE/hr
           </div>
         </div>
       </div>
@@ -335,16 +354,15 @@ const handleCopy = async () => {
           <div className="ps-field">
             <label>Country</label>
             <select value={country} onChange={(e) => setCountry(e.target.value)}>
-              <option value="NG">Nigeria</option>
-              <option value="GH">Ghana</option>
-              <option value="KE">Kenya</option>
-              <option value="ZA">South Africa</option>
-              <option value="SG">Singapore</option>
-              <option value="US">United States</option>
-              <option value="UK">United Kingdom</option>
-              <option value="IN">Indonesia</option>
-          
-              <option value="OTHER">Other</option>
+             <option value="US">United States</option>
+  <option value="NG">Nigeria</option>
+  <option value="GH">Ghana</option>
+  <option value="KE">Kenya</option>
+  <option value="ZA">South Africa</option>
+  <option value="SG">Singapore</option>
+  <option value="GB">United Kingdom</option>
+  <option value="ID">Indonesia</option>
+  <option value="OTHER">Other</option>  
             </select>
           </div>
         </div>
