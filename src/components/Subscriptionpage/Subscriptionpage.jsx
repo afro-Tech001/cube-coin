@@ -10,12 +10,12 @@ import "react-toastify/dist/ReactToastify.css";
 const PLANS = [
   {
     id: 0, name: "Basic", price: 100,
-    rate: "1,250 CUBE/hr", rateVal: 1250.00,
+    rate: "2.30 CUBE/hr", rateVal: 2.30,
     subscriptionCubes: 20000,
-    dailyEarning: 30000,
+    dailyEarning: 55.20,
     dailyNaira: 1500,
     features: [
-      "30,000 CUBE daily ($100 value)",
+      "55.20 CUBE daily ($5.02)",
       "Entry-level mining",
       "Daily rewards",
       "Mobile access",
@@ -24,7 +24,7 @@ const PLANS = [
     badge: "New · Best entry",
   },
   {
-    id: 1, name: "Starter", price: 10600,
+    id: 1, name: "Essential", price: 10600,
     rate: "2,500 CUBE/hr", rateVal: 2500.00,
     subscriptionCubes: 50000,
     dailyEarning: 60000,
@@ -38,7 +38,7 @@ const PLANS = [
     ],
   },
   {
-    id: 2, name: "Bronze", price: 16200,
+    id: 2, name: "Standard", price: 16200,
     rate: "3,750 CUBE/hr", rateVal: 3750.00,
     subscriptionCubes: 100000,
     dailyEarning: 90000,
@@ -52,7 +52,7 @@ const PLANS = [
     ],
   },
   {
-    id: 3, name: "Silver", price: 22500,
+    id: 3, name: "Premium", price: 22500,
     rate: "5,000 CUBE/hr", rateVal: 5000.00,
     subscriptionCubes: 200000,
     dailyEarning: 120000,
@@ -68,7 +68,7 @@ const PLANS = [
     featured: true, badge: "Most popular",
   },
   {
-    id: 4, name: "Gold", price: 30350,
+    id: 4, name: "Enterprise", price: 30350,
     rate: "6,250 CUBE/hr", rateVal: 6250.00,
     subscriptionCubes: 250000,
     dailyEarning: 150000,
