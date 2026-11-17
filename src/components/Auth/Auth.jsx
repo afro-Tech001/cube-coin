@@ -229,39 +229,11 @@ export default function Auth() {
 
     localStorage.setItem("cubecoin_profile", JSON.stringify(profile));
 
-    // ── Check subscription expiry ───────────────────────────────────────────
-    const { data: sub } = await supabase
-      .from("subscriptions")
-      .select("plan_name, expires_at, payment_status")
-      .eq("user_id", data.user.id)
-      .eq("payment_status", "approved")
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (sub?.expires_at && new Date(sub.expires_at) < new Date()) {
-      // Plan expired — mark profile and show expiry modal
-      await supabase
-        .from("profiles")
-        .update({ subscription_status: "expired" })
-        .eq("id", data.user.id);
-
-      // Store expiry info for the modal
-      localStorage.setItem("cubecoin_expired", JSON.stringify({
-        planName:  sub.plan_name,
-        expiredAt: sub.expires_at,
-      }));
-
-      toast.warn("Your plan has expired. Please resubscribe to continue.", { autoClose: 4000 });
-      setTimeout(() => navigate("/plan-expired"), 1500);
-      return;
-    }
-
-    // ── All good — route based on subscription status ───────────────────────
+    // ── Route based on subscription status ──────────────────────────────────
     toast.success(`Welcome back, ${profile?.full_name || data.user.email} 🚀`);
 
     const subStatus = profile?.subscription_status;
-    if (subStatus === "approved") {
+    if (subStatus === "approved" || subStatus === "expired") {
       setTimeout(() => navigate("/dashboard"), 1500);
     } else if (subStatus === "pending") {
       setTimeout(() => navigate("/subscription-status"), 1500);

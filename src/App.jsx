@@ -30,22 +30,10 @@ import AdminUpgradePage from "./Admin/AdminPages/AdminUpgradePage/AdminUpgradePa
 import CdashboardDaily from "./pages/CdashboardDaily/CdashboardDaily";
 import AdminWithdrawalSettingsPage from "./Admin/AdminPages/AdminWithdrawalPage/AdminWithdrawalSettingsPage";
 import AdminDailyTasksPage from "./Admin/AdminPages/AdminDailyTasksPage/AdminDailyTasksPage";
-import { supabase } from "./libs/supabase";
-import { usePlanExpiry } from "./hooks/usePlanExpiry";
-import PlanExpiredPage from "./components/PlanExpiredModal/PlanExpiredPage";
 import LandingPage from "./pages/LandingPage/LandingPage";
 function App() {
 
   const [loading, setLoading] = useState(true);
-   const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user: u } }) => {
-      setUser(u);
-    });
-  }, []);
-
-  const { expired, expiredAt, planName, checked } = usePlanExpiry(user);
 
   useEffect(() => {
 
@@ -79,11 +67,6 @@ function App() {
       <Route path="/spinwheel" element={<ProtectedRoute><CdashboardSpinWheel /></ProtectedRoute>} />
       <Route path="/upgrade" element={<ProtectedRoute><CdashboardUpgrade /></ProtectedRoute>} />
       <Route path="/dailyTask" element={<ProtectedRoute><CdashboardDaily /></ProtectedRoute>} />
-      {checked && expired && (
-        <Route path="*" element={<PlanExpiredPage planName={planName} expiredAt={expiredAt} />} />
-      )}
-
-
       {/* Admin Routes */}
       <Route path="/admin/dashboard" element={<ProtectedRoute><Admindashboard /></ProtectedRoute>} />
       <Route path="/admin/users" element={<ProtectedRoute><AdminUserPage /></ProtectedRoute>} />
